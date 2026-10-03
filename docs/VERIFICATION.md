@@ -1,4 +1,6 @@
-# Packaging verification
+# Historical packaging verification
+
+The section below records the supplied scaffold. Current execution results are recorded in `docs/evidence/local-execution.json` and the current checkpoint appended below.
 
 Checked on **2026-10-03**, using Node.js **22.16.0** and the locally available TypeScript **5.8.3** compiler.
 
@@ -20,4 +22,18 @@ Bun and the Codex CLI were not installed in the packaging container, and registr
 
 The source pins and official configuration documentation were inspected separately. That does not establish successful installation, actual account access, the effective model of a running thread, or production readiness.
 
-These passing tests validate **the starter foundations**. They are not proof that the final product's security, payments or market claims hold. P0 must install/verify dependencies; P1–P6 must implement and independently validate the product gates.
+These passing tests validate **the starter foundations**. They are not proof that the final product's security, payments or market claims hold. P0 must install/verify dependencies; P1â€“P6 must implement and independently validate the product gates.
+
+## Current local implementation checkpoint â€” 2026-10-03
+
+| Check | Result | Boundary |
+|---|---|---|
+| Frozen Bun install | Passed | Real installed lockfile |
+| Starter tests | 105 passed | Original helper/scaffold scope |
+| Product tests | 47 passed in 10 files | Parser, federation, hostile evidence, SQL, SDK/MCP, payment policy |
+| Browser | 12 passed, 0 skipped | Production server; actual fixture providers; Edge |
+| Lint/typecheck/build |Passed | Full implemented local source |
+| Evaluation | 3 cases, 2 passing abstention guards | Equal source access, tiny authored fixtures |
+| Favicon follow-up |HTTP200 | Asset-only correction after browser run; rebuilt app |
+
+Evidence: `docs/evidence/local-execution.json`, `browser-verification.json`, and `retrieval-evaluation.json`. Browser report retains the earlier selector timeout. Independent review scope and remaining review gap are in SECURITY.md. Release remains blocked on hosted auth, real multi-connection database safety, verified publication and real Tempo settlement/recovery. No CI, public deployment or payment transaction is claimed.

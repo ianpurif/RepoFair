@@ -1,0 +1,90 @@
+{
+  "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+  "mode": "fixture",
+  "commands": [
+    {
+      "command": "node scripts/doctor.mjs",
+      "exitCode": 0,
+      "scope": "Node22.23.3 Bun1.4.1 Git2.40.1 Codex0.149.1 verified at preflight"
+    },
+    {
+      "command": "node scripts/bootstrap.mjs --install",
+      "exitCode": 0,
+      "scope": "Real registry resolution and Bun lockfile"
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "exitCode": 0,
+      "scope": "319 installs checked; no changes"
+    },
+    {
+      "command": "node scripts/verify-starter.mjs",
+      "exitCode": 0,
+      "scope": "105 passed, 0 failed/skipped"
+    },
+    {
+      "command": "bun run test:product",
+      "exitCode": 0,
+      "scope": "47 tests in10 files passed; includes2 actual MCP stdio tests and4 PostgreSQL-WASM tests"
+    },
+    {
+      "command": "bun run lint",
+      "exitCode": 0,
+      "scope": "Full ESLint and file hygiene passed after final LF normalization"
+    },
+    {
+      "command": "bun run typecheck",
+      "exitCode": 0,
+      "scope": "Full contracts/core/worker/provider/SDK and Next source checks"
+    },
+    {
+      "command": "bun run build",
+      "exitCode": 0,
+      "scope": "Final optimized production build passed, including favicon fix"
+    },
+    {
+      "command": "bun run test:browser --reporter=list,./tests/browser/evidence-reporter.ts",
+      "exitCode": 0,
+      "scope": "12 passed, 0 failed/skipped; real fixture endpoints and production server. See browser-verification.json"
+    },
+    {
+      "command": "bun run evaluate",
+      "exitCode": 0,
+      "scope": "Three equal-source BM25 comparison cases and2 passing abstention guardrails; no general superiority claim"
+    },
+    {
+      "command": "bun run sdk:example",
+      "exitCode": 0,
+      "scope": "Actual HTTP source API returned validated original citations"
+    },
+    {
+      "command": "curl.exe http://localhost:3000/favicon.ico",
+      "exitCode": 0,
+      "scope": "HTTP200 after reviewer finding fixed"
+    },
+    {
+      "command": "curl.exe http://localhost:3000/demo",
+      "exitCode": 0,
+      "scope": "HTTP200 on final production server"
+    },
+    {
+      "command": "bun run verify:release",
+      "exitCode": 1,
+      "scope": "Correctly blocked: P2-P6 incomplete, hosted database/payment/recovery and final independent adapter review missing"
+    }
+  ],
+  "notVerified": [
+    "Hosted Clerk/Supabase auth and Storage",
+    "Multi-connection PostgreSQL budget concurrency",
+    "GitHub import and durable indexing queue",
+    "Verified publisher and endpoint authority",
+    "Real Tempo settlement or paid recovery",
+    "Independent review of later unwired payment adapter (client agent thread limit)",
+    "Public deployment or remote CI execution"
+  ],
+  "corrections": [
+    "Initial browser run11 passed/1 selector timeout; corrected test selected actual parsed import edge, final12 passed.",
+    "Final lint initially rejected CRLF in lead-written documents; normalized to repository LF, rerun passed.",
+    "Missing favicon fixed; final build and HTTP200 verified, browser suite preceded this asset-only fix."
+  ]
+}

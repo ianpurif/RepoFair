@@ -1,0 +1,119 @@
+{
+  "recordedAt": "2026-10-03T15:06:21.815Z",
+  "mode": "fixture",
+  "sourceAccess": "Identical original snapshot files for both methods",
+  "responseCharacterBudget": 12000,
+  "rows": [
+    {
+      "id": "retry-overview",
+      "fixtureId": "jobboard-app@1.0.0",
+      "availableFiles": [
+        "src/index.ts",
+        "src/policy.ts",
+        "src/run-job.ts"
+      ],
+      "expectedFiles": [
+        "src/run-job.ts",
+        "src/policy.ts"
+      ],
+      "baseline": {
+        "method": "BM25 over original source files",
+        "files": [
+          "src/run-job.ts"
+        ],
+        "sourceCharacters": 454,
+        "fileRecall": 0.5
+      },
+      "graph": {
+        "method": "lexical passages plus parsed graph neighborhood",
+        "files": [
+          "src/policy.ts",
+          "src/run-job.ts",
+          "src/index.ts"
+        ],
+        "sourceCharacters": 443,
+        "fileRecall": 1
+      }
+    },
+    {
+      "id": "permanent-v1",
+      "fixtureId": "retry-kit@1.0.0",
+      "availableFiles": [
+        "src/backoff.ts",
+        "src/index.ts"
+      ],
+      "expectedFiles": [
+        "src/index.ts"
+      ],
+      "baseline": {
+        "method": "BM25 over original source files",
+        "files": [
+          "src/index.ts",
+          "src/backoff.ts"
+        ],
+        "sourceCharacters": 345,
+        "fileRecall": 1
+      },
+      "graph": {
+        "method": "lexical passages plus parsed graph neighborhood",
+        "files": [
+          "src/index.ts",
+          "src/backoff.ts",
+          "package.json"
+        ],
+        "sourceCharacters": 444,
+        "fileRecall": 1
+      }
+    },
+    {
+      "id": "permanent-v2",
+      "fixtureId": "retry-kit@2.0.0",
+      "availableFiles": [
+        "src/backoff.ts",
+        "src/index.ts"
+      ],
+      "expectedFiles": [
+        "src/index.ts"
+      ],
+      "baseline": {
+        "method": "BM25 over original source files",
+        "files": [
+          "src/index.ts",
+          "src/backoff.ts"
+        ],
+        "sourceCharacters": 376,
+        "fileRecall": 1
+      },
+      "graph": {
+        "method": "lexical passages plus parsed graph neighborhood",
+        "files": [
+          "src/index.ts",
+          "src/backoff.ts",
+          "package.json"
+        ],
+        "sourceCharacters": 476,
+        "fileRecall": 1
+      }
+    }
+  ],
+  "guardrails": [
+    {
+      "id": "unsupported-version",
+      "status": "abstained",
+      "citationCount": 0,
+      "passed": true
+    },
+    {
+      "id": "runtime-result",
+      "status": "abstained",
+      "citationCount": 0,
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Five reviewed questions and tiny authored fixtures are not a benchmark of general code understanding.",
+    "Recall measures supporting file presence, not answer correctness. No generation model or vector baseline was used.",
+    "Both methods share source access and a character ceiling; whole-file BM25 and passage retrieval have different granularity.",
+    "No accuracy, latency, cost or superiority claim follows from these observations."
+  ]
+}

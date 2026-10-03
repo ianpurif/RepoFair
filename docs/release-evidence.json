@@ -3,52 +3,74 @@
   "checks": [
     {
       "id": "product_unit_tests",
-      "status": "not_run",
-      "command": null,
-      "recordedAt": null,
-      "evidencePaths": []
+      "status": "passed",
+      "command": "bun run test:product",
+      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "evidencePaths": [
+        "docs/evidence/local-execution.json"
+      ],
+      "scope": "Public authored fixtures only; not live payment or hosted authorization"
     },
     {
       "id": "typecheck",
-      "status": "not_run",
-      "command": null,
-      "recordedAt": null,
-      "evidencePaths": []
+      "status": "passed",
+      "command": "bun run typecheck",
+      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "evidencePaths": [
+        "docs/evidence/local-execution.json"
+      ],
+      "scope": "Public authored fixtures only; not live payment or hosted authorization"
     },
     {
       "id": "lint",
-      "status": "not_run",
-      "command": null,
-      "recordedAt": null,
-      "evidencePaths": []
+      "status": "passed",
+      "command": "bun run lint",
+      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "evidencePaths": [
+        "docs/evidence/local-execution.json"
+      ],
+      "scope": "Public authored fixtures only; not live payment or hosted authorization"
     },
     {
       "id": "production_build",
-      "status": "not_run",
-      "command": null,
-      "recordedAt": null,
-      "evidencePaths": []
+      "status": "passed",
+      "command": "bun run build",
+      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "evidencePaths": [
+        "docs/evidence/local-execution.json"
+      ],
+      "scope": "Public authored fixtures only; not live payment or hosted authorization"
     },
     {
       "id": "database_tenant_isolation",
-      "status": "not_run",
-      "command": null,
-      "recordedAt": null,
-      "evidencePaths": []
+      "status": "partial",
+      "command": "bun run test:product",
+      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "evidencePaths": [
+        "tests/database/migrations.test.ts",
+        "docs/evidence/local-execution.json"
+      ],
+      "scope": "Actual SQL in PostgreSQL-WASM with test claims; hosted auth and multi-connection tests unavailable"
     },
     {
       "id": "browser_e2e",
-      "status": "not_run",
-      "command": null,
-      "recordedAt": null,
-      "evidencePaths": []
+      "status": "passed",
+      "command": "bun run test:browser --reporter=list,./tests/browser/evidence-reporter.ts",
+      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "evidencePaths": [
+        "docs/evidence/browser-verification.json"
+      ],
+      "scope": "Public authored fixtures only; not live payment or hosted authorization"
     },
     {
       "id": "provider_independence",
-      "status": "not_run",
-      "command": null,
-      "recordedAt": null,
-      "evidencePaths": []
+      "status": "passed",
+      "command": "bun run test:product",
+      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "evidencePaths": [
+        "docs/evidence/local-execution.json"
+      ],
+      "scope": "Public authored fixtures only; not live payment or hosted authorization"
     },
     {
       "id": "tempo_testnet_payment",
@@ -66,18 +88,24 @@
     },
     {
       "id": "versioned_federation",
-      "status": "not_run",
-      "command": null,
-      "recordedAt": null,
-      "evidencePaths": []
+      "status": "passed",
+      "command": "bun run test:product",
+      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "evidencePaths": [
+        "docs/evidence/local-execution.json"
+      ],
+      "scope": "Public authored fixtures only; not live payment or hosted authorization"
     },
     {
       "id": "independent_security_review",
-      "status": "not_run",
-      "command": null,
-      "recordedAt": null,
-      "evidencePaths": []
+      "status": "partial",
+      "command": "Actual atlas_security review and regression tests",
+      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "evidencePaths": [
+        "docs/SECURITY.md"
+      ],
+      "scope": "Earlier fixture review completed; later payment adapter independent review blocked by client limit"
     }
   ],
-  "note": "Starter tests do not satisfy product release checks."
+  "note": "Passing fixture checks do not satisfy missing live milestones. Release must remain blocked."
 }

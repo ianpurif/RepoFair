@@ -1,6 +1,22 @@
 # Provider publishing specification
 
-This is a milestone specification, not an active service.
+The local fixture service below is implemented. Verified owner publication remains a milestone specification.
+
+## Local implementation
+
+`bun run provider:a` and `bun run provider:b` launch separately configured
+fixture processes with explicit `--publish`. The reviewed exposure is the
+authored retry-kit or event-log catalog snapshot; no arbitrary repository or
+private paths can be selected. Without `--publish`, manifest/context access is
+unavailable. This is a fixture publishing flag, not verified repository ownership.
+Stopping/restarting without the flag revokes new requests. No result cache is
+shared across buyers; previously delivered content cannot be recalled.
+
+Each request validates package, exact version, body bounds and provider state
+before indexing. Each response has provider identity, source snapshot and
+fixture/no-payment fields. Provider origin/redirect handling uses a fixed
+loopback allowlist in this mode. Production endpoint registration, administrative
+authority and content-rights attestations still require implementation and tests.
 
 Verify repository administrative authority and endpoint control separately. Show authorized exposure before publication. Store declared rights/licensing and accuracy status separately; don't award an all-purpose trusted badge.
 

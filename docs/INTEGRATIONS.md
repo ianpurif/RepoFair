@@ -36,21 +36,37 @@ meets Next/Supabase requirements. Install and runtime outcomes are tracked separ
 
 No authenticated external integration or payment was performed by these checks.
 
-| Integration | Supplied state | Required acceptance |
+Payment adapter inspection verified installed mppx 0.13.1 declarations/source:
+decimal SDK amount becomes atomic challenge amount; chain ID is in
+request.methodDetails; opaque metadata uses official PaymentRequest.deserialize;
+requiresAuth uses Payment-Authorization; successful withReceipt returns the SDK
+receipt. waitForConfirmation:true is explicit. Sources:
+https://mpp.dev/sdk/typescript/server/Mppx.create,
+https://mpp.dev/sdk/typescript/client/Mppx.create,
+https://mpp.dev/payment-methods/tempo/charge.md. Offline tests do not enable live mode.
+
+Local SQL validation uses @electric-sql/pglite 0.5.8, verified from npm and
+https://pglite.dev/docs/ and https://pglite.dev/docs/api on 2026-10-03.
+`new PGlite()`, exec(migration), parameterized query and role switching run the
+actual migration. Four tests pass, including row visibility, denied mutations,
+reservations, malformed idempotency, unknown settlement and revocation.
+The test claim shim is not hosted JWT verification; single-backend WASM is not
+multi-connection concurrency proof.
+
+| Integration | Current local state | Remaining acceptance |
 |---|---|---|
-| Codex agents | Six standalone TOML files, requested model/effort fields statically checked | Confirm trusted workspace, account access and actual delegation in user's client. |
-| Astra/Sol | Astra medium; Sol xhigh; no silent fallback | Record requested values and observed runtime values where exposed. |
-| Next/React/Tailwind | Source scaffold with initial pins | Resolve tooling, generate bun.lock, verify peers and production build. |
-| TypeScript | Pure core checked using locally available 5.8.3 compiler | Bootstrap chooses exact supported 5.x tooling; rerun after install. |
-| ts-morph / React Flow | Not installed or implemented | Versioned parser and actual graph, not a canned node list. |
-| Clerk / Supabase | Environment placeholders only | Current third-party auth integration; real RLS tests, no stale JWT template. |
-| GitHub App | Not implemented | Read-only import, exact snapshot, webhook verification, publishing authority. |
-| MPP / Tempo | Disabled | Official SDK request/receipt validation and real testnet evidence with safe recovery. |
-| Independent provider | Local health/unavailable boundary only | Actual paid bounded version-correct context delivery and separate recipients. |
-| MCP | Not implemented | Real protocol server/transport using supported SDK, not a renamed JSON route. |
-| Application generation | No model or key configured | Cited answers over allowed original source and explicit limitations. |
-| LangSmith | Disabled | Optional redacted traces/evaluation with approved data handling. |
-| Vitest / ESLint / Playwright | Product tooling to add in P0/P1 | Full unit/integration/browser/lint coverage; retain starter tests. |
+| Codex agents | Six roles actually delegated; handles recorded | Observed child model fields remain unavailable, not inferred. |
+| Next/React/Tailwind | Exact pins installed, production build passes | Hosted runtime not deployed. |
+| TypeScript | 5.9.3; full source checks pass | Recheck future changes. |
+| ts-morph / React Flow | Actual fixture parser and interactive graph | Hard parser isolation before arbitrary imports. |
+| Clerk / Supabase | SQL foundation and local policy tests | Hosted identity, Storage, multi-connection tests and service adapters. |
+| GitHub App | Unavailable | Read-only import, exact snapshots, webhooks and publisher authority. |
+| MPP / Tempo | Unwired testnet adapter and offline official SDK challenge tests | Durable adapters, independent final review and actual settlement/recovery. |
+| Independent providers | Two separate fixture HTTP processes | Verified ownership, publication and distinct real recipients. |
+| MCP | Official stdio tools and protocol tests | Authenticated/paid transport not implemented. |
+| Application generation | Extractive source evidence only | No generation/embedding model configured. |
+| LangSmith | Disabled | Optional redacted traces with approved handling. |
+| Vitest / ESLint / Playwright | Installed local verification tooling | Live acceptance remains separate. |
 
 Bootstrap resolves missing toolchain packages through npm publisher metadata and pins exact versions before Bun install. This step does not certify security, peer compatibility or runtime behavior. Inspect advisories and test rather than treating the newest tag as automatically safe.
 

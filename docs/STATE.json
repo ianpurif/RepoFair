@@ -2,52 +2,72 @@
   "schemaVersion": 1,
   "product": "Chronos Atlas",
   "stage": "implementation",
-  "currentPhase": "P0",
-  "nextAction": "Integrate parser and workspace; then fixture providers, federation and verification.",
+  "currentPhase": "P6-local-checkpoint",
+  "nextAction": "Configure external integrations and complete missing production adapters and acceptance gates listed in BLOCKERS.md. Local fixture checkpoint is verified.",
   "milestones": [
     {
       "id": "P0",
       "title": "Foundation",
-      "status": "partial",
-      "acceptanceEvidence": []
+      "status": "complete",
+      "acceptanceEvidence": [
+        "docs/evidence/local-execution.json"
+      ]
     },
     {
       "id": "P1",
       "title": "Local intelligence",
-      "status": "not_started",
-      "acceptanceEvidence": []
+      "status": "complete",
+      "acceptanceEvidence": [
+        "docs/evidence/local-execution.json"
+      ]
     },
     {
       "id": "P2",
       "title": "Provider publishing",
-      "status": "not_started",
-      "acceptanceEvidence": []
+      "status": "partial",
+      "acceptanceEvidence": [
+        "apps/provider/src/fixture-server.ts",
+        "docs/PROVIDER-PUBLISHING.md"
+      ]
     },
     {
       "id": "P3",
       "title": "Tempo purchase",
-      "status": "not_started",
-      "acceptanceEvidence": []
+      "status": "blocked",
+      "acceptanceEvidence": [
+        "tests/tempo",
+        "supabase/migrations/202610030001_atlas.sql"
+      ]
     },
     {
       "id": "P4",
       "title": "Federation",
-      "status": "not_started",
-      "acceptanceEvidence": []
+      "status": "partial",
+      "acceptanceEvidence": [
+        "tests/integration/federation.test.ts",
+        "tests/integration/answer-boundary.test.ts"
+      ]
     },
     {
       "id": "P5",
       "title": "Product experience",
-      "status": "not_started",
-      "acceptanceEvidence": []
+      "status": "partial",
+      "acceptanceEvidence": [
+        "docs/evidence/browser-verification.json",
+        "tests/integration/mcp-stdio.test.ts"
+      ]
     },
     {
       "id": "P6",
       "title": "Verification and delivery",
-      "status": "not_started",
-      "acceptanceEvidence": []
+      "status": "partial",
+      "acceptanceEvidence": [
+        "docs/evidence/retrieval-evaluation.json",
+        "docs/SECURITY.md"
+      ]
     }
   ],
   "liveIntegrationsVerified": false,
-  "lastUpdatedBy": "lead"
+  "lastUpdatedBy": "lead",
+  "updatedAt": "2026-10-03T15:15:56.670068+00:00"
 }

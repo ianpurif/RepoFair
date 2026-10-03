@@ -1,23 +1,24 @@
 # Verification strategy
 
-Starter checks run offline with Node's built-in test runner and type stripping. They validate supplied deterministic helpers and harness structure, not the complete product. The starter lint command checks only file hygiene; add real ESLint and Vitest/browser/database checks in P0/P1.
+Local checks cover the authored fixture product. They do not establish hosted authorization, concurrent database connections or real payment settlement.
 
 ## Commands
-- `node scripts/verify-starter.mjs`: hygiene, requested agent settings, domain unit tests, fixture integrity and provider boundary tests.
-- `node scripts/typecheck.mjs --core-only`: pure contracts/core/SDK types; local TypeScript or explicitly available compiler required.
-- `bun run typecheck`: core and Next source after dependency installation.
-- `bun run build`: production Next build after bootstrap.
-- `bun run verify:release`: validates product milestone evidence; deliberately fails in the supplied starter.
 
-## Product test matrix
-Parsing: aliases, imports, reexports, dynamic/unresolved refs, oversized/malicious files, snapshot stability.
-Evidence: exact lines, cited content, denied scope, revoked permission revisions, provider provenance, partial context.
-Versions: exact vs ranges, wrong package, ambiguous mapping, stale cached evidence, unsupported release, no automatic fallback.
-Federation: distinct IDs, verified export linkage, malformed graph, unresolved symbols, buyer source minimization.
-Money: serializable reservation races, expiry, amount/recipient/network substitution, replay, crash recovery, pending settlement, settled payment plus failed delivery.
-Authorization: real Clerk-derived principals and DB policies; actual denied reads/writes across every table/storage path. A unit test of a scope helper is not an RLS test.
-Browser: import, graph navigation, cite line, source/version change, purchase approval, publish exposure, error/empty/loading, narrow layout, keyboard/reduced-motion.
+- `node scripts/verify-starter.mjs`: 105 dependency-free starter/domain checks.
+- `bun run test:product`: Vitest parser, evidence, federation, SDK/MCP, SQL and payment-policy tests. Stop provider processes on 4311/4312 first; integration tests own these ports.
+- `bun run lint`: ESLint plus file hygiene.
+- `bun run typecheck`: contracts, core, worker, provider, SDK and Next sources.
+- `bun run build`: production Next build.
+- `bun run evaluate`: equal-source BM25 comparison and abstention guardrails; writes the measured fixture report.
+- `bun run test:browser`: start web on 3000 and both fixture providers first. Windows uses installed Edge; other hosts need Playwright Chromium. Tests do not auto-start or replace occupied services.
+- `bun run verify:release`: full product acceptance gate; remains blocked.
 
-Evaluate against a competent lexical/vector baseline with identical source access. Record reviewed supporting file sets, unanswered questions, wrong-version questions, latency and full incurred cost. Do not replace a failed task with a passing fixture in the report.
+## Evidence boundaries
 
-Record exact commands, timestamps, exit codes and evidence paths. Unrun or skipped is not passed. Require independent review before live data/funds.
+PostgreSQL-WASM executes the real migration with separate local test principals and a JWT-claim shim. It checks policy isolation, denied mutation, reservation accounting and replay rejection. It cannot prove hosted Clerk authentication, Storage policies or multi-connection reservation races.
+
+Payment tests generate an official SDK challenge offline and exercise approval checks and uncertainty handling. They never sign or settle a transaction. Durable payment adapters are required but unwired; no paid recovery success is claimed.
+
+Browser tests exercise real fixture APIs, source navigation, original citations, version reset, explicit provider disclosure, failure states, keyboard and narrow layouts. Authenticated import and paid approval are unavailable, not passing fixtures for those features.
+
+See `docs/evidence/local-execution.json` and `docs/evidence/browser-verification.json` for actual results. Independent security findings and scope are recorded in SECURITY.md. No remote CI or production deployment is implied by local checks.

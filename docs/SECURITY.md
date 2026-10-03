@@ -19,3 +19,18 @@ No keys in browser bundles, logs, imported source, storage or model inputs. No r
 
 ## Review gate
 An unresolved critical/high access, source-execution, payment replay or data-leak defect blocks the corresponding release. Do not downgrade a test to a mock to pass. Independent reviewer findings include path, consequence, reproduction and a concrete fix/test requirement.
+
+## Independent review — 2026-10-03
+
+Actual task `/root/security_review` reproduced three issues: provider answer
+metadata was insufficiently validated; null SQL replay terms bypassed `<>`
+comparisons; SDK source responses were not bound to the requested locator.
+Lead added bounded answer/canonical citation validation, re-extracts fixture
+answers after independent source verification, uses null-safe SQL comparisons
+and rejects missing terms, and binds SDK source to exact path/range. Regression
+tests pass. No critical/high defect was demonstrated in reviewed fixture paths.
+This is not a production-security certification; live gates remain blocked.
+
+## Final adapter review boundary
+
+The lead reviewed the later unwired Tempo adapter and corrected saved receipt failure to report unknown settlement instead of settled delivery failure. Its regression passes. An independent follow-up review could not start: both resuming the security agent and spawning the configured security role returned `agent thread limit reached`. This is a client coordination limit, not a successful independent review. Independent adapter review remains required before payment activation.

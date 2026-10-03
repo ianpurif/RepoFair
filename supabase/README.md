@@ -1,7 +1,9 @@
 # Database boundary
 
-No application schema or RLS policies are represented as deployed. P0/P1 must create migrations for trusted Clerk identity, organization/repository scope, immutable source graphs, jobs, providers, quotes, reservations and deliveries.
+`migrations/202610030001_atlas.sql` defines workspaces, memberships, immutable snapshot source/graphs, jobs, budgets and purchases. Mutations are service-only; authenticated reads use Clerk text subjects and membership policies. Nothing is represented as deployed.
 
-Use the current supported Clerk third-party Supabase integration. Test actual policies with at least two independently scoped principals and attempts against every protected table/storage path. A pure sameScope unit test is not an RLS test.
+`tests/database/migrations.test.ts` executes the actual SQL in disposable PostgreSQL-WASM with a test claim shim. It checks row isolation, denied direct mutations, integer reservations, null replay rejection, unknown settlement and revocation. It does not validate live JWT signatures, hosted Storage policies or concurrent PostgreSQL connections.
 
-Payment reservations need atomic locking/unique idempotency. Do not implement the production ledger as an in-memory object. The root release gate remains blocked until database tests run.
+Before enabling private data, configure supported Clerk third-party Supabase auth, review and apply migrations to an isolated test database, and test two independently authenticated principals across every protected table/storage path. Complete service persistence and worker adapters before use. Never replace the production ledger with in-memory state.
+
+The root release gate remains blocked on hosted integration and multi-connection acceptance tests.

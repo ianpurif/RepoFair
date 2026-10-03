@@ -1,25 +1,6 @@
 {
   "schemaVersion": 1,
-  "active": [
-    {
-      "task": "/root/p1_engineering",
-      "role": "atlas_engineer",
-      "allowedWritePaths": [
-        "packages/core/src/local",
-        "apps/worker/src/fixture-service.ts",
-        "tests/local"
-      ],
-      "status": "active"
-    },
-    {
-      "task": "/root/p1_frontend",
-      "role": "atlas_frontend",
-      "allowedWritePaths": [
-        "apps/web/src except app/api"
-      ],
-      "status": "active"
-    }
-  ],
+  "active": [],
   "completed": [
     {
       "task": "/root/p0_architecture",
@@ -36,6 +17,56 @@
       "milestone": "P0/P1",
       "status": "completed",
       "completedAt": "2026-10-03T14:27:38.309Z"
+    },
+    {
+      "task": "/root/p1_engineering",
+      "role": "atlas_engineer",
+      "allowedWritePaths": [
+        "packages/core/src/local",
+        "apps/worker/src/fixture-service.ts",
+        "tests/local"
+      ],
+      "status": "completed",
+      "completedAt": "2026-10-03T14:52:03.765Z"
+    },
+    {
+      "task": "/root/security_review",
+      "role": "atlas_security",
+      "allowedWritePaths": [],
+      "status": "completed",
+      "completedAt": "2026-10-03T14:52:03.765Z"
+    },
+    {
+      "task": "/root/p1_frontend",
+      "role": "atlas_frontend",
+      "allowedWritePaths": [
+        "apps/web/src except app/api"
+      ],
+      "status": "completed",
+      "completedAt": "2026-10-03T15:08:04.703398+00:00"
+    },
+    {
+      "task": "/root/p1_engineering",
+      "role": "atlas_engineer",
+      "phase": "P3 adapter followup",
+      "allowedWritePaths": [
+        "apps/provider/src/tempo-adapter.ts",
+        "packages/sdk/src/payment-policy.ts",
+        "tests/tempo"
+      ],
+      "status": "completed",
+      "completedAt": "2026-10-03T15:08:04.703398+00:00"
+    },
+    {
+      "task": "/root/verification",
+      "role": "atlas_verifier",
+      "status": "completed",
+      "allowedWritePaths": [
+        "tests/browser",
+        "tests/integration/mcp-stdio.test.ts",
+        "docs/evidence/browser-verification.json"
+      ],
+      "completedAt": "2026-10-03T15:15:56.670068+00:00"
     }
   ],
   "note": "Populate only with actual task handles and path ownership from the current session."

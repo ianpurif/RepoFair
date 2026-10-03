@@ -1,5 +1,7 @@
 # Supplied implementation boundary
 
+Historical starting state. Implementation has progressed; see STATE.json, PROGRESS.md and VERIFICATION.md for the current local checkpoint.
+
 ## Supplied
 Complete BUILD prompt and START entry; project-local multi-agent configs and skills; phase/review/resume templates; small Next source scaffold; separate provider/worker boundaries; TypeScript contracts and pure domain helpers; three original fixture repositories; offline checks, bootstrap and launch helpers.
 
