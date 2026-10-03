@@ -21,6 +21,7 @@ export function validateEvidence(e: SourceEvidence, scope: Scope): void {
   requireCondition(Number.isFinite(Date.parse(e.observedAt)), 'INVALID_TIME', 'Invalid observation time.');
 }
 export function isSafeRelativePath(path: string): boolean {
+  // eslint-disable-next-line no-control-regex -- reject control characters in untrusted paths
   if (!path || path.startsWith('/') || path.includes('\\') || /[\x00-\x1f\x7f]/.test(path)) return false;
   if (/^[A-Za-z]:/.test(path)) return false;
   return path.split('/').every(part => part !== '' && part !== '.' && part !== '..');
