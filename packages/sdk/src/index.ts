@@ -3,7 +3,7 @@ const states = new Set<CapabilityState>(['available', 'not-implemented', 'unveri
 function isCapabilities(value: unknown): value is Capabilities {
   if (typeof value !== 'object' || value === null) return false;
   const v = value as Record<string, unknown>;
-  return v.product === 'Chronos Atlas' && v.stage === 'starter' && v.mode === 'fixture'
+  return v.product === 'Chronos Atlas' && (v.stage === 'starter' || v.stage === 'local-fixture') && v.mode === 'fixture'
     && v.livePayments === false && typeof v.capabilities === 'object' && v.capabilities !== null
     && !Array.isArray(v.capabilities)
     && Object.values(v.capabilities).every(s => typeof s === 'string' && states.has(s as CapabilityState))

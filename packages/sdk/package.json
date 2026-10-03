@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
-  }
+    ".": "./src/index.ts",
+    "./fixture": "./src/fixture.ts"
+  },
+  "dependencies": {"@atlas/contracts":"workspace:*","@atlas/core":"workspace:*","@atlas/worker":"workspace:*","@modelcontextprotocol/sdk":"1.32.0","zod":"4.6.5","mppx":"0.13.1","viem":"2.57.2"}
 }

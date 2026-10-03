@@ -19,12 +19,15 @@
     "lint": "eslint apps packages tests/local && node scripts/check-hygiene.mjs",
     "test:product": "vitest run",
     "test:browser": "playwright test",
+    "mcp": "bun packages/sdk/src/mcp.ts",
+    "sdk:example": "bun packages/sdk/examples/fixture.ts",
+    "evaluate": "bun scripts/evaluate.ts",
     "typecheck": "node scripts/typecheck.mjs",
     "dev": "node scripts/web.mjs dev",
     "build": "node scripts/web.mjs build",
     "start": "node scripts/web.mjs start",
-    "provider:a": "node apps/provider/src/server.mjs --identity fixture-retry --port 4311",
-    "provider:b": "node apps/provider/src/server.mjs --identity fixture-events --port 4312",
+    "provider:a": "bun apps/provider/src/fixture-server.ts --identity fixture-retry --publish",
+    "provider:b": "bun apps/provider/src/fixture-server.ts --identity fixture-events --publish",
     "worker:check": "node apps/worker/src/main.mjs --check",
     "verify": "node scripts/verify-starter.mjs && node scripts/typecheck.mjs && node scripts/web.mjs build",
     "verify:release": "node scripts/release-gate.mjs"
@@ -37,7 +40,9 @@
     "eslint": "10.12.0",
     "@eslint/js": "10.0.1",
     "typescript-eslint": "8.71.0",
-    "@types/pg": "8.23.1"
+    "@types/pg": "8.23.1",
+    "@electric-sql/pglite": "0.5.8"
+    ,"@modelcontextprotocol/sdk": "1.32.0"
   },
   "packageManager": "bun@1.4.1"
 }
