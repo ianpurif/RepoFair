@@ -16,7 +16,7 @@
     "bootstrap": "node scripts/bootstrap.mjs --install",
     "verify:starter": "node scripts/verify-starter.mjs",
     "test": "node scripts/run-tests.mjs",
-    "lint": "eslint apps packages tests/local && node scripts/check-hygiene.mjs",
+    "lint": "eslint apps packages tests scripts/evaluate.ts && node scripts/check-hygiene.mjs",
     "test:product": "vitest run",
     "test:browser": "playwright test",
     "mcp": "bun packages/sdk/src/mcp.ts",
@@ -41,8 +41,10 @@
     "@eslint/js": "10.0.1",
     "typescript-eslint": "8.71.0",
     "@types/pg": "8.23.1",
-    "@electric-sql/pglite": "0.5.8"
-    ,"@modelcontextprotocol/sdk": "1.32.0"
+    "@electric-sql/pglite": "0.5.8",
+    "@modelcontextprotocol/sdk": "1.32.0",
+    "mppx": "0.13.1",
+    "viem": "2.57.2"
   },
   "packageManager": "bun@1.4.1"
 }

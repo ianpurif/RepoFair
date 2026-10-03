@@ -13,4 +13,33 @@ jobs:
       - run: node scripts/verify-starter.mjs
       - name: Parse Codex TOML syntax
         run: python3 -c "import pathlib,tomllib; [tomllib.loads(p.read_text()) for p in pathlib.Path('.codex').rglob('*.toml')]"
-# This workflow verifies starter foundations only. Add full product/build/RLS/browser jobs during P0/P1.
+  product:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.1'
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bun run test:product
+      - run: bun run typecheck
+      - run: bun run build
+      - run: bun run evaluate
+      - run: bunx playwright install --with-deps chromium
+      - name: Start explicit fixture services
+        run: |
+          bun run dev > /tmp/atlas-web.log 2>&1 &
+          bun run provider:a > /tmp/atlas-a.log 2>&1 &
+          bun run provider:b > /tmp/atlas-b.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://localhost:3000/api/capabilities > /dev/null; then exit 0; fi
+            sleep 2
+          done
+          exit 1
+      - run: bun run test:browser
+# Fixture gates only. Hosted auth, concurrent PostgreSQL and real Tempo settlement
+# require separately configured acceptance runs. No remote run is claimed here.
