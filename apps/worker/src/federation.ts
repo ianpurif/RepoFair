@@ -1,6 +1,6 @@
 import { FIXTURE_PROVIDERS, parseFixtureId, parseQuestion } from '@atlas/contracts';
 import type { FixtureId, FixtureProviderResult, FederationResult, ParsedEdge } from '@atlas/contracts';
-import { validateLocalIndex } from '@atlas/core/local';
+import { validateLocalIndex, validateLocalAnswer, answerLocal } from '@atlas/core/local';
 import { indexFixture } from './fixture-service.ts';
 
 async function boundedJson(response: Response): Promise<unknown> {
@@ -43,17 +43,15 @@ export async function federateFixture(fixtureId: FixtureId, approvedIds: readonl
     const expected = await indexFixture(parseFixtureId(`${id === 'fixture-retry' ? 'retry-kit' : 'event-log'}@${version}`));
     if (data.index.snapshot.revision !== expected.snapshot.revision || JSON.stringify(data.index.files) !== JSON.stringify(expected.files)
       || JSON.stringify(data.index.nodes) !== JSON.stringify(expected.nodes) || JSON.stringify(data.index.edges) !== JSON.stringify(expected.edges)) throw new Error('Provider source or graph mismatch');
-    if (!data.answer || data.answer.mode !== 'extractive' || !Array.isArray(data.answer.citations)) throw new Error('Invalid provider answer');
-    for (const citation of data.answer.citations) {
-      const actual = data.index.evidence.find(e => e.id === citation.id);
-      if (!actual || actual.original !== citation.original || JSON.stringify(actual.source) !== JSON.stringify(citation.source)) throw new Error('Invalid provider citation');
-    }
+    validateLocalAnswer(data.answer, expected);
     const boundary = local.nodes.find(n => n.localId === `package:${config.packageName}@${version}`);
     const target = data.index.nodes.find(n => n.localId === `package:${config.packageName}@${version}`);
     const exportEdge = data.index.edges.find(e => e.from === target?.id && e.extractionMethod === 'explicit-release-export');
     if (!boundary || !target || !exportEdge) throw new Error('Explicit package export mapping unavailable');
     joins.push({ id: JSON.stringify(['fixture-join', boundary.id, target.id]), from: boundary.id, to: target.id, relation: 'package-binding', provenance: 'parsed-source', extractionMethod: 'explicit-release-export', evidenceId: exportEdge.evidenceId });
-    providers.push(data);
+    // Report our actual independent extraction activity, never a provider's
+    // asserted execution narrative. Source bytes and graph were compared above.
+    providers.push({ schemaVersion: 1, mode: 'fixture', providerId: config.providerId, payment: 'not-attempted', index: expected, answer: answerLocal(expected, question) });
   }
   return { schemaVersion: 1, mode: 'fixture', local, providers, nodes: [...local.nodes, ...providers.flatMap(p => p.index.nodes)],
     edges: [...local.edges, ...providers.flatMap(p => p.index.edges), ...joins],

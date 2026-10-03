@@ -78,14 +78,18 @@ create or replace function atlas.reserve_purchase(
 ) returns uuid language plpgsql security definer set search_path=pg_catalog,atlas as $$
 declare b atlas.budgets; existing atlas.purchases; result uuid;
 begin
+ if w is null or actor is null or idem is null or digest is null or provider is null or net is null or asset is null
+ or payee is null or request_hash is null or package is null or release is null or expiry is null or units is null
+ or ''=any(array[actor,idem,digest,provider,net,asset,payee,request_hash,package,release])
+ or units::text in ('NaN','Infinity','-Infinity') then raise exception 'Incomplete purchase terms'; end if;
  if actor is null or not exists(select 1 from atlas.memberships where workspace_id=w and principal_id=actor) then raise exception 'Access denied'; end if;
  select * into b from atlas.budgets where workspace_id=w and principal_id=actor and network=net and token=asset for update;
  if not found then raise exception 'Budget unavailable'; end if;
  select * into existing from atlas.purchases where workspace_id=w and principal_id=actor and idempotency_key=idem;
  if found then
-   if existing.terms_digest<>digest or existing.provider_id<>provider or existing.network<>net or existing.token<>asset
-   or existing.recipient<>payee or existing.request_digest<>request_hash or existing.package_name<>package
-   or existing.version<>release or existing.amount<>units or existing.expires_at<>expiry then raise exception 'Idempotency terms changed'; end if;
+   if existing.terms_digest is distinct from digest or existing.provider_id is distinct from provider or existing.network is distinct from net or existing.token is distinct from asset
+   or existing.recipient is distinct from payee or existing.request_digest is distinct from request_hash or existing.package_name is distinct from package
+   or existing.version is distinct from release or existing.amount is distinct from units or existing.expires_at is distinct from expiry then raise exception 'Idempotency terms changed'; end if;
    return existing.id;
  end if;
  if expiry<=now() or units is null or units<=0 or units<>trunc(units) then raise exception 'Invalid or expired terms'; end if;
