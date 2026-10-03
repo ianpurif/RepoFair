@@ -22,3 +22,12 @@ client. Real architect/researcher task handles are recorded in AGENT-RUNS.jsonl;
 backend model observations remain null where not exposed.
 Official standalone agent schema checked at https://learn.chatgpt.com/docs/agent-configuration/subagents.
 Next: integrate initial reviews, resolve dependencies, freeze P1 service contracts.
+
+### P0 integration
+Both reviews returned concrete observations. Existing framework pins were
+confirmed in official registry metadata; bootstrap and Bun install succeeded.
+Shared P1 contracts are frozen; engineer/frontend own disjoint paths in TASKS.
+Typecheck during integration reports only not-yet-created parser/worker exports;
+rerun after their handoff. External credentials are absent by user confirmation.
+Migration foundation is implemented but database tests are blocked by unavailable
+Docker engine/no local PostgreSQL. No live milestone is marked complete.

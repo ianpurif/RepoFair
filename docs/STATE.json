@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "product": "Chronos Atlas",
-  "stage": "starter",
+  "stage": "implementation",
   "currentPhase": "P0",
-  "nextAction": "Execute START.md preflight; complete P0 and continue.",
+  "nextAction": "Integrate parser and workspace; then fixture providers, federation and verification.",
   "milestones": [
     {
       "id": "P0",
@@ -49,5 +49,5 @@
     }
   ],
   "liveIntegrationsVerified": false,
-  "lastUpdatedBy": "starter-packager"
+  "lastUpdatedBy": "lead"
 }

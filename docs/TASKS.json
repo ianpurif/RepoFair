@@ -1,9 +1,42 @@
 {
   "schemaVersion": 1,
   "active": [
-    {"task":"/root/p0_architecture","role":"atlas_architect","allowedWritePaths":[],"milestone":"P0/P1","status":"active"},
-    {"task":"/root/p0_research","role":"atlas_researcher","allowedWritePaths":[],"milestone":"P0/P1","status":"active"}
+    {
+      "task": "/root/p1_engineering",
+      "role": "atlas_engineer",
+      "allowedWritePaths": [
+        "packages/core/src/local",
+        "apps/worker/src/fixture-service.ts",
+        "tests/local"
+      ],
+      "status": "active"
+    },
+    {
+      "task": "/root/p1_frontend",
+      "role": "atlas_frontend",
+      "allowedWritePaths": [
+        "apps/web/src except app/api"
+      ],
+      "status": "active"
+    }
   ],
-  "completed": [],
+  "completed": [
+    {
+      "task": "/root/p0_architecture",
+      "role": "atlas_architect",
+      "allowedWritePaths": [],
+      "milestone": "P0/P1",
+      "status": "completed",
+      "completedAt": "2026-10-03T14:27:38.309Z"
+    },
+    {
+      "task": "/root/p0_research",
+      "role": "atlas_researcher",
+      "allowedWritePaths": [],
+      "milestone": "P0/P1",
+      "status": "completed",
+      "completedAt": "2026-10-03T14:27:38.309Z"
+    }
+  ],
   "note": "Populate only with actual task handles and path ownership from the current session."
 }

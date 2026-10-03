@@ -16,3 +16,17 @@ One web app, worker, standalone provider runtime and PostgreSQL. Use node/edge t
 Off by default. No signer shipped. Testnet requires explicit configuration; mainnet requires consent. Pure reducers are validation building blocks only; final persistence must enforce concurrent invariants.
 
 Append new decisions with date, evidence, alternatives, consequence and verification requirement. Never silently overwrite historical decisions.
+
+## D006 — Fixture scope and parser isolation (2026-10-03)
+Architect review accepted a public catalog-only fixture boundary while auth is
+unconfigured. Server ignores caller tenant identity and never accepts arbitrary
+filesystem paths or repositories. In-memory ts-morph parsing consumes bounded,
+digest-checked bytes. npm v3 local links resolve only against trusted catalog
+metadata. Source graphs remain snapshot scoped and structurally validated.
+
+## D007 — Persistence gate (2026-10-03)
+PostgreSQL schema uses Clerk text subjects, membership-based read policies and
+server-only mutations. Budgets serialize on the allowance row; unknown payments
+retain reservations. SQL is not a claimed payment verifier. Docker is unavailable;
+database concurrency/RLS acceptance stays unverified rather than inferred from
+pure helpers. Live adapters stay disabled until independently tested.
