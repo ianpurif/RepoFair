@@ -59,6 +59,22 @@
         "src/format.ts",
         "src/index.ts"
       ]
+    },
+    {
+      "repositoryId": "jobboard-app",
+      "packageName": "@atlas-fixture/jobboard-app",
+      "version": "2.0.0",
+      "root": "fixtures/repos/jobboard-app-v2",
+      "kind": "fixture",
+      "snapshotId": "jobboard-app@2.0.0",
+      "revision": "sha256:6343960970835a28031a292e394429a2802dbe002517fbced3aa153c31b288a2",
+      "files": [
+        "package-lock.json",
+        "package.json",
+        "src/index.ts",
+        "src/policy.ts",
+        "src/run-job.ts"
+      ]
     }
   ]
 }

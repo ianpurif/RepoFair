@@ -2,7 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';import {join} from 'node:path';import {createHash} from 'node:crypto';
 import {ROOT,readJson} from '../scripts/lib.mjs';
 const catalog=readJson('fixtures/catalog.json');
-test('four real source snapshots represent one application and two provider repos',()=>{assert.equal(catalog.snapshots.length,4);assert.equal(new Set(catalog.snapshots.map(x=>x.repositoryId)).size,3);});
+test('five real source snapshots represent one application and two provider repos',()=>{assert.equal(catalog.snapshots.length,5);assert.equal(new Set(catalog.snapshots.map(x=>x.repositoryId)).size,3);});
 for(const s of catalog.snapshots)test(`fixture digest is actual content: ${s.snapshotId}`,()=>{
  const h=createHash('sha256');for(const p of [...s.files].sort()){const data=readFileSync(join(ROOT,s.root,p));h.update(p);h.update('\0');h.update(data);h.update('\0');}assert.equal(s.revision,'sha256:'+h.digest('hex'));assert.equal(s.kind,'fixture');
 });

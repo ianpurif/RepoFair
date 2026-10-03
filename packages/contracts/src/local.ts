@@ -1,7 +1,7 @@
 import type { GraphEdge, GraphNode, Scope, Snapshot, SourceEvidence } from './index.ts';
 
 /** Public fixtures only. A caller-supplied scope is never authentication. */
-export type FixtureId = 'jobboard-app@1.0.0' | 'retry-kit@1.0.0' | 'retry-kit@2.0.0' | 'event-log@1.0.0';
+export type FixtureId = 'jobboard-app@1.0.0' | 'jobboard-app@2.0.0' | 'retry-kit@1.0.0' | 'retry-kit@2.0.0' | 'event-log@1.0.0';
 export type SourceFile = Readonly<{ path: string; text: string; lineCount: number }>;
 export type DependencyBinding = Readonly<{
   packageName: string; version: string | null; importedNames: readonly string[];
@@ -28,7 +28,7 @@ export type LocalAnswer = Readonly<{
   missingEvidence: readonly string[]; activities: readonly Activity[];
 }>;
 export const FIXTURE_IDS: readonly FixtureId[] = [
-  'jobboard-app@1.0.0', 'retry-kit@1.0.0', 'retry-kit@2.0.0', 'event-log@1.0.0',
+  'jobboard-app@1.0.0', 'jobboard-app@2.0.0', 'retry-kit@1.0.0', 'retry-kit@2.0.0', 'event-log@1.0.0',
 ];
 export function parseFixtureId(value: unknown): FixtureId {
   if (typeof value !== 'string' || !FIXTURE_IDS.includes(value as FixtureId)) throw new Error('Unsupported fixture snapshot');
