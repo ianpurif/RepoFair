@@ -1,0 +1,14 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {sameScope,validateEvidence,checkSourcePassage,isSafeRelativePath} from '../../packages/core/src/evidence.ts';
+const scope={tenantId:'t1',principalId:'p1',permissionRevision:'r1'};
+const e={id:'e1',scope,source:{repositoryId:'repo',snapshotId:'s1',kind:'fixture',revision:'sha256:'+'a'.repeat(64),path:'src/a.ts',startLine:2,endLine:2},original:'const answer = 42;',providerId:null,observedAt:'2026-10-03T00:00:00Z',provenance:'parsed-source'};
+test('matching nonempty scope',()=>assert.equal(sameScope(scope,{...scope}),true));
+for(const field of ['tenantId','principalId','permissionRevision'])test(`scope change ${field} denies evidence`,()=>assert.throws(()=>validateEvidence(e,{...scope,[field]:'other'}),{code:'DENIED'}));
+test('empty identity is not authority',()=>assert.equal(sameScope({...scope,tenantId:''},{...scope,tenantId:''}),false));
+test('valid original citation can be checked against source',()=>assert.doesNotThrow(()=>checkSourcePassage(e,scope,'// first\nconst answer = 42;\n')));
+test('citation checking rejects fabricated passage',()=>assert.throws(()=>checkSourcePassage({...e,original:'made up'},scope,'// first\nconst answer = 42;\n'),{code:'SOURCE_MISMATCH'}));
+test('citation checking rejects out-of-bounds lines',()=>assert.throws(()=>checkSourcePassage({...e,source:{...e.source,endLine:50}},scope,'one line'),{code:'INVALID_LINES'}));
+test('branch names are not immutable git revisions',()=>assert.throws(()=>validateEvidence({...e,source:{...e.source,kind:'git',revision:'main'}},scope),{code:'INVALID_REVISION'}));
+test('real-shaped git hashes are syntactically valid but not verified as existing',()=>assert.doesNotThrow(()=>validateEvidence({...e,source:{...e.source,kind:'git',revision:'b'.repeat(40)}},scope)));
+for(const path of ['../secret','/secret','a/../b','a\\b','C:/file','a//b','./x','a\0b'])test(`reject unsafe path ${JSON.stringify(path)}`,()=>assert.equal(isSafeRelativePath(path),false));
+test('relative source path is accepted',()=>assert.equal(isSafeRelativePath('src/jobs/run.ts'),true));

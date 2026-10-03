@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "digestAlgorithm": "SHA-256 of sorted relative path + NUL + file bytes + NUL",
+  "snapshots": [
+    {
+      "repositoryId": "jobboard-app",
+      "packageName": "@atlas-fixture/jobboard-app",
+      "version": "1.0.0",
+      "root": "fixtures/repos/jobboard-app",
+      "kind": "fixture",
+      "snapshotId": "jobboard-app@1.0.0",
+      "revision": "sha256:175ab9880f816c987e534974a206d19f8afb34638aa113ff39a5993a9ff5e512",
+      "files": [
+        "package-lock.json",
+        "package.json",
+        "src/index.ts",
+        "src/policy.ts",
+        "src/run-job.ts"
+      ]
+    },
+    {
+      "repositoryId": "retry-kit",
+      "packageName": "@atlas-fixture/retry-kit",
+      "version": "1.0.0",
+      "root": "fixtures/repos/retry-kit/v1",
+      "kind": "fixture",
+      "snapshotId": "retry-kit@1.0.0",
+      "revision": "sha256:ec78809d7039903684d6cca633849c9b94757ea287d4d9bb9bdd34bc8d3a6d2a",
+      "files": [
+        "package.json",
+        "src/backoff.ts",
+        "src/index.ts"
+      ]
+    },
+    {
+      "repositoryId": "retry-kit",
+      "packageName": "@atlas-fixture/retry-kit",
+      "version": "2.0.0",
+      "root": "fixtures/repos/retry-kit/v2",
+      "kind": "fixture",
+      "snapshotId": "retry-kit@2.0.0",
+      "revision": "sha256:6629233d34c8bbc8f7a62cf7032551d2b9e1c7c8c9afe8f0a90123cc5b36db90",
+      "files": [
+        "package.json",
+        "src/backoff.ts",
+        "src/index.ts"
+      ]
+    },
+    {
+      "repositoryId": "event-log",
+      "packageName": "@atlas-fixture/event-log",
+      "version": "1.0.0",
+      "root": "fixtures/repos/event-log/v1",
+      "kind": "fixture",
+      "snapshotId": "event-log@1.0.0",
+      "revision": "sha256:4f1f680d177ad29938f1d1dc8c011da69a306d355096812486f435ba6f2b1b6c",
+      "files": [
+        "package.json",
+        "src/format.ts",
+        "src/index.ts"
+      ]
+    }
+  ]
+}

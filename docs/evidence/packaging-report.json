@@ -1,0 +1,62 @@
+{
+  "recordedAt": "2026-10-03T13:02:11.500528+00:00",
+  "nodeVersion": "v22.16.0",
+  "typescriptVersion": "Version 5.8.3",
+  "starterTestCount": 104,
+  "starterTestsFailed": 0,
+  "checks": [
+    {
+      "check": "starter-tests",
+      "command": "node scripts/verify-starter.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "evidence": "docs/evidence/starter-tests.txt"
+    },
+    {
+      "check": "core-typecheck",
+      "command": "node scripts/typecheck.mjs --core-only",
+      "exitCode": 0,
+      "status": "passed",
+      "evidence": "docs/evidence/core-typecheck.txt"
+    },
+    {
+      "check": "environment-doctor",
+      "command": "node scripts/doctor.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "evidence": "docs/evidence/environment-doctor.txt"
+    },
+    {
+      "check": "release-gate",
+      "command": "node scripts/release-gate.mjs",
+      "exitCode": 1,
+      "status": "expected_block",
+      "evidence": "docs/evidence/release-gate.txt"
+    },
+    {
+      "check": "launcher-dry-run",
+      "command": "node scripts/launch-codex.mjs --dry-run",
+      "exitCode": 0,
+      "status": "passed",
+      "evidence": "docs/evidence/launcher-dry-run.txt"
+    },
+    {
+      "check": "bootstrap-plan",
+      "command": "node scripts/bootstrap.mjs --plan",
+      "exitCode": 0,
+      "status": "passed",
+      "evidence": "docs/evidence/bootstrap-plan.txt"
+    }
+  ],
+  "tomlFilesParsed": 7,
+  "javascriptFilesSyntaxChecked": 22,
+  "notRun": [
+    "Bun/root dependency installation",
+    "Next production build",
+    "Application browser tests",
+    "Database/RLS integration tests",
+    "Authenticated Codex subagent execution",
+    "GitHub/Clerk/Supabase/LLM integrations",
+    "Tempo settlement and MCP"
+  ]
+}

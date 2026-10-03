@@ -1,0 +1,2 @@
+# Web implementation scope
+Read the root AGENTS.md and docs/DESIGN.md. The current screens are honest starter status pages, not an accepted product UI. Build the actual three-panel graph using real data. Keep provider approvals, source versions and fixture/testnet/live labeling visible. No secret in client bundles; no private source sent to third parties without authorization. Root manifests and shared contracts require assigned ownership.

@@ -1,0 +1,26 @@
+# Chronos Atlas — project-scoped Codex configuration.
+# Reviewed against official documentation on 2026-10-03.
+# Project trust and model access must be confirmed in the user's Codex client.
+model = "gpt-6-astra"
+model_reasoning_effort = "medium"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+web_search = "live"
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 2
+default_subagent_model = "gpt-6.1-sol"
+default_subagent_reasoning_effort = "xhigh"
+
+[features]
+multi_agent = true
+
+# Keep shell networking permission-controlled. Research can use web_search.
+# Codex may request narrowly scoped permission for dependency installation.
+[sandbox_workspace_write]
+network_access = false
+
+[mcp_servers.openaiDeveloperDocs]
+url = "https://developers.openai.com/mcp"
+startup_timeout_sec = 20

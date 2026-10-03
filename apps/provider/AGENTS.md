@@ -1,0 +1,2 @@
+# Independent provider boundary
+Current server is an honest local health boundary, not a paid service. Implement P2/P3 with separately configured provider identity/index/recipient. Read docs/PROVIDER-PUBLISHING.md and TEMPO.md. Never turn a transaction hash into proof without official verification. Validate access/version before charging; persist paid delivery recovery. No fixture receipt masquerades as actual settlement.

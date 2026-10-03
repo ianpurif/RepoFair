@@ -1,0 +1,2 @@
+{"at":"2026-10-03T14:18:34Z","task":"/root/p0_architecture","role":"atlas_architect","status":"started","requestedModel":"gpt-6-astra","requestedEffort":"medium","observedModel":null,"observedEffort":null,"scope":"read-only P0/P1 architecture; no nested delegation"}
+{"at":"2026-10-03T14:18:34Z","task":"/root/p0_research","role":"atlas_researcher","status":"started","requestedModel":"gpt-6-astra","requestedEffort":"medium","observedModel":null,"observedEffort":null,"scope":"read-only P0/P1 official stack research; no nested delegation"}

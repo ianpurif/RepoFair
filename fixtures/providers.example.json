@@ -1,0 +1,27 @@
+{
+  "mode": "fixture",
+  "providers": [
+    {
+      "providerId": "fixture-retry",
+      "endpoint": "http://localhost:4311",
+      "packageName": "@atlas-fixture/retry-kit",
+      "versions": [
+        "1.0.0",
+        "2.0.0"
+      ],
+      "recipient": null,
+      "published": false
+    },
+    {
+      "providerId": "fixture-events",
+      "endpoint": "http://localhost:4312",
+      "packageName": "@atlas-fixture/event-log",
+      "versions": [
+        "1.0.0"
+      ],
+      "recipient": null,
+      "published": false
+    }
+  ],
+  "note": "Illustrative endpoint configuration only. These processes do not yet serve paid context."
+}

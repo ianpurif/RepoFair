@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "active": [
+    {"task":"/root/p0_architecture","role":"atlas_architect","allowedWritePaths":[],"milestone":"P0/P1","status":"active"},
+    {"task":"/root/p0_research","role":"atlas_researcher","allowedWritePaths":[],"milestone":"P0/P1","status":"active"}
+  ],
+  "completed": [],
+  "note": "Populate only with actual task handles and path ownership from the current session."
+}

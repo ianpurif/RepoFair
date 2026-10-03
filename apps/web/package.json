@@ -1,0 +1,15 @@
+{
+  "name": "@atlas/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "next": "16.3.8",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "tailwindcss": "4.3.3",
+    "@atlas/core": "workspace:*",
+    "@atlas/contracts": "workspace:*"
+  },
+  "devDependencies": {}
+}

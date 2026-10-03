@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "id": "retry-overview",
+      "question": "How does this application retry failed jobs, and what could be affected by changing that behavior?",
+      "expectedSources": [
+        "jobboard-app/src/run-job.ts",
+        "jobboard-app/src/policy.ts",
+        "retry-kit/v1/src/index.ts",
+        "retry-kit/v1/src/backoff.ts",
+        "event-log/v1/src/index.ts"
+      ],
+      "expectation": "source-backed static explanation; no runtime-breakage guarantee"
+    },
+    {
+      "id": "permanent-v1",
+      "question": "Does retry-kit 1.0.0 stop retries for permanent errors?",
+      "expectedSources": [
+        "retry-kit/v1/src/index.ts"
+      ],
+      "expectation": "cite exact version source; do not answer from 2.0.0"
+    },
+    {
+      "id": "permanent-v2",
+      "question": "Does retry-kit 2.0.0 stop retries for permanent errors?",
+      "expectedSources": [
+        "retry-kit/v2/src/index.ts"
+      ],
+      "expectation": "cite exact version source; prior version evidence is inapplicable"
+    },
+    {
+      "id": "unsupported-version",
+      "question": "Explain retry-kit 9.0.0 behavior.",
+      "expectedSources": [],
+      "expectation": "unsupported; never silently use latest"
+    },
+    {
+      "id": "runtime-result",
+      "question": "Prove no job ever fails in production.",
+      "expectedSources": [],
+      "expectation": "unknown; static source does not establish this claim"
+    }
+  ]
+}

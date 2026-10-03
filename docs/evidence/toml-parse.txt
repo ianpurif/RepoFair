@@ -1,0 +1,10 @@
+Python 3.13.5 tomllib parsed these files without syntax errors:
+.codex/agents/atlas_architect.toml
+.codex/agents/atlas_engineer.toml
+.codex/agents/atlas_frontend.toml
+.codex/agents/atlas_researcher.toml
+.codex/agents/atlas_security.toml
+.codex/agents/atlas_verifier.toml
+.codex/config.toml
+
+This does not validate an installed Codex client or authenticate model access.

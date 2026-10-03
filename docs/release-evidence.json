@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "checks": [
+    {
+      "id": "product_unit_tests",
+      "status": "not_run",
+      "command": null,
+      "recordedAt": null,
+      "evidencePaths": []
+    },
+    {
+      "id": "typecheck",
+      "status": "not_run",
+      "command": null,
+      "recordedAt": null,
+      "evidencePaths": []
+    },
+    {
+      "id": "lint",
+      "status": "not_run",
+      "command": null,
+      "recordedAt": null,
+      "evidencePaths": []
+    },
+    {
+      "id": "production_build",
+      "status": "not_run",
+      "command": null,
+      "recordedAt": null,
+      "evidencePaths": []
+    },
+    {
+      "id": "database_tenant_isolation",
+      "status": "not_run",
+      "command": null,
+      "recordedAt": null,
+      "evidencePaths": []
+    },
+    {
+      "id": "browser_e2e",
+      "status": "not_run",
+      "command": null,
+      "recordedAt": null,
+      "evidencePaths": []
+    },
+    {
+      "id": "provider_independence",
+      "status": "not_run",
+      "command": null,
+      "recordedAt": null,
+      "evidencePaths": []
+    },
+    {
+      "id": "tempo_testnet_payment",
+      "status": "not_run",
+      "command": null,
+      "recordedAt": null,
+      "evidencePaths": []
+    },
+    {
+      "id": "payment_recovery",
+      "status": "not_run",
+      "command": null,
+      "recordedAt": null,
+      "evidencePaths": []
+    },
+    {
+      "id": "versioned_federation",
+      "status": "not_run",
+      "command": null,
+      "recordedAt": null,
+      "evidencePaths": []
+    },
+    {
+      "id": "independent_security_review",
+      "status": "not_run",
+      "command": null,
+      "recordedAt": null,
+      "evidencePaths": []
+    }
+  ],
+  "note": "Starter tests do not satisfy product release checks."
+}

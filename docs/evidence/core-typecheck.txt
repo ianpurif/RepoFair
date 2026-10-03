@@ -1,0 +1,3 @@
+$ node scripts/typecheck.mjs --core-only
+
+Exit code: 0

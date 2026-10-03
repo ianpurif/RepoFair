@@ -1,0 +1,24 @@
+$ node scripts/release-gate.mjs
+RELEASE BLOCKED
+- Product stage is still starter.
+- P0: acceptance evidence missing.
+- P1: acceptance evidence missing.
+- P2: acceptance evidence missing.
+- P3: acceptance evidence missing.
+- P4: acceptance evidence missing.
+- P5: acceptance evidence missing.
+- P6: acceptance evidence missing.
+- product_unit_tests: not verified.
+- typecheck: not verified.
+- lint: not verified.
+- production_build: not verified.
+- database_tenant_isolation: not verified.
+- browser_e2e: not verified.
+- provider_independence: not verified.
+- tempo_testnet_payment: not verified.
+- payment_recovery: not verified.
+- versioned_federation: not verified.
+- independent_security_review: not verified.
+- Real bun.lock not present.
+
+Exit code: 1

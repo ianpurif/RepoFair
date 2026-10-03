@@ -1,0 +1,10 @@
+{
+  "name": "@atlas-fixture/jobboard-app",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@atlas-fixture/retry-kit": "file:../retry-kit/v1",
+    "@atlas-fixture/event-log": "file:../event-log/v1"
+  }
+}

@@ -1,0 +1,54 @@
+$ node scripts/bootstrap.mjs --plan
+{
+  "schemaVersion": 1,
+  "note": "P0 resolves missing tooling to exact versions via official npm registry. Validate compatibility before install. Existing exact pins are preserved.",
+  "packages": [
+    {
+      "manifest": "package.json",
+      "section": "devDependencies",
+      "name": "typescript",
+      "range": "5"
+    },
+    {
+      "manifest": "package.json",
+      "section": "devDependencies",
+      "name": "@types/node",
+      "range": "22"
+    },
+    {
+      "manifest": "apps/web/package.json",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "range": "19"
+    },
+    {
+      "manifest": "apps/web/package.json",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "range": "19"
+    },
+    {
+      "manifest": "apps/web/package.json",
+      "section": "devDependencies",
+      "name": "@tailwindcss/postcss",
+      "range": "4.3.3"
+    }
+  ],
+  "laterPackages": [
+    "ts-morph",
+    "@xyflow/react",
+    "@clerk/nextjs",
+    "@supabase/supabase-js",
+    "sonner",
+    "lucide-react",
+    "mppx",
+    "viem",
+    "@modelcontextprotocol/sdk",
+    "vitest",
+    "@playwright/test",
+    "eslint"
+  ],
+  "typescriptRationale": "Use the supported TS 5.x compiler interface initially; audit before changing major families. Source parser is a separately versioned dependency."
+}
+
+Exit code: 0

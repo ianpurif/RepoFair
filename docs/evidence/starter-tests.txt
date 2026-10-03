@@ -1,0 +1,652 @@
+$ node scripts/verify-starter.mjs
+PASS scaffold file hygiene. This is not a substitute for application ESLint.
+TAP version 13
+# (node:1212) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: atomic amounts use exact large integer arithmetic
+ok 1 - atomic amounts use exact large integer arithmetic
+  ---
+  duration_ms: 1.218974
+  type: 'test'
+  ...
+# Subtest: zero is a valid nonnegative accounting amount
+ok 2 - zero is a valid nonnegative accounting amount
+  ---
+  duration_ms: 0.152142
+  type: 'test'
+  ...
+# Subtest: reject atomic input "-1"
+ok 3 - reject atomic input "-1"
+  ---
+  duration_ms: 0.989535
+  type: 'test'
+  ...
+# Subtest: reject atomic input "1.5"
+ok 4 - reject atomic input "1.5"
+  ---
+  duration_ms: 0.138561
+  type: 'test'
+  ...
+# Subtest: reject atomic input "1e6"
+ok 5 - reject atomic input "1e6"
+  ---
+  duration_ms: 0.134565
+  type: 'test'
+  ...
+# Subtest: reject atomic input "NaN"
+ok 6 - reject atomic input "NaN"
+  ---
+  duration_ms: 0.128786
+  type: 'test'
+  ...
+# Subtest: reject atomic input " 1"
+ok 7 - reject atomic input " 1"
+  ---
+  duration_ms: 0.151931
+  type: 'test'
+  ...
+# Subtest: reject atomic input "01"
+ok 8 - reject atomic input "01"
+  ---
+  duration_ms: 0.114704
+  type: 'test'
+  ...
+# Subtest: reject atomic input "0x10"
+ok 9 - reject atomic input "0x10"
+  ---
+  duration_ms: 0.337614
+  type: 'test'
+  ...
+# Subtest: reject atomic input ""
+ok 10 - reject atomic input ""
+  ---
+  duration_ms: 0.451006
+  type: 'test'
+  ...
+# Subtest: reject atomic input "1111111111111111111111111111111111111111111111111111111111111111111111111111111"
+ok 11 - reject atomic input "1111111111111111111111111111111111111111111111111111111111111111111111111111111"
+  ---
+  duration_ms: 0.244602
+  type: 'test'
+  ...
+# Subtest: a paid purchase cannot be zero
+ok 12 - a paid purchase cannot be zero
+  ---
+  duration_ms: 0.185813
+  type: 'test'
+  ...
+# (node:1213) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: reserves without mutating prior state
+ok 13 - reserves without mutating prior state
+  ---
+  duration_ms: 1.292176
+  type: 'test'
+  ...
+# Subtest: same idempotency key and terms reuse the reservation
+ok 14 - same idempotency key and terms reuse the reservation
+  ---
+  duration_ms: 0.134024
+  type: 'test'
+  ...
+# Subtest: changed terms cannot reuse a key
+ok 15 - changed terms cannot reuse a key
+  ---
+  duration_ms: 0.647175
+  type: 'test'
+  ...
+# Subtest: inflight reservations count toward allowance
+ok 16 - inflight reservations count toward allowance
+  ---
+  duration_ms: 0.811935
+  type: 'test'
+  ...
+# Subtest: settlement does not double-count spend
+ok 17 - settlement does not double-count spend
+  ---
+  duration_ms: 0.182037
+  type: 'test'
+  ...
+# Subtest: unknown payment keeps the reservation
+ok 18 - unknown payment keeps the reservation
+  ---
+  duration_ms: 0.149307
+  type: 'test'
+  ...
+# Subtest: unknown can reconcile to settlement without a new reservation
+ok 19 - unknown can reconcile to settlement without a new reservation
+  ---
+  duration_ms: 0.147124
+  type: 'test'
+  ...
+# Subtest: released key cannot accidentally become a new purchase
+ok 20 - released key cannot accidentally become a new purchase
+  ---
+  duration_ms: 0.114955
+  type: 'test'
+  ...
+# Subtest: duplicate ledger keys are invalid
+ok 21 - duplicate ledger keys are invalid
+  ---
+  duration_ms: 0.243641
+  type: 'test'
+  ...
+# Subtest: cannot transition directly from draft to settled
+ok 22 - cannot transition directly from draft to settled
+  ---
+  duration_ms: 0.332836
+  type: 'test'
+  ...
+# Subtest: unknown payment cannot be automatically retried
+ok 23 - unknown payment cannot be automatically retried
+  ---
+  duration_ms: 0.15122
+  type: 'test'
+  ...
+# Subtest: delivery needs independently verified settlement
+ok 24 - delivery needs independently verified settlement
+  ---
+  duration_ms: 0.102486
+  type: 'test'
+  ...
+# Subtest: failed delivery can resume after existing settlement
+ok 25 - failed delivery can resume after existing settlement
+  ---
+  duration_ms: 0.061043
+  type: 'test'
+  ...
+# Subtest: revoked delivery cannot resume
+ok 26 - revoked delivery cannot resume
+  ---
+  duration_ms: 0.110328
+  type: 'test'
+  ...
+# Subtest: changed recipient changes approved term identity
+ok 27 - changed recipient changes approved term identity
+  ---
+  duration_ms: 0.36138
+  type: 'test'
+  ...
+# Subtest: changed version changes approved term identity
+ok 28 - changed version changes approved term identity
+  ---
+  duration_ms: 0.104479
+  type: 'test'
+  ...
+# Subtest: expired terms are rejected
+ok 29 - expired terms are rejected
+  ---
+  duration_ms: 0.183489
+  type: 'test'
+  ...
+# Subtest: zero-value paid quote is rejected
+ok 30 - zero-value paid quote is rejected
+  ---
+  duration_ms: 0.095445
+  type: 'test'
+  ...
+# (node:1214) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: matching nonempty scope
+ok 31 - matching nonempty scope
+  ---
+  duration_ms: 1.26162
+  type: 'test'
+  ...
+# Subtest: scope change tenantId denies evidence
+ok 32 - scope change tenantId denies evidence
+  ---
+  duration_ms: 0.86739
+  type: 'test'
+  ...
+# Subtest: scope change principalId denies evidence
+ok 33 - scope change principalId denies evidence
+  ---
+  duration_ms: 0.178922
+  type: 'test'
+  ...
+# Subtest: scope change permissionRevision denies evidence
+ok 34 - scope change permissionRevision denies evidence
+  ---
+  duration_ms: 0.128115
+  type: 'test'
+  ...
+# Subtest: empty identity is not authority
+ok 35 - empty identity is not authority
+  ---
+  duration_ms: 0.143428
+  type: 'test'
+  ...
+# Subtest: valid original citation can be checked against source
+ok 36 - valid original citation can be checked against source
+  ---
+  duration_ms: 0.37528
+  type: 'test'
+  ...
+# Subtest: citation checking rejects fabricated passage
+ok 37 - citation checking rejects fabricated passage
+  ---
+  duration_ms: 0.24279
+  type: 'test'
+  ...
+# Subtest: citation checking rejects out-of-bounds lines
+ok 38 - citation checking rejects out-of-bounds lines
+  ---
+  duration_ms: 0.227476
+  type: 'test'
+  ...
+# Subtest: branch names are not immutable git revisions
+ok 39 - branch names are not immutable git revisions
+  ---
+  duration_ms: 1.264013
+  type: 'test'
+  ...
+# Subtest: real-shaped git hashes are syntactically valid but not verified as existing
+ok 40 - real-shaped git hashes are syntactically valid but not verified as existing
+  ---
+  duration_ms: 0.559
+  type: 'test'
+  ...
+# Subtest: reject unsafe path "../secret"
+ok 41 - reject unsafe path "../secret"
+  ---
+  duration_ms: 0.199043
+  type: 'test'
+  ...
+# Subtest: reject unsafe path "/secret"
+ok 42 - reject unsafe path "/secret"
+  ---
+  duration_ms: 0.089386
+  type: 'test'
+  ...
+# Subtest: reject unsafe path "a/../b"
+ok 43 - reject unsafe path "a/../b"
+  ---
+  duration_ms: 0.088976
+  type: 'test'
+  ...
+# Subtest: reject unsafe path "a\\\\b"
+ok 44 - reject unsafe path "a\\\\b"
+  ---
+  duration_ms: 0.07262
+  type: 'test'
+  ...
+# Subtest: reject unsafe path "C:/file"
+ok 45 - reject unsafe path "C:/file"
+  ---
+  duration_ms: 0.077057
+  type: 'test'
+  ...
+# Subtest: reject unsafe path "a//b"
+ok 46 - reject unsafe path "a//b"
+  ---
+  duration_ms: 0.083687
+  type: 'test'
+  ...
+# Subtest: reject unsafe path "./x"
+ok 47 - reject unsafe path "./x"
+  ---
+  duration_ms: 0.109126
+  type: 'test'
+  ...
+# Subtest: reject unsafe path "a\\u0000b"
+ok 48 - reject unsafe path "a\\u0000b"
+  ---
+  duration_ms: 0.077538
+  type: 'test'
+  ...
+# Subtest: relative source path is accepted
+ok 49 - relative source path is accepted
+  ---
+  duration_ms: 0.105871
+  type: 'test'
+  ...
+# (node:1245) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: symbol IDs differ across repositories
+ok 50 - symbol IDs differ across repositories
+  ---
+  duration_ms: 0.777102
+  type: 'test'
+  ...
+# Subtest: symbol IDs differ across snapshots
+ok 51 - symbol IDs differ across snapshots
+  ---
+  duration_ms: 0.092321
+  type: 'test'
+  ...
+# Subtest: tuple ID cannot collide through separator injection
+ok 52 - tuple ID cannot collide through separator injection
+  ---
+  duration_ms: 0.127394
+  type: 'test'
+  ...
+# Subtest: duplicate nodes fail
+ok 53 - duplicate nodes fail
+  ---
+  duration_ms: 0.601906
+  type: 'test'
+  ...
+# Subtest: unmapped endpoints fail
+ok 54 - unmapped endpoints fail
+  ---
+  duration_ms: 0.160023
+  type: 'test'
+  ...
+# Subtest: edge without evidence fails
+ok 55 - edge without evidence fails
+  ---
+  duration_ms: 0.168696
+  type: 'test'
+  ...
+# Subtest: bounded graph expansion is potential relationship, not breakage
+ok 56 - bounded graph expansion is potential relationship, not breakage
+  ---
+  duration_ms: 0.34173
+  type: 'test'
+  ...
+# Subtest: unknown start node fails closed
+ok 57 - unknown start node fails closed
+  ---
+  duration_ms: 1.001774
+  type: 'test'
+  ...
+# Subtest: depth and size are bounded
+ok 58 - depth and size are bounded
+  ---
+  duration_ms: 0.309842
+  type: 'test'
+  ...
+# Subtest: exact release resolution
+ok 59 - exact release resolution
+  ---
+  duration_ms: 0.686013
+  type: 'test'
+  ...
+# Subtest: no fuzzy release selection latest
+ok 60 - no fuzzy release selection latest
+  ---
+  duration_ms: 0.220806
+  type: 'test'
+  ...
+# Subtest: no fuzzy release selection ^1.0.0
+ok 61 - no fuzzy release selection ^1.0.0
+  ---
+  duration_ms: 0.064599
+  type: 'test'
+  ...
+# Subtest: no fuzzy release selection ~1.0.0
+ok 62 - no fuzzy release selection ~1.0.0
+  ---
+  duration_ms: 0.0463
+  type: 'test'
+  ...
+# Subtest: no fuzzy release selection 1.x
+ok 63 - no fuzzy release selection 1.x
+  ---
+  duration_ms: 0.082996
+  type: 'test'
+  ...
+# Subtest: no fuzzy release selection *
+ok 64 - no fuzzy release selection *
+  ---
+  duration_ms: 0.054072
+  type: 'test'
+  ...
+# Subtest: missing version never falls back to latest
+ok 65 - missing version never falls back to latest
+  ---
+  duration_ms: 0.07882
+  type: 'test'
+  ...
+# Subtest: package mismatch fails
+ok 66 - package mismatch fails
+  ---
+  duration_ms: 0.067823
+  type: 'test'
+  ...
+# Subtest: ambiguous provider mapping fails
+ok 67 - ambiguous provider mapping fails
+  ---
+  duration_ms: 0.12522
+  type: 'test'
+  ...
+# Subtest: exact prerelease identifiers can be represented
+ok 68 - exact prerelease identifiers can be represented
+  ---
+  duration_ms: 0.086031
+  type: 'test'
+  ...
+# Subtest: depth-limited graph declares omitted relationships
+ok 69 - depth-limited graph declares omitted relationships
+  ---
+  duration_ms: 0.371114
+  type: 'test'
+  ...
+# Subtest: four real source snapshots represent one application and two provider repos
+ok 70 - four real source snapshots represent one application and two provider repos
+  ---
+  duration_ms: 0.936149
+  type: 'test'
+  ...
+# Subtest: fixture digest is actual content: jobboard-app@1.0.0
+ok 71 - fixture digest is actual content: jobboard-app@1.0.0
+  ---
+  duration_ms: 0.704241
+  type: 'test'
+  ...
+# Subtest: fixture digest is actual content: retry-kit@1.0.0
+ok 72 - fixture digest is actual content: retry-kit@1.0.0
+  ---
+  duration_ms: 0.33481
+  type: 'test'
+  ...
+# Subtest: fixture digest is actual content: retry-kit@2.0.0
+ok 73 - fixture digest is actual content: retry-kit@2.0.0
+  ---
+  duration_ms: 0.290662
+  type: 'test'
+  ...
+# Subtest: fixture digest is actual content: event-log@1.0.0
+ok 74 - fixture digest is actual content: event-log@1.0.0
+  ---
+  duration_ms: 0.208257
+  type: 'test'
+  ...
+# Subtest: two provider configs really have different endpoints and identities
+ok 75 - two provider configs really have different endpoints and identities
+  ---
+  duration_ms: 0.177189
+  type: 'test'
+  ...
+# Subtest: the application really imports both provider packages
+ok 76 - the application really imports both provider packages
+  ---
+  duration_ms: 0.33537
+  type: 'test'
+  ...
+# Subtest: version change exists in source, not only a canned answer
+ok 77 - version change exists in source, not only a canned answer
+  ---
+  duration_ms: 0.326336
+  type: 'test'
+  ...
+# Subtest: fixture lockfile resolves local dependencies and contains no install scripts
+ok 78 - fixture lockfile resolves local dependencies and contains no install scripts
+  ---
+  duration_ms: 1.100544
+  type: 'test'
+  ...
+# Subtest: reviewed fixture target files really exist
+ok 79 - reviewed fixture target files really exist
+  ---
+  duration_ms: 0.731964
+  type: 'test'
+  ...
+# Subtest: lead is exactly Astra medium
+ok 80 - lead is exactly Astra medium
+  ---
+  duration_ms: 0.804874
+  type: 'test'
+  ...
+# Subtest: two concurrent spawned agents, not two total threads
+ok 81 - two concurrent spawned agents, not two total threads
+  ---
+  duration_ms: 0.199073
+  type: 'test'
+  ...
+# Subtest: no full-access/never-approval configuration
+ok 82 - no full-access/never-approval configuration
+  ---
+  duration_ms: 0.136998
+  type: 'test'
+  ...
+# Subtest: six named custom agents pin requested models and efforts
+ok 83 - six named custom agents pin requested models and efforts
+  ---
+  duration_ms: 0.468213
+  type: 'test'
+  ...
+# Subtest: Sol Extra high uses xhigh, never extrahigh or max
+ok 84 - Sol Extra high uses xhigh, never extrahigh or max
+  ---
+  duration_ms: 0.168236
+  type: 'test'
+  ...
+# Subtest: full supplied build prompt has all sixteen sections and current scope
+ok 85 - full supplied build prompt has all sixteen sections and current scope
+  ---
+  duration_ms: 1.300539
+  type: 'test'
+  ...
+# Subtest: entry file directs complete execution rather than a scaffold stop
+ok 86 - entry file directs complete execution rather than a scaffold stop
+  ---
+  duration_ms: 0.240376
+  type: 'test'
+  ...
+# Subtest: optional launcher does not execute in dry-run
+ok 87 - optional launcher does not execute in dry-run
+  ---
+  duration_ms: 40.027905
+  type: 'test'
+  ...
+# Subtest: release gate rejects the unfinished starter
+ok 88 - release gate rejects the unfinished starter
+  ---
+  duration_ms: 31.531689
+  type: 'test'
+  ...
+# Subtest: all configured local skills have a skill entry
+ok 89 - all configured local skills have a skill entry
+  ---
+  duration_ms: 0.476014
+  type: 'test'
+  ...
+# (node:1278) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: health never claims paid context readiness
+ok 90 - health never claims paid context readiness
+  ---
+  duration_ms: 23.707026
+  type: 'test'
+  ...
+# Subtest: /context/retrieve is unavailable rather than a fake service
+ok 91 - /context/retrieve is unavailable rather than a fake service
+  ---
+  duration_ms: 6.42214
+  type: 'test'
+  ...
+# Subtest: /mcp is unavailable rather than a fake service
+ok 92 - /mcp is unavailable rather than a fake service
+  ---
+  duration_ms: 2.825339
+  type: 'test'
+  ...
+# Subtest: /.well-known/atlas-provider.json is unavailable rather than a fake service
+ok 93 - /.well-known/atlas-provider.json is unavailable rather than a fake service
+  ---
+  duration_ms: 3.57627
+  type: 'test'
+  ...
+# Subtest: starter capability state is fail-closed
+ok 94 - starter capability state is fail-closed
+  ---
+  duration_ms: 0.219795
+  type: 'test'
+  ...
+# Subtest: invalid provider identity cannot become response metadata
+ok 95 - invalid provider identity cannot become response metadata
+  ---
+  duration_ms: 0.246525
+  type: 'test'
+  ...
+# (node:1300) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: SDK requires HTTPS for remote services
+ok 96 - SDK requires HTTPS for remote services
+  ---
+  duration_ms: 1.030919
+  type: 'test'
+  ...
+# Subtest: SDK only permits localhost with an explicit option
+ok 97 - SDK only permits localhost with an explicit option
+  ---
+  duration_ms: 0.185562
+  type: 'test'
+  ...
+# Subtest: SDK rejects credential-bearing URLs
+ok 98 - SDK rejects credential-bearing URLs
+  ---
+  duration_ms: 0.163268
+  type: 'test'
+  ...
+# Subtest: SDK rejects misleading origin URL paths
+ok 99 - SDK rejects misleading origin URL paths
+  ---
+  duration_ms: 0.116357
+  type: 'test'
+  ...
+# Subtest: SDK accepts a clean HTTPS origin
+ok 100 - SDK accepts a clean HTTPS origin
+  ---
+  duration_ms: 0.107223
+  type: 'test'
+  ...
+# Subtest: SDK validates complete response fields before returning
+ok 101 - SDK validates complete response fields before returning
+  ---
+  duration_ms: 19.919364
+  type: 'test'
+  ...
+# Subtest: SDK preserves actual unavailable status
+ok 102 - SDK preserves actual unavailable status
+  ---
+  duration_ms: 0.347779
+  type: 'test'
+  ...
+# Subtest: SDK rejects oversized provider response
+ok 103 - SDK rejects oversized provider response
+  ---
+  duration_ms: 0.488443
+  type: 'test'
+  ...
+# Subtest: SDK accepts a fully validated starter capability response
+ok 104 - SDK accepts a fully validated starter capability response
+  ---
+  duration_ms: 1.022385
+  type: 'test'
+  ...
+1..104
+# tests 104
+# suites 0
+# pass 104
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 375.821134
+
+PASS starter verification. Not a product, browser, database, payment or authenticated-agent verification.
+
+Exit code: 0

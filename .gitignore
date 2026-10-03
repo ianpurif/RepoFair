@@ -1,0 +1,21 @@
+node_modules/
+.next/
+.vercel/
+.turbo/
+dist/
+build/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+!**/.env.example
+.atlas/
+*.log
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+# Never ignore .codex, .agents or the real lockfile.

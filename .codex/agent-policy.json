@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "lead": {
+    "model": "gpt-6-astra",
+    "effort": "medium"
+  },
+  "extraHighToken": "xhigh",
+  "maxConcurrentSubagents": 2,
+  "nestedDelegation": false,
+  "silentFallback": false,
+  "roles": [
+    {
+      "name": "atlas_architect",
+      "model": "gpt-6-astra",
+      "effort": "medium",
+      "sandbox": "read-only"
+    },
+    {
+      "name": "atlas_researcher",
+      "model": "gpt-6-astra",
+      "effort": "medium",
+      "sandbox": "read-only"
+    },
+    {
+      "name": "atlas_engineer",
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh",
+      "sandbox": "workspace-write"
+    },
+    {
+      "name": "atlas_frontend",
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh",
+      "sandbox": "workspace-write"
+    },
+    {
+      "name": "atlas_verifier",
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh",
+      "sandbox": "workspace-write"
+    },
+    {
+      "name": "atlas_security",
+      "model": "gpt-6-astra",
+      "effort": "medium",
+      "sandbox": "read-only"
+    }
+  ]
+}

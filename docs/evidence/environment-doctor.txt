@@ -1,0 +1,12 @@
+$ node scripts/doctor.mjs
+OK Node 22.16.0
+FOUND git: git version 2.47.3
+MISSING bun: Required for the corresponding build step.
+MISSING codex: CLI optional when using the Codex app/IDE.
+REQUESTED lead=gpt-6-astra/medium; max subagents=2
+NOT CHECKED: signed-in model access, active client overrides, project trust, real delegation.
+MISSING bun.lock: P0 must generate it through a real Bun install.
+MISSING node_modules: source scaffold is not installed.
+Product integrations are intentionally disabled in this starter. Secret values were not inspected.
+
+Exit code: 0

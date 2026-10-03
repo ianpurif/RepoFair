@@ -1,0 +1,26 @@
+@import "tailwindcss";
+:root { color-scheme: light dark; --paper:#f7f7f5; --ink:#1f2429; --muted:#626971; --line:#d7dcd9; --accent:#275e55; }
+@media (prefers-color-scheme: dark) { :root { --paper:#151819; --ink:#eaedeb; --muted:#a5ada9; --line:#343c38; --accent:#a4d0c3; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; }
+main { max-width:1000px; margin:0 auto; padding:48px 24px 80px; }
+header { display:flex; justify-content:space-between; align-items:center; gap:20px; border-bottom:1px solid var(--line); padding-bottom:20px; }
+.wordmark { font-weight:650; letter-spacing:-.03em; font-size:20px; }
+.badge { padding:4px 10px; border:1px solid var(--line); border-radius:999px; font-size:12px; color:var(--muted); }
+h1 { font-size:clamp(32px,5vw,54px); max-width:700px; line-height:1.08; letter-spacing:-.04em; font-weight:600; margin:64px 0 24px; }
+h2 { font-size:18px; margin:0 0 14px; }
+p { max-width:680px; color:var(--muted); }
+a { color:var(--accent); text-underline-offset:4px; }
+a:focus-visible, button:focus-visible { outline:3px solid var(--accent); outline-offset:5px; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:40px; }
+.panel { border:1px solid var(--line); border-radius:12px; padding:22px; }
+.panel p { font-size:14px; margin:0 0 12px; }
+code { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:.9em; }
+pre { white-space:pre-wrap; overflow-wrap:anywhere; border:1px solid var(--line); padding:14px; border-radius:8px; }
+dl { margin:0; font-size:13px; }
+dl div { display:flex; justify-content:space-between; gap:12px; border-top:1px solid var(--line); padding:9px 0; }
+dt { overflow-wrap:anywhere; } dd { margin:0; color:var(--muted); white-space:nowrap; }
+footer { margin-top:32px; color:var(--muted); font-size:13px; }
+.skip-link { position:fixed; left:12px; top:-100px; background:var(--paper); padding:10px; z-index:10; }.skip-link:focus { top:12px; }
+@media(max-width:700px) { main { padding:24px 18px 50px; }.grid { grid-template-columns:1fr; } h1 { margin-top:44px; } }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; animation:none!important; transition:none!important; } }

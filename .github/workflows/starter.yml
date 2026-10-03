@@ -1,0 +1,16 @@
+name: Starter verification
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  starter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - run: node scripts/verify-starter.mjs
+      - name: Parse Codex TOML syntax
+        run: python3 -c "import pathlib,tomllib; [tomllib.loads(p.read_text()) for p in pathlib.Path('.codex').rglob('*.toml')]"
+# This workflow verifies starter foundations only. Add full product/build/RLS/browser jobs during P0/P1.

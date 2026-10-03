@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "product": "Chronos Atlas",
+  "stage": "starter",
+  "currentPhase": "P0",
+  "nextAction": "Execute START.md preflight; complete P0 and continue.",
+  "milestones": [
+    {
+      "id": "P0",
+      "title": "Foundation",
+      "status": "partial",
+      "acceptanceEvidence": []
+    },
+    {
+      "id": "P1",
+      "title": "Local intelligence",
+      "status": "not_started",
+      "acceptanceEvidence": []
+    },
+    {
+      "id": "P2",
+      "title": "Provider publishing",
+      "status": "not_started",
+      "acceptanceEvidence": []
+    },
+    {
+      "id": "P3",
+      "title": "Tempo purchase",
+      "status": "not_started",
+      "acceptanceEvidence": []
+    },
+    {
+      "id": "P4",
+      "title": "Federation",
+      "status": "not_started",
+      "acceptanceEvidence": []
+    },
+    {
+      "id": "P5",
+      "title": "Product experience",
+      "status": "not_started",
+      "acceptanceEvidence": []
+    },
+    {
+      "id": "P6",
+      "title": "Verification and delivery",
+      "status": "not_started",
+      "acceptanceEvidence": []
+    }
+  ],
+  "liveIntegrationsVerified": false,
+  "lastUpdatedBy": "starter-packager"
+}

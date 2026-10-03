@@ -1,0 +1,2 @@
+# Deterministic domain core
+No I/O or model-owned permissions/spending. Existing helpers are tested building blocks, not production authorization or payment verification. Add runtime service schemas in shared contracts and actual transactional boundaries in adapters. Preserve exact versions, immutable locators, independently scoped graph identities and failure distinctions. Test before broadening behavior.
