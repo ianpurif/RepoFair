@@ -2,5 +2,6 @@
   "name": "@atlas/provider",
   "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "dependencies": {"@atlas/contracts":"workspace:*","@atlas/core":"workspace:*","@atlas/worker":"workspace:*","mppx":"0.13.1","viem":"2.57.2","zod":"4.6.5"}
 }
