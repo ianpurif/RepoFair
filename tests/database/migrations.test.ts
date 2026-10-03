@@ -1,6 +1,8 @@
 import { beforeAll, afterAll, describe, it, expect } from 'vitest';
 import { PGlite } from '@electric-sql/pglite';
 import { readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+const requestDigest = 'sha-256=' + createHash('sha256').update('test request only').digest('base64');
 const db = new PGlite();
 const w1 = '00000000-0000-4000-8000-000000000001';
 const w2 = '00000000-0000-4000-8000-000000000002';
@@ -19,7 +21,7 @@ beforeAll(async () => {
 afterAll(async () => { await db.close(); });
 async function reserve(key: string, amount = '60', recipient = 'recipient') {
   return db.query<{ id: string }>(`select atlas.reserve_purchase($1,'user_a',$2,$3,'provider','test','asset',$4,$5,'pkg','1.0.0','2030-01-01T00:00:00Z',$6) as id`,
-    [w1, key, 'a'.repeat(64), recipient, 'b'.repeat(64), amount]);
+    [w1, key, 'a'.repeat(64), recipient, requestDigest, amount]);
 }
 describe('Actual PostgreSQL-WASM migration checks (not multi-connection or hosted auth)', () => {
   it('isolates membership/workspace rows and denies direct mutations', async () => {
@@ -36,7 +38,7 @@ describe('Actual PostgreSQL-WASM migration checks (not multi-connection or hoste
     expect((await reserve('approved-1')).rows[0]?.id).toBe(first.rows[0]?.id);
     await expect(reserve('approved-1','60','changed')).rejects.toThrow('Idempotency terms changed');
     await expect(reserve('approved-2')).rejects.toThrow('Budget exceeded');
-    const args: unknown[] = [w1,'user_a','approved-1','a'.repeat(64),'provider','test','asset','recipient','b'.repeat(64),'pkg','1.0.0','2030-01-01T00:00:00Z','60'];
+    const args: unknown[] = [w1,'user_a','approved-1','a'.repeat(64),'provider','test','asset','recipient',requestDigest,'pkg','1.0.0','2030-01-01T00:00:00Z','60'];
     for (const position of [3,7,11]) {
       const invalid = [...args]; invalid[position] = null;
       await expect(db.query('select atlas.reserve_purchase($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)',invalid)).rejects.toThrow('Incomplete purchase terms');

@@ -61,7 +61,7 @@ create table atlas.purchases (
   id uuid primary key default gen_random_uuid(), workspace_id uuid not null, principal_id text not null,
   idempotency_key text not null, terms_digest text not null check(terms_digest ~ '^[a-f0-9]{64}$'),
   provider_id text not null, network text not null, token text not null, recipient text not null,
-  request_digest text not null check(request_digest ~ '^[a-f0-9]{64}$'),
+  request_digest text not null check(request_digest ~ '^sha-256=[A-Za-z0-9+/]{43}=$'),
   package_name text not null, version text not null, expires_at timestamptz not null,
   amount numeric(78,0) not null check(amount>0),
   payment_state text not null check(payment_state in ('reserved','pending','unknown','settled','failed','expired')),
