@@ -13,3 +13,14 @@ export function starterCapabilities(): Capabilities {
     limitations: ['Development starter, not the completed product.', 'Domain helpers are not a payment verifier or authorization service.'],
   };
 }
+/** Locally implemented capabilities; no environment variable enables live access. */
+export function applicationCapabilities(): Capabilities {
+  const starter = starterCapabilities();
+  return { ...starter, stage: 'local-fixture', capabilities: { ...starter.capabilities,
+    'source-graph-parser': 'available', 'extractive-questions': 'available',
+    'fixture-provider-http': 'available', 'fixture-federation': 'available', 'fixture-mcp-stdio': 'available',
+  }, limitations: ['Public catalog fixtures only; arbitrary repository import is unavailable.',
+    'External integrations and payments are disabled. Fixture provider HTTP is real; no settlement is attempted.',
+    'Extractive source retrieval is available without a generation model.',
+    'Hosted identity, RLS and multi-connection budget tests remain unverified.'] };
+}

@@ -1,7 +1,6 @@
 import { createHash } from 'node:crypto';
 import { lstat, readFile, realpath } from 'node:fs/promises';
 import { basename, dirname, isAbsolute, relative, resolve, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { FIXTURE_IDS, parseFixtureId } from '../../../packages/contracts/src/local.ts';
 import type { FixtureId, LocalIndex } from '../../../packages/contracts/src/local.ts';
 import { isSafeRelativePath } from '../../../packages/core/src/evidence.ts';
@@ -9,7 +8,6 @@ import { isExactVersion } from '../../../packages/core/src/versions.ts';
 import { LOCAL_LIMITS, parseLocalIndex } from '../../../packages/core/src/local/index.ts';
 import type { TrustedFixtureLink } from '../../../packages/core/src/local/index.ts';
 
-const MODULE_WORKSPACE = fileURLToPath(new URL('../../../', import.meta.url));
 const MAX_CATALOG_BYTES = 32_000;
 type CatalogSnapshot = { repositoryId: string; packageName: string; version: string; root: string;
   kind: 'fixture'; snapshotId: FixtureId; revision: string; files: string[] };
@@ -23,7 +21,7 @@ async function workspaceRoot(): Promise<string> {
   // Next runs from apps/web; bundled import.meta.url may point inside .next.
   // These are fixed application locations, never caller-controlled import paths.
   const cwdRoot = basename(cwd) === 'web' && basename(dirname(cwd)) === 'apps' ? resolve(cwd, '../..') : cwd;
-  for (const candidate of [...new Set([cwdRoot, MODULE_WORKSPACE])]) {
+  for (const candidate of [cwdRoot]) {
     try { const info = await lstat(resolve(candidate, 'fixtures/catalog.json')); if (info.isFile()) return candidate; }
     catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
   }
