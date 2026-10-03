@@ -1,0 +1,17 @@
+'use client';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import type { FixtureProviderInfo } from '@atlas/contracts';
+import { ArrowUpRight, Box, CircleAlert, LoaderCircle, RefreshCw } from 'lucide-react';
+import { discoverProviders } from '../lib/local-client';
+export function ProviderDirectory({ providerId }: { providerId?: string }) {
+  const [providers, setProviders] = useState<FixtureProviderInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [refresh, setRefresh] = useState(0);
+  useEffect(() => { const controller = new AbortController(); setLoading(true); setError(null); discoverProviders(controller.signal).then(result => { if (!controller.signal.aborted) { setProviders(providerId ? result.filter(provider => provider.providerId === providerId) : result); setLoading(false); } }).catch(error => { if (!controller.signal.aborted) { setError(error instanceof Error ? error.message : 'Provider discovery failed.'); setLoading(false); } }); return () => controller.abort(); }, [providerId, refresh]);
+  return <section className="provider-directory"><div className="section-toolbar"><span className="status-tag fixture">Local HTTP fixtures · payments disabled</span><button className="button secondary" onClick={() => setRefresh(value => value + 1)} disabled={loading}><RefreshCw size={13} /> Refresh availability</button></div><p className="directory-intro">Each service runs in a separate local process with its own configuration. Availability below is read from the actual allowlisted endpoint. Fixture publication does not verify repository administration or live commerce.</p>
+    {loading ? <div className="empty-card" role="status"><LoaderCircle className="spin" size={24} /><h2>Checking local endpoints</h2></div> : error ? <div className="empty-card" role="alert"><CircleAlert size={24} /><h2>Provider discovery unavailable</h2><p>{error}</p></div> : providers.length === 0 ? <div className="empty-card"><Box size={24} /><h2>No accessible fixture provider</h2><p>No provider registration was returned for this request.</p></div> : <div className="provider-cards">{providers.map(provider => <article key={provider.providerId}><div className="provider-card-title"><Box size={18} /><h2>{provider.providerId}</h2><span className={`status-tag ${provider.published ? 'available' : 'unavailable'}`}>{provider.published ? 'Available' : 'Unavailable'}</span></div><p>{provider.packageName}</p><dl><div><dt>Exact versions</dt><dd>{provider.versions.join(', ')}</dd></div><div><dt>Endpoint</dt><dd><code>{provider.endpoint}</code></dd></div><div><dt>Payment</dt><dd>Disabled · no recipient or price</dd></div><div><dt>Origin</dt><dd>Original local fixture source</dd></div></dl>{!provider.published && <p className="provider-card-note">Start the separately configured provider process to enable fixture requests.</p>}<Link className="text-button" href={providerId ? '/app' : `/app/providers/${provider.providerId}`}>{providerId ? 'Review approval in workspace' : 'Inspect provider'}<ArrowUpRight size={13} /></Link></article>)}</div>}
+    <div className="notice provider-live-notice"><CircleAlert size={18} /><div><strong>Live provider publishing and purchases are unavailable</strong><p>Owner authorization, endpoint verification for external services, and Tempo settlement require separately verified setup. Fixture context has no payment receipt.</p></div></div>
+  </section>;
+}

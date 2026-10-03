@@ -1,0 +1,31 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Activity, ArrowUpRight, Boxes, GitBranch, Layers3, Settings2, Upload } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { ThemeToggle } from './theme-provider';
+
+const links = [
+  { href: '/app', title: 'Workspace', icon: GitBranch },
+  { href: '/app/providers', title: 'Providers', icon: Boxes },
+  { href: '/app/publish', title: 'Publish', icon: Upload },
+  { href: '/app/activity', title: 'Activity', icon: Activity },
+  { href: '/app/settings', title: 'Settings', icon: Settings2 },
+];
+export function AtlasLogo({ compact = false }: { compact?: boolean }) {
+  return <Link href="/" className="brand" aria-label="Chronos Atlas home"><span className="brand-icon"><Layers3 size={19} strokeWidth={1.65} /></span>{!compact && <span>Chronos <strong>Atlas</strong></span>}</Link>;
+}
+export function AppShell({ children }: { children: ReactNode }) {
+  const path = usePathname();
+  return <div className="app-shell"><aside className="app-rail"><AtlasLogo compact /><nav aria-label="Application">{links.map(({ href, title, icon: Icon }) => {
+    const active = href === '/app' ? path === href || path.startsWith('/app/repositories/') || path === '/demo' : path.startsWith(href);
+    return <Link key={href} href={href} className={`rail-link ${active ? 'active' : ''}`} aria-label={title} title={title} aria-current={active ? 'page' : undefined}><Icon size={19} strokeWidth={1.7} /><span>{title}</span></Link>;
+  })}</nav><div className="rail-bottom"><ThemeToggle /><Link href="/sign-in" className="rail-link" aria-label="Sign in unavailable" title="Sign in setup"><span className="account-icon">CA</span></Link></div></aside><div className="app-content">{children}</div></div>;
+}
+export function PageHeader({ title, subtitle }: { title: string; subtitle: string }) {
+  return <header className="page-header"><div><span className="eyebrow">Chronos Atlas</span><h1>{title}</h1><p>{subtitle}</p></div><Link className="button secondary" href="/app">Open workspace <ArrowUpRight size={15} /></Link></header>;
+}
+export function Unavailable({ title, detail }: { title: string; detail: string }) {
+  return <div className="unavailable-state"><span className="status-tag unavailable">Unavailable</span><h2>{title}</h2><p>{detail}</p><Link className="button secondary" href="/app">Explore the local fixtures <ArrowUpRight size={15} /></Link></div>;
+}
