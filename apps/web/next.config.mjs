@@ -3,6 +3,7 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 export default {
   output: 'standalone',
   outputFileTracingRoot: root,
-  transpilePackages: ['@atlas/core', '@atlas/contracts'],
+  transpilePackages: ['@atlas/core', '@atlas/contracts', '@atlas/worker'],
+  serverExternalPackages: ['ts-morph'],
   turbopack: { root },
 };

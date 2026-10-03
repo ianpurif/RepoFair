@@ -16,7 +16,9 @@
     "bootstrap": "node scripts/bootstrap.mjs --install",
     "verify:starter": "node scripts/verify-starter.mjs",
     "test": "node scripts/run-tests.mjs",
-    "lint": "node scripts/check-hygiene.mjs",
+    "lint": "eslint apps packages tests/local && node scripts/check-hygiene.mjs",
+    "test:product": "vitest run",
+    "test:browser": "playwright test",
     "typecheck": "node scripts/typecheck.mjs",
     "dev": "node scripts/web.mjs dev",
     "build": "node scripts/web.mjs build",
@@ -27,5 +29,15 @@
     "verify": "node scripts/verify-starter.mjs && node scripts/typecheck.mjs && node scripts/web.mjs build",
     "verify:release": "node scripts/release-gate.mjs"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "@types/node": "22.20.5",
+    "vitest": "5.0.3",
+    "@playwright/test": "1.63.0",
+    "eslint": "10.12.0",
+    "@eslint/js": "10.0.1",
+    "typescript-eslint": "8.71.0",
+    "@types/pg": "8.23.1"
+  },
+  "packageManager": "bun@1.4.1"
 }
