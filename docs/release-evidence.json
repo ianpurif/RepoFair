@@ -5,62 +5,63 @@
       "id": "product_unit_tests",
       "status": "passed",
       "command": "bun run test:product",
-      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "recordedAt": "2026-10-07T08:59:31.580Z",
       "evidencePaths": [
-        "docs/evidence/local-execution.json"
+        "docs/evidence/live-audit-checkpoint.json"
       ],
-      "scope": "Public authored fixtures only; not live payment or hosted authorization"
+      "scope": "Local application checks; separate hosted reports establish bounded live acceptance, not full product readiness"
     },
     {
       "id": "typecheck",
       "status": "passed",
       "command": "bun run typecheck",
-      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "recordedAt": "2026-10-07T08:59:31.580Z",
       "evidencePaths": [
-        "docs/evidence/local-execution.json"
+        "docs/evidence/live-audit-checkpoint.json"
       ],
-      "scope": "Public authored fixtures only; not live payment or hosted authorization"
+      "scope": "Local application checks; separate hosted reports establish bounded live acceptance, not full product readiness"
     },
     {
       "id": "lint",
       "status": "passed",
       "command": "bun run lint",
-      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "recordedAt": "2026-10-07T08:59:31.580Z",
       "evidencePaths": [
-        "docs/evidence/local-execution.json"
+        "docs/evidence/live-audit-checkpoint.json"
       ],
-      "scope": "Public authored fixtures only; not live payment or hosted authorization"
+      "scope": "Local application checks; separate hosted reports establish bounded live acceptance, not full product readiness"
     },
     {
       "id": "production_build",
       "status": "passed",
       "command": "bun run build",
-      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "recordedAt": "2026-10-07T08:59:31.580Z",
       "evidencePaths": [
-        "docs/evidence/local-execution.json"
+        "docs/evidence/live-audit-checkpoint.json"
       ],
-      "scope": "Public authored fixtures only; not live payment or hosted authorization"
+      "scope": "Local application checks; separate hosted reports establish bounded live acceptance, not full product readiness"
     },
     {
       "id": "database_tenant_isolation",
-      "status": "partial",
-      "command": "bun run test:product",
-      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "status": "passed",
+      "command": "bun scripts/verify-hosted-database.ts",
+      "recordedAt": "2026-10-07T08:25:29.803Z",
       "evidencePaths": [
-        "tests/database/migrations.test.ts",
-        "docs/evidence/local-execution.json"
+        "docs/evidence/hosted-database.json",
+        "docs/evidence/clerk-session.json"
       ],
-      "scope": "Actual SQL in PostgreSQL-WASM with test claims; hosted auth and multi-connection tests unavailable"
+      "scope": "Hosted PostgreSQL separate-backend isolation, server repository grants, revocation and concurrent reservations; separate real Clerk JWT acceptance. Storage and organizations remain open."
     },
     {
       "id": "browser_e2e",
       "status": "passed",
       "command": "bun run test:browser --reporter=list,./tests/browser/evidence-reporter.ts",
-      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "recordedAt": "2026-10-07T08:59:31.580Z",
       "evidencePaths": [
-        "docs/evidence/browser-verification.json"
+        "docs/evidence/browser-verification.json",
+        "docs/evidence/private-repository-ui.json"
       ],
-      "scope": "Public authored fixtures only; not live payment or hosted authorization"
+      "scope": "Public fixtures and real authorized private source/graph/extractive questions; no paid acceptance"
     },
     {
       "id": "provider_independence",
@@ -99,12 +100,13 @@
     {
       "id": "independent_security_review",
       "status": "partial",
-      "command": "Actual atlas_security review and regression tests",
-      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "command": "Actual atlas_security review and independent hosted webhook verification",
+      "recordedAt": "2026-10-07T08:25:29.803Z",
       "evidencePaths": [
-        "docs/SECURITY.md"
+        "docs/SECURITY.md",
+        "docs/evidence/webhook-verification.json"
       ],
-      "scope": "Earlier fixture review completed; later payment adapter independent review blocked by client limit"
+      "scope": "Repository, webhook and saved-payment-term findings addressed; full publication/payment integration still unavailable for complete review."
     }
   ],
   "note": "Passing fixture checks do not satisfy missing live milestones. Release must remain blocked."

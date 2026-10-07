@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "verifiedAt": "2026-10-07T07:38:19.724Z",
-  "auditId": "632c9537-b1ca-4457-a361-79e9249f62a5",
+  "verifiedAt": "2026-10-07T08:06:50.810Z",
+  "auditId": "2f964c04-5f7c-4d59-83c2-2c97d2c0874d",
   "status": "passed",
   "scope": "Real hosted PostgreSQL TLS, isolated synthetic tenant RLS, native separate-backend concurrent reservations, idempotency, revocation and cleanup",
   "checks": [
@@ -45,6 +45,14 @@
           "anonymousWrite": false
         },
         {
+          "name": "personal_workspaces",
+          "rls": true,
+          "authenticatedRead": true,
+          "authenticatedWrite": false,
+          "anonymousRead": false,
+          "anonymousWrite": false
+        },
+        {
           "name": "purchases",
           "rls": true,
           "authenticatedRead": true,
@@ -77,6 +85,14 @@
           "anonymousWrite": false
         },
         {
+          "name": "webhook_deliveries",
+          "rls": true,
+          "authenticatedRead": false,
+          "authenticatedWrite": false,
+          "anonymousRead": false,
+          "anonymousWrite": false
+        },
+        {
           "name": "workspaces",
           "rls": true,
           "authenticatedRead": true,
@@ -94,6 +110,11 @@
       "workspacesCreated": 2,
       "claims": "Synthetic audit subjects; no actual Clerk JWT verification",
       "sourceRows": "Synthetic policy fixtures, not imported Git commits"
+    },
+    {
+      "id": "direct-jwt-without-server-repository-proof-denied",
+      "status": "passed",
+      "sourceAndGraphDeniedWithoutServerProof": true
     },
     {
       "id": "real-separate-connection-tenant-isolation",

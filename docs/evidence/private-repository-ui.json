@@ -1,0 +1,148 @@
+{
+  "checkedAt": "2026-10-07T08:57:12.434Z",
+  "scope": "Real connected human account; existing private import; desktop and narrow browser source/graph/extractive retrieval. No import/workspace writes, provider purchases, AI calls, or private source egress.",
+  "command": "bun scripts/verify-private-repository-ui.ts --allow-test-session --wait-ready",
+  "browser": {
+    "engine": "Edge",
+    "freshContext": true,
+    "savedAuthState": false,
+    "screenshotsOrTracesSaved": false,
+    "pageErrors": 0,
+    "consoleErrors": 6,
+    "expectedIndexHttpErrors": 0,
+    "expectedNegativeRouteHttpErrors": 6,
+    "unexpectedConsoleErrors": 0,
+    "pageFailedRequestCount": 1,
+    "aiRequests": 0,
+    "bearerRequestsAtExternalOrigins": 0
+  },
+  "sources": [
+    "https://clerk.com/docs/reference/backend/sign-in-tokens/create-sign-in-token",
+    "https://clerk.com/docs/nextjs/reference/objects/sign-in",
+    "https://clerk.com/docs/reference/backend/sign-in-tokens/revoke-sign-in-token",
+    "https://clerk.com/docs/reference/backend/sessions/revoke-session"
+  ],
+  "credentialsOrIdentifiersPersistedByVerifier": false,
+  "privateSourcePersistedByVerifier": false,
+  "session": {
+    "status": "verified",
+    "ticketSingleUse": true,
+    "ticketTtlSeconds": 120,
+    "principalMatches": true,
+    "newlyCreatedSession": true,
+    "existingSessionReused": false
+  },
+  "catalog": {
+    "status": "verified",
+    "accountHttpStatus": 200,
+    "principalMatches": true,
+    "privateRepositoryVisible": true,
+    "actualImportStatusRendered": true,
+    "importStatus": "complete",
+    "connectionControlEnabled": true
+  },
+  "index": {
+    "status": "verified",
+    "httpStatus": 200,
+    "noStore": true,
+    "mode": "git",
+    "principalMatches": true,
+    "workspaceMatches": true,
+    "immutableCommitMatchesQueuedImport": true,
+    "fileCount": 144,
+    "nodeCount": 1831,
+    "edgeCount": 7399
+  },
+  "source": {
+    "status": "verified",
+    "fullFileMatchesExactGitSource": true,
+    "displayedLineCount": 52,
+    "provenanceVisible": true
+  },
+  "graph": {
+    "status": "verified",
+    "progressiveExpansion": true,
+    "existingNodePositionsPreserved": true,
+    "accessibleListMatchesNodeAndEdgeCounts": true,
+    "relationshipOriginChecked": true
+  },
+  "question": {
+    "status": "verified",
+    "httpStatus": 200,
+    "mode": "extractive",
+    "questionDerivedFromRealSymbol": true,
+    "answerStatus": "evidence_ready",
+    "citationCount": 8,
+    "allCitationsCommitPrincipalWorkspaceAndSourceBound": true,
+    "citationNavigationMatchesSource": true,
+    "privateSourceSentToAi": false
+  },
+  "negativeRoutes": {
+    "status": "verified",
+    "realAuthenticatedCookies": true,
+    "importWritesPerformed": false,
+    "malformedQuestionJson": 400,
+    "oversizedQuestionBody": 413,
+    "emptyQuestion": 400,
+    "nonObjectQuestion": 400,
+    "wrongQuestionContentType": 400,
+    "malformedImportJson": 400,
+    "crossOriginQuestion": 403
+  },
+  "accessibility": {
+    "status": "verified",
+    "keyboardPanelResize": true,
+    "keyboardSearchShortcut": true,
+    "narrowWidth": 390,
+    "noHorizontalPageOverflow": true,
+    "narrowRepositorySourceAndListPanels": true,
+    "reducedMotionEnabled": true
+  },
+  "cleanup": {
+    "status": "verified",
+    "existingSessionsRevokedByTest": 0,
+    "sessionRevokeHttpStatus": 200,
+    "newSessionRevoked": true,
+    "ticketConsumedSingleUse": true
+  },
+  "anonymousRepository": {
+    "httpStatus": 401,
+    "denied": true
+  },
+  "navigation": {
+    "status": "verified",
+    "immediateRouteMatched": false,
+    "pathnameMatchesExpectedAfterRouterSettled": true
+  },
+  "initialIndexState": {
+    "httpStatus": 200,
+    "ready": true
+  },
+  "questionComposer": {
+    "textareaCount": 1,
+    "textareaEnabled": true,
+    "submitButtonCount": 1
+  },
+  "composerAfterFill": {
+    "inputHasValue": true,
+    "buttonEnabled": true,
+    "buttonAtCenter": true,
+    "buttonBox": {
+      "x": 1021,
+      "y": 785,
+      "width": 28,
+      "height": 28
+    },
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "questionApi": {
+    "httpStatus": 200,
+    "modeMatches": true,
+    "citationCount": 8
+  },
+  "status": "verified",
+  "completedAt": "2026-10-07T08:58:45.612Z"
+}

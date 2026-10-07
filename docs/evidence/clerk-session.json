@@ -1,0 +1,68 @@
+{
+  "checkedAt": "2026-10-07T07:47:35.985Z",
+  "scope": "Hosted Clerk development password sign-in through the real widget; account GET and Supabase REST JWT validation. No workspace mutations, invitations, email links, AI calls, or payments.",
+  "mode": "development-test-account",
+  "sources": [
+    "https://clerk.com/docs/reference/backend/user/create-user",
+    "https://clerk.com/docs/guides/development/testing/test-emails-and-phones",
+    "https://clerk.com/docs/reference/backend/user/delete-user",
+    "https://clerk.com/docs/reference/backend/sessions/revoke-session",
+    "https://supabase.com/docs/guides/auth/third-party/clerk"
+  ],
+  "credentialPersistence": false,
+  "temporaryUserCreated": true,
+  "browser": {
+    "engine": "Edge",
+    "widgetRendered": true,
+    "passwordSubmitted": true,
+    "pageErrors": 0,
+    "consoleErrors": 0
+  },
+  "account": {
+    "status": "verified",
+    "httpStatus": 200,
+    "authenticated": true,
+    "principalMatches": true,
+    "noStore": true
+  },
+  "supabase": {
+    "status": "verified",
+    "probe": "Nonexistent public table, limit=0; schema-cache error proves token validation but not data access.",
+    "httpStatus": 404,
+    "responseCode": "PGRST205",
+    "rejectionCategory": null,
+    "invalidTokenHttpStatus": 401,
+    "publishableKeyControlHttpStatus": 404,
+    "publishableKeyControlCode": "PGRST205",
+    "sessionTokenAccepted": true,
+    "jwtVerificationBlockedByApiKey": false,
+    "jwtRolePresent": true,
+    "jwtRoleIsAuthenticated": true,
+    "legacyJwtTemplateUsed": false,
+    "dataAuthorizationVerified": false
+  },
+  "cleanup": {
+    "status": "verified",
+    "sessionRevokeHttpStatus": 200,
+    "sessionRevoked": true,
+    "userDeleteHttpStatus": 200,
+    "userAbsenceHttpStatus": 404,
+    "userDeleted": true
+  },
+  "instance": {
+    "httpStatus": 200,
+    "development": true
+  },
+  "anonymousAccount": {
+    "httpStatus": 401,
+    "denied": true
+  },
+  "userCreationHttpStatus": 200,
+  "session": {
+    "status": "verified",
+    "principalMatchesTemporaryUser": true,
+    "tokenIssued": true
+  },
+  "status": "verified",
+  "completedAt": "2026-10-07T07:47:44.535Z"
+}

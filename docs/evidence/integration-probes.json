@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-07T07:38:31.331Z",
+  "date": "2026-10-07T08:19:46.436Z",
   "scope": "Read-only integration probes; no AI inference, payments, migrations, private repository downloads, or signed-in user acceptance.",
   "results": [
     {
@@ -24,7 +24,7 @@
       "id": "database",
       "status": "verified",
       "tlsVerified": true,
-      "atlasTables": 9,
+      "atlasTables": 11,
       "rlsVerified": false
     },
     {
@@ -39,7 +39,7 @@
       "repositoryRead": {
         "status": "verified",
         "httpStatus": 200,
-        "accessibleRepositoryCount": 72,
+        "accessibleRepositoryCount": 73,
         "userOAuthAuthorizationVerified": false
       },
       "installationsHttpStatus": 200,

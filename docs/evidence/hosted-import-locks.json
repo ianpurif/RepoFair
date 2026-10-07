@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "auditId": "d088c91c-d4bf-4731-b6e2-f590244dd6f1",
+  "verifiedAt": "2026-10-07T08:35:06.414Z",
+  "status": "passed",
+  "scope": "Hosted native PostgreSQL row-lock contention on isolated complete-status database fixtures; no existing tenant or source reads",
+  "checks": [
+    {
+      "id": "hosted-preflight",
+      "status": "passed",
+      "verifiedNativeTls": true,
+      "scopedTablesRlsEnabled": true,
+      "trustedRepositoryPolicyPresent": true
+    },
+    {
+      "id": "isolated-complete-status-fixtures",
+      "status": "passed",
+      "jobsAlwaysComplete": true,
+      "eligibleForWorkerClaim": false,
+      "sourceRowsCreated": 0,
+      "graphRowsCreated": 0
+    },
+    {
+      "id": "repository-job-snapshot-concurrent-order",
+      "status": "passed",
+      "separateBackendPids": [
+        21382,
+        21384
+      ],
+      "realRepositoryWaitObserved": true,
+      "waiterCompleted": true,
+      "jobLockAvailableToRepositoryHolder": true,
+      "reverseOrderDetectedByNowait": false,
+      "noDeadlockWaitRequired": true
+    },
+    {
+      "id": "reverse-order-negative-control",
+      "status": "passed",
+      "separateBackendPids": [
+        21384,
+        21382
+      ],
+      "realRepositoryWaitObserved": true,
+      "waiterCompleted": true,
+      "jobLockAvailableToRepositoryHolder": false,
+      "reverseOrderDetectedByNowait": true,
+      "noDeadlockWaitRequired": true
+    },
+    {
+      "id": "repository-first-skip-locked",
+      "status": "passed",
+      "separateBackendPids": [
+        21382,
+        21384
+      ],
+      "lockedRepositorySkipped": true,
+      "noJobLockAcquired": true
+    },
+    {
+      "id": "fixture-status-and-scope-retained",
+      "status": "passed",
+      "jobStatus": "complete",
+      "snapshotStatus": "complete",
+      "allNativeSocketsVerified": true,
+      "scopedCounts": {
+        "jobs": 1,
+        "source_files": 0,
+        "graphs": 0,
+        "snapshots": 1,
+        "repositories": 1,
+        "memberships": 1,
+        "workspaces": 1
+      }
+    }
+  ],
+  "cleanup": {
+    "status": "passed",
+    "onlyGeneratedWorkspace": "65aced12-4174-4d5f-8e74-903a872e0f57",
+    "remainingRows": {
+      "jobs": 0,
+      "source_files": 0,
+      "graphs": 0,
+      "snapshots": 0,
+      "repositories": 0,
+      "memberships": 0,
+      "workspaces": 0
+    }
+  },
+  "limitations": [
+    "Synthetic database fixtures are not GitHub imports, actual Git commits, verified Clerk identities or source evidence.",
+    "The contention probes exercise repository/job/snapshot SQL locking, not the full HTTP import workflow or every possible concurrent workload.",
+    "The production service lock acquisition order is separately covered by its focused integration test SQL traces.",
+    "No source, provider inference, purchase, payment broadcast, transaction ID or receipt was created."
+  ]
+}

@@ -41,3 +41,11 @@ Evidence: `docs/evidence/local-execution.json`, `browser-verification.json`, and
 ## Application AI change — 2026-10-07
 
 62 focused AI tests and 14 browser checks pass; 105 starter tests, full types, lint, frozen install and production build pass. The new provider audit reports no forbidden application runtime dependency/call/configuration. Tests use mocked Voyage/DeepSeek HTTP and browser answer transport, with no live paid requests. See `docs/evidence/ai-provider-migration.json` and AI.md for scope and the first browser selector correction. Earlier checkpoint counts above remain historical.
+
+## Hosted private-import checkpoint — 2026-10-07
+
+The current product suite passes 192 tests in 18 files; the focused import/auth/webhook suites pass 81 tests. Fixture browser checks pass 14/14. Lint, full source types and the production build pass. `docs/evidence/live-audit-checkpoint.json` links each result and its scope.
+
+Separate real evidence now covers Clerk widget sign-in and Supabase JWT acceptance, hosted multi-connection RLS/reservations, lock contention, signed localhost webhook persistence, and the user's private RepoFair import. The private browser checks exact source, graph expansion/list/origins, eight cited source ranges, keyboard/narrow layout and negative API requests. Verification sessions were revoked without revoking existing user sessions.
+
+One approved public-fixture Voyage/DeepSeek workflow also passed with eight canonical citations and estimated usage below US$0.001. No private source was sent to AI. Remote webhook delivery, organizations/Storage, publisher acceptance, real Tempo settlement/recovery and authenticated paid agent access remain separate open gates; release intentionally remains blocked.

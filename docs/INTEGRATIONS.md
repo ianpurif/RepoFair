@@ -58,13 +58,13 @@ multi-connection concurrency proof.
 | Codex agents | Six roles actually delegated; handles recorded | Observed child model fields remain unavailable, not inferred. |
 | Next/React/Tailwind | Exact pins installed, production build passes | Hosted runtime not deployed. |
 | TypeScript | 5.9.3; full source checks pass | Recheck future changes. |
-| ts-morph / React Flow | Actual fixture parser and interactive graph | Hard parser isolation before arbitrary imports. |
-| Clerk / Supabase | SQL foundation and local policy tests | Hosted identity, Storage, multi-connection tests and service adapters. |
-| GitHub App | Unavailable | Read-only import, exact snapshots, webhooks and publisher authority. |
+| ts-morph / React Flow | Real 144-file Git snapshot parsed and persisted; Node child with hard timeout/memory bounds | Unsupported syntax/resolution remains explicit; no runtime execution claims. |
+| Clerk / Supabase | Real sign-in, native session JWT acceptance, personal workspace provisioning, hosted RLS and concurrent reservations verified | Organization membership and private Storage remain open. |
+| GitHub App | Linked-user/App authorization, durable private import, immutable readback and extractive citations verified | Remote delivery and publisher authority remain open. |
 | MPP / Tempo | Unwired testnet adapter and offline official SDK challenge tests | Durable adapters, independent final review and actual settlement/recovery. |
 | Independent providers | Two separate fixture HTTP processes | Verified ownership, publication and distinct real recipients. |
 | MCP | Official stdio tools and protocol tests | Authenticated/paid transport not implemented. |
-| Application AI | Native Voyage embeddings/reranking + DeepSeek JSON generation; local disclosure-gated path | HTTP-mocked acceptance only; live provider access unverified. See AI.md. |
+| Application AI | Native Voyage embeddings/reranking + DeepSeek generation passed a four-request public-fixture workflow | Private authenticated AI and operating-cost reservations remain open. See AI.md. |
 | LangSmith | Disabled | Optional redacted traces with approved handling. |
 | Vitest / ESLint / Playwright | Installed local verification tooling | Live acceptance remains separate. |
 
@@ -74,4 +74,14 @@ Add each verified API signature, package version, source URL, observation date, 
 
 ## Application AI provider decision — 2026-10-07
 
-User requires Voyage AI for embeddings/retrieval and DeepSeek for all LLM/chat/reasoning/generation. Implemented native fetch against fixed official endpoints, server-only keys, explicit enablement and per-question disclosure. No model SDK, generic model env selection, provider fallback or retry. Defaults and verified official API references are recorded in AI.md. Real paid calls were not authorized or performed.
+User requires Voyage AI for embeddings/retrieval and DeepSeek for all LLM/chat/reasoning/generation. Implemented native fetch against fixed official endpoints, server-only keys, explicit enablement and per-question disclosure. No model SDK, generic model env selection, provider fallback or retry. Defaults and verified official API references are recorded in AI.md. User approved up to US$1; four public-fixture calls passed with estimated cost US$0.00068157. This estimate is not a billing statement. No private repository source was sent to either service.
+
+## Hosted identity and repository audit — 2026-10-07
+
+Clerk Next 7.9.11 is installed. Static environment middleware configuration avoids the encryption-key requirement caused by dynamic key options. Native Clerk session JWTs use the supported Supabase third-party integration (no legacy token template). A publishable key cannot read the Supabase OpenAPI root: the verification instead uses an intentionally nonexistent table, which returns authenticated schema-cache 404 for valid tokens and 401 for an invalid token.
+
+PostgreSQL uses the project's session pooler with certificate and hostname verification. The official Supabase CA is loaded through DATABASE_SSL_CA_FILE; verification is never disabled. Eleven Atlas tables and three subsequent migrations are present. Client-to-pooler verified TLS is distinct from the pooler's internal database hop.
+
+Private repository reads require verified Clerk identity, workspace membership, a linked GitHub identity and fresh repository authorization. A personal owner's verified numeric GitHub user ID must match both the installation account and repository owner; organization/collaborator access requires independent user repository-read permission. Only then does the server set a transaction-local repository grant used by PostgreSQL RLS. Direct client JWT claims cannot supply this grant. GitHub permissions reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/repository-access-and-collaboration/permission-levels-for-a-personal-account-repository.
+
+The App has one installation and read-only Contents/Metadata permission. The latest read-only probe found 73 accessible repositories, no event subscriptions, and HTTP 404 for webhook configuration. Local HMAC, replay, persistence and revocation tests pass, including hosted concurrent delivery tests; this does not establish remote GitHub delivery.

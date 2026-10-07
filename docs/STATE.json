@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "product": "Chronos Atlas",
   "stage": "implementation",
-  "currentPhase": "live-integration-audit",
-  "nextAction": "Complete hosted identity/RLS/concurrency acceptance and durable authenticated import, publication and testnet payment integrations.",
+  "currentPhase": "personal-private-import-verified",
+  "nextAction": "Complete organization scope, verified publishing, durable Tempo settlement/recovery, private AI cost/disclosure controls and authenticated SDK/MCP. Remote webhook delivery requires an approved reachable HTTPS deployment.",
   "milestones": [
     {
       "id": "P0",
@@ -82,5 +82,18 @@
       "docs/evidence/ai-live.json"
     ],
     "liveScope": "Bounded public fixture workflow; four real requests; private/hosted AI not accepted"
+  },
+  "hostedVerification": {
+    "clerkSession": true,
+    "supabaseClerkJwt": true,
+    "personalWorkspace": true,
+    "databaseTenantIsolation": true,
+    "concurrentReservations": true,
+    "webhookLocalAndHosted": true,
+    "remoteGitHubDelivery": false,
+    "privateImport": true,
+    "fullProduct": false,
+    "privateBrowser": true,
+    "privateSourceSentToAi": false
   }
 }

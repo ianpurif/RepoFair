@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-07T07:31:44.886Z",
-  "finishedAt": "2026-10-07T07:32:18.107Z",
+  "startedAt": "2026-10-07T08:49:36.402Z",
+  "finishedAt": "2026-10-07T08:50:11.389Z",
   "exitStatus": "passed",
   "command": "Playwright test invocation with evidence reporter",
   "url": "http://localhost:3000",
@@ -21,7 +21,7 @@
       "title": "AI disclosure is bound to the edited question and consumed; generated citations open real source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 3116,
+      "durationMs": 2604,
       "errors": [],
       "console": null
     },
@@ -29,7 +29,7 @@
       "title": "AI failure stays visible and never triggers local extraction as a fallback",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1504,
+      "durationMs": 1707,
       "errors": [],
       "console": null
     },
@@ -37,7 +37,7 @@
       "title": "parsed graph selection and list relationships open actual immutable source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1782,
+      "durationMs": 1904,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -51,7 +51,7 @@
       "title": "local question citations match original files and exact selected lines",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1833,
+      "durationMs": 2021,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -65,7 +65,7 @@
       "title": "unanswerable runtime guarantees and unsupported versions abstain without citations",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1812,
+      "durationMs": 2072,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -79,7 +79,7 @@
       "title": "search shortcut, empty state, and keyboard resizing remain usable",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1737,
+      "durationMs": 1826,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -93,7 +93,7 @@
       "title": "provider approval explicitly discloses a separate bounded outbound question",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 2953,
+      "durationMs": 2143,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -107,7 +107,7 @@
       "title": "two real providers extend graph with distinct exact-version provenance and clickable source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1996,
+      "durationMs": 2320,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -121,7 +121,7 @@
       "title": "buyer version change clears stale provider context, approval, question and source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 6240,
+      "durationMs": 6808,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -135,7 +135,7 @@
       "title": "mobile panels, keyboard evidence navigation and reduced motion fit the viewport",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1204,
+      "durationMs": 1711,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -149,7 +149,7 @@
       "title": "publishing remains gated and configured Clerk sign-in offers real authentication",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 2208,
+      "durationMs": 2503,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -163,7 +163,7 @@
       "title": "activity records actual index/source/retrieval/provider operations and can be cleared",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 2416,
+      "durationMs": 2677,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -177,7 +177,7 @@
       "title": "invalid snapshot, private path and cross-origin HTTP operations fail closed",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1137,
+      "durationMs": 1478,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -191,7 +191,7 @@
       "title": "injected indexing transport failure shows retry and records failed then actual recovered operation",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1212,
+      "durationMs": 1314,
       "errors": [],
       "console": {
         "pageErrors": [],

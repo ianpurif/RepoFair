@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-07T08:59:31.580Z",
+  "scope": "Configured local application, hosted development Clerk/Supabase and user-authorized private RepoFair import; no public deployment or payment settlement",
+  "checks": [
+    {
+      "command": "bun run test:product",
+      "exitCode": 0,
+      "testFiles": 18,
+      "testsPassed": 192,
+      "scope": "Local unit/integration suites; mocks and PostgreSQL-WASM are labelled in tests"
+    },
+    {
+      "command": "bunx vitest run tests/integration/{repository-service,github,git-parser,clerk-github,database-config,github-webhook}.test.ts",
+      "exitCode": 0,
+      "testFiles": 6,
+      "testsPassed": 81,
+      "scope": "Focused import/auth/webhook regressions; shell invoked six explicit paths"
+    },
+    {
+      "command": "bun run test:browser --reporter=list,./tests/browser/evidence-reporter.ts",
+      "exitCode": 0,
+      "testsPassed": 14,
+      "evidence": "docs/evidence/browser-verification.json"
+    },
+    {
+      "command": "bun run lint",
+      "exitCode": 0,
+      "scope": "ESLint, hygiene and exclusive Voyage/DeepSeek application provider audit"
+    },
+    {
+      "command": "bun run typecheck",
+      "exitCode": 0,
+      "scope": "Full source packages and web TypeScript"
+    },
+    {
+      "command": "bun run build",
+      "exitCode": 0,
+      "scope": "Production Next build including authenticated repository and webhook routes"
+    },
+    {
+      "command": "node scripts/worker.mjs --once",
+      "exitCode": 0,
+      "scope": "Actual private immutable import persisted after initial source/AST-bound failures were fixed",
+      "evidence": "docs/evidence/private-import.json"
+    },
+    {
+      "command": "bun scripts/verify-private-repository-ui.ts --allow-test-session --wait-ready",
+      "exitCode": 0,
+      "evidence": "docs/evidence/private-repository-ui.json"
+    },
+    {
+      "command": "bun scripts/verify-hosted-database.ts",
+      "exitCode": 0,
+      "evidence": "docs/evidence/hosted-database.json"
+    },
+    {
+      "command": "bun scripts/verify-hosted-import-locks.ts",
+      "exitCode": 0,
+      "evidence": "docs/evidence/hosted-import-locks.json"
+    },
+    {
+      "command": "bun scripts/verify-hosted-webhook.ts",
+      "exitCode": 0,
+      "evidence": "docs/evidence/webhook-verification.json"
+    },
+    {
+      "command": "bun run verify:release",
+      "exitCode": 1,
+      "scope": "Expected blocked result: full publishing, payment/recovery, federation and product acceptance remain incomplete"
+    }
+  ],
+  "privateSourceSentToAi": false,
+  "fullProductComplete": false
+}

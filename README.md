@@ -2,7 +2,7 @@
 
 **Map your code. Connect the knowledge.**
 
-Atlas maps source relationships and connects version-specific evidence from independently operated knowledge providers. The working local experience uses original public fixtures. Real authentication, GitHub import and Tempo settlement remain disabled pending credentials and acceptance checks.
+Atlas maps source relationships and connects version-specific evidence from independently operated knowledge providers. Public fixtures run without credentials. Clerk sign-in, Supabase persistence and read-only GitHub import now have real service adapters; acceptance evidence and remaining setup are tracked in [BLOCKERS.md](docs/BLOCKERS.md). Paid provider publication and Tempo settlement remain incomplete.
 
 ## Run locally
 
@@ -22,6 +22,8 @@ bun run provider:b
 
 These are separate HTTP processes on 127.0.0.1:4311 and :4312, with separate identities and package/version catalogs. Payments are disabled, recipients are unset, and no receipts are fabricated. Stop a process to unpublish its local service. Already delivered data remains on the buyer's device.
 
+For configured GitHub imports, sign in at `/sign-in`, connect GitHub in account settings and open `/app/repositories`. Run `bun run worker` in a separate terminal alongside the web server. Imports are durable jobs; stopping the worker leaves pending jobs pending rather than inventing a completed map. The private workspace uses deterministic source retrieval; private AI disclosure is not enabled.
+
 ## Local behavior
 
 - In-memory ts-morph extraction of files, symbols, imports, re-exports, references and statically supported calls, with original source ranges and extraction methods.
@@ -29,7 +31,7 @@ These are separate HTTP processes on 127.0.0.1:4311 and :4312, with separate ide
 - Three-panel workspace, graph/list navigation, source inspection, version selection and separately approved provider requests.
 - Five immutable source snapshots across one application and two dependencies. The second buyer snapshot resolves retry-kit 2.0.0 through a real npm lockfile.
 - Typed local SDK and genuine MCP stdio tools. See [MCP setup](docs/MCP.md).
-- Tenant and purchase SQL foundation with PostgreSQL-WASM policy tests. Hosted identity and concurrent database safety are separate gates.
+- Tenant and purchase SQL with PostgreSQL-WASM and hosted multi-connection policy/reservation tests. Actual Clerk session acceptance is recorded separately.
 
 ## Application AI
 
@@ -37,9 +39,9 @@ Voyage AI provides embeddings and reranking; DeepSeek provides generated answers
 
 ## Source and authorization boundary
 
-The running application accepts only catalog fixture IDs, never arbitrary filesystem roots, client tenant claims or private repositories. Files are bounded, digest-checked and parsed without executing scripts, installing dependencies, loading plugins or following symlinks.
+Fixture routes accept only catalog IDs. Authenticated repository routes require verified identity, workspace membership and fresh GitHub authorization before reading source. Immutable Git blobs are digest-checked and parsed without executing scripts, installing dependencies, loading plugins or following symlinks. Imported source stays within the configured application's PostgreSQL storage and authorized local responses.
 
-Initial dependency resolution supports npm package-lock v3. Fixture file links match trusted catalog metadata. Unsupported resolution stays unresolved. Parser time checks are cooperative; hostile arbitrary imports need process isolation before enabling that feature.
+Initial dependency resolution supports npm package-lock v3. Fixture file links match trusted catalog metadata. Unsupported resolution stays unresolved. Git imports use a separate Node parser process with a hard timeout, memory ceiling, sanitized environment and bounded source/graph sizes. They require a root package.json with an exact package version.
 
 ## Checks
 

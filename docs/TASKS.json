@@ -84,6 +84,70 @@
       "allowedWritePaths": [],
       "status": "completed",
       "completedAt": "2026-10-07"
+    },
+    {
+      "task": "/root/webhook_verifier",
+      "role": "atlas_verifier",
+      "status": "completed",
+      "allowedWritePaths": [
+        "tests/integration/github-webhook.test.ts",
+        "scripts/verify-hosted-webhook.ts",
+        "docs/evidence/webhook-verification.json"
+      ],
+      "recordedAt": "2026-10-07T08:25:29.803Z"
+    },
+    {
+      "task": "/root/private_import_security",
+      "role": "atlas_security",
+      "status": "completed",
+      "allowedWritePaths": [],
+      "recordedAt": "2026-10-07T08:25:29.803Z"
+    },
+    {
+      "task": "/root/payment_backend_audit",
+      "role": "atlas_security",
+      "status": "completed",
+      "allowedWritePaths": [],
+      "recordedAt": "2026-10-07T08:25:29.803Z"
+    },
+    {
+      "task": "/root/integration_code_audit",
+      "role": "atlas_architect",
+      "status": "completed",
+      "allowedWritePaths": [],
+      "recordedAt": "2026-10-07T08:25:29.803Z"
+    },
+    {
+      "task": "/root/github_backend",
+      "role": "atlas_engineer",
+      "status": "completed",
+      "allowedWritePaths": [
+        "apps/worker/src/github.ts",
+        "apps/worker/src/repository-service.ts",
+        "tests/integration/github.test.ts",
+        "tests/integration/repository-service.test.ts",
+        "scripts/verify-hosted-import-locks.ts"
+      ],
+      "recordedAt": "2026-10-07T08:25:29.803Z",
+      "completedAt": "2026-10-07T08:59:31.580Z"
+    },
+    {
+      "task": "/root/clerk_frontend",
+      "role": "atlas_frontend",
+      "status": "completed",
+      "allowedWritePaths": [
+        "scripts/verify-private-repository-ui.ts",
+        "docs/evidence/private-repository-ui.json"
+      ],
+      "recordedAt": "2026-10-07T08:25:29.803Z",
+      "completedAt": "2026-10-07T08:59:31.580Z"
+    },
+    {
+      "task": "/root/import_final_security",
+      "role": "atlas_security",
+      "allowedWritePaths": [],
+      "status": "completed",
+      "completedAt": "2026-10-07T08:59:31.580Z"
     }
   ],
   "note": "Populate only with actual task handles and path ownership from the current session."

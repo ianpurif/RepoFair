@@ -38,3 +38,13 @@ The lead reviewed the later unwired Tempo adapter and corrected saved receipt fa
 ## Application AI boundary review — 2026-10-07
 
 Actual read-only architect review `/root/ai_boundary_review` checked egress/consent/citations and found disclosure approval could survive question edits. Lead fixed approval reset on edits, suggestions and version changes, and consumes it on submission; browser regressions pass. Review also noted Host checks alone are not authentication. The loopback-only launcher now supplies an internal server marker required by the route; public deployment remains unsupported. Native clients have fixed vendor hosts, no redirects/retries/fallback, bounded bodies/deadlines and sanitized errors. No independent live-account/security certification is claimed.
+
+## Hosted repository review — 2026-10-07
+
+Actual `/root/private_import_security` review found inconsistent repository/job lock ordering, insufficient event/body binding for signed webhook payloads, and a possible direct-database path around fresh GitHub authorization if the schema were exposed. Fixes use consistent repository-first locks, event-specific body shape checks, and transaction-local server repository grants enforced by RLS. The database adapter clears grants for every principal transaction. Hosted checks deny source/graph reads without a grant, deny the wrong tenant even with a grant, and deny a revoked member. Imported code is parsed in a bounded child with a sanitized environment; it is never installed or executed.
+
+Actual `/root/webhook_verifier` independently passed 16 local tests and 17 hosted/HTTP checks covering HMAC rejection, concurrent deduplication, immutable jobs, cancellation, revocation and persisted signed localhost ping. Test records were cleaned. Remote GitHub delivery and dashboard secret matching remain unverified.
+
+The earlier payment-review scheduling limitation was resolved by `/root/payment_backend_audit`. Saved immutable purchase terms remain authoritative after provider configuration changes; mismatched provider identity remains denied. This review and regression tests do not establish real settlement or durable payment delivery.
+
+Final actual read-only `/root/import_final_security` review found no critical/high defect in the scoped import boundary after the bounded parallel downloader, parser diagnostics and bulk insert changes. It checked fresh authorization before reads/publication, numeric personal-owner binding, transaction-local grant reset/RLS, immutable hashes, isolated parsing, repository-first locks and extractive private questions. No tests or live requests were performed by this reviewer; the separate hosted/API/browser reports supply execution evidence. This is not a full-product security certification.

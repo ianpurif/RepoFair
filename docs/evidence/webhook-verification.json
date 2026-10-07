@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-07T08:13:15.422Z",
+  "scope": "Native hosted PostgreSQL handler tests with synthetic generated workspaces and GitHub IDs; server principal claim injection, not a Clerk authentication test.",
+  "databaseTls": "native-adapter-verifies-certificate-and-host",
+  "command": "bun scripts/verify-hosted-webhook.ts",
+  "cleanup": "verified-generated-rows-only",
+  "checks": [
+    {
+      "id": "hosted-migrations-and-server-grant-policy",
+      "status": "passed"
+    },
+    {
+      "id": "forged-hmac-no-durable-mutation",
+      "status": "passed"
+    },
+    {
+      "id": "no-source-or-graph-without-server-grant",
+      "status": "passed"
+    },
+    {
+      "id": "authorized-grant-enables-isolated-source-and-graph",
+      "status": "passed"
+    },
+    {
+      "id": "other-principal-denied-despite-grant",
+      "status": "passed"
+    },
+    {
+      "id": "unsigned-event-header-reinterpretation-denied",
+      "status": "passed"
+    },
+    {
+      "id": "concurrent-same-delivery-one-immutable-job",
+      "status": "passed"
+    },
+    {
+      "id": "same-uuid-changed-signed-body-denied",
+      "status": "passed"
+    },
+    {
+      "id": "different-delivery-same-commit-no-second-job",
+      "status": "passed"
+    },
+    {
+      "id": "invalid-removal-transaction-rolls-back-delivery",
+      "status": "passed"
+    },
+    {
+      "id": "installation-repository-removal-revokes-and-cancels",
+      "status": "passed"
+    },
+    {
+      "id": "revocation-denies-source-and-graph-even-with-prior-grant",
+      "status": "passed"
+    },
+    {
+      "id": "revoked-repository-push-cannot-queue",
+      "status": "passed"
+    },
+    {
+      "id": "exact-removal-replay-is-duplicate",
+      "status": "passed"
+    },
+    {
+      "id": "localhost-http-invalid-signature-denied",
+      "status": "passed"
+    },
+    {
+      "id": "localhost-http-signed-ping-and-replay",
+      "status": "passed"
+    },
+    {
+      "id": "localhost-http-oversized-body-denied",
+      "status": "passed"
+    }
+  ],
+  "remoteGitHubDeliveryVerified": false,
+  "httpRouteVerified": true,
+  "limitations": [
+    "No GitHub-origin HTTP delivery, webhook dashboard secret match, public endpoint, browser session, or remote source was exercised."
+  ]
+}

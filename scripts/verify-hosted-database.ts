@@ -97,8 +97,8 @@ try {
         has_table_privilege('anon',c.oid,'SELECT') AS anonymous_read,
         (has_table_privilege('anon',c.oid,'INSERT') OR has_table_privilege('anon',c.oid,'UPDATE') OR has_table_privilege('anon',c.oid,'DELETE') OR has_table_privilege('anon',c.oid,'TRUNCATE')) AS anonymous_write
       FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='atlas' AND c.relkind='r' ORDER BY c.relname`)).rows;
-    assert(rows.length === tables.length && tables.every(table => rows.some(row => row.name === table)), 'audit-hosted-table-layout-differs');
-    assert(rows.every(row => row.rls && row.authenticated_read && !row.authenticated_write && !row.anonymous_read && !row.anonymous_write), 'audit-hosted-table-permissions-differ');
+    assert(rows.length === tables.length + 2 && ['personal_workspaces','webhook_deliveries'].every(name => rows.some(row => row.name === name)) && tables.every(table => rows.some(row => row.name === table)), 'audit-hosted-table-layout-differs');
+    assert(rows.every(row => row.rls && (row.name === 'webhook_deliveries' ? !row.authenticated_read : row.authenticated_read) && !row.authenticated_write && !row.anonymous_read && !row.anonymous_write), 'audit-hosted-table-permissions-differ');
     const roles = (await transaction.query<{ name: string; bypass: boolean; superuser: boolean }>("SELECT rolname AS name, rolbypassrls AS bypass, rolsuper AS superuser FROM pg_roles WHERE rolname IN ('authenticated','anon')")).rows;
     assert(roles.length === 2 && roles.every(role => !role.bypass && !role.superuser), 'audit-untrusted-role-bypasses-rls');
     const functions = (await transaction.query<{ name: string; source: string; security_definer: boolean; authenticated_execute: boolean; anonymous_execute: boolean; service_execute: boolean }>(`
@@ -132,11 +132,17 @@ try {
     }
     return { workspacesCreated: 2, claims: 'Synthetic audit subjects; no actual Clerk JWT verification', sourceRows: 'Synthetic policy fixtures, not imported Git commits' };
   }));
+  await check('direct-jwt-without-server-repository-proof-denied', async () => {
+    const counts = await db.withPrincipalTransaction(principals[0]!, scopedCounts);
+    assert(['repositories','snapshots','source_files','graphs','jobs'].every(table => counts[table] === 0), 'audit-direct-source-access-without-github-proof');
+    return { sourceAndGraphDeniedWithoutServerProof: true };
+  });
   await check('real-separate-connection-tenant-isolation', async () => {
     let arrived = 0; let release = () => {}; const barrier = new Promise<void>(resolve => { release = resolve; });
     const results = await Promise.all(([0, 1] as const).map(actor => db.withPrincipalTransaction(principals[actor]!, async transaction => {
       const pid = (await transaction.query<{ pid: number }>('SELECT pg_backend_pid() AS pid')).rows[0]?.pid;
       if (++arrived === 2) release(); await barrier;
+      await transaction.query("SELECT set_config('atlas.authorized_repository_ids',$1,true)",[JSON.stringify(repositoryIds)]);
       const counts = await scopedCounts(transaction);
       assert(tables.every(table => counts[table] === (table === 'purchases' ? 0 : 1)), 'audit-tenant-row-isolation-failed');
       const source = await transaction.query<{ workspace_id: string }>('SELECT workspace_id FROM atlas.source_files WHERE workspace_id=ANY($1::uuid[])', [workspaceIds]);
@@ -199,7 +205,7 @@ try {
   });
   await check('membership-revocation-removes-all-private-visibility', async () => {
     await db.withAdminTransaction(transaction => transaction.query('DELETE FROM atlas.memberships WHERE workspace_id=$1 AND principal_id=$2', [workspaceIds[0], principals[0]]));
-    const counts = await db.withPrincipalTransaction(principals[0]!, scopedCounts);
+    const counts = await db.withPrincipalTransaction(principals[0]!, async transaction => { await transaction.query("SELECT set_config('atlas.authorized_repository_ids',$1,true)",[JSON.stringify(repositoryIds)]); return scopedCounts(transaction); });
     assert(Object.values(counts).every(count => count === 0), 'audit-revoked-principal-keeps-private-access');
     await expectDatabaseDenial(() => reserve(db, 0, 'revoked-request', '1'), 'query');
     return { newRequestVisibilityRemoved: true, sourceAndGraphHidden: true, budgetAndPurchasesHidden: true, reservationAfterRevocationDenied: true, counts };
