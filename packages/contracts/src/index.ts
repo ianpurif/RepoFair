@@ -1,6 +1,7 @@
 /** Public domain contracts. Runtime service integration is milestone work. */
 export * from './local.ts';
 export * from './federation.ts';
+export * from './publication.ts';
 export type Mode = 'fixture' | 'tempo-testnet' | 'live';
 export type EvidenceState = 'sufficient' | 'insufficient' | 'unknown';
 export type AnswerStatus = 'evidence_ready' | 'answered' | 'clarification_needed' | 'abstained' | 'unavailable' | 'denied';

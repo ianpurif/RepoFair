@@ -10,7 +10,8 @@
     "./database": "./src/database.ts",
     "./github": "./src/github.ts",
     "./repositories": "./src/repository-service.ts",
-    "./github-webhook": "./src/github-webhook.ts"
+    "./github-webhook": "./src/github-webhook.ts",
+    "./publications": "./src/publication-service.ts"
   },
   "dependencies": {
     "@atlas/core": "workspace:*",

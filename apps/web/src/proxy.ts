@@ -1,7 +1,7 @@
 import { clerkMiddleware } from '@clerk/nextjs/server';
 import { NextResponse, type NextFetchEvent, type NextRequest } from 'next/server';
 
-const isProtectedApi = (pathname: string) => ['/api/account', '/api/repositories'].some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+const isProtectedApi = (pathname: string) => ['/api/account', '/api/repositories', '/api/publications'].some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 
 const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.trim();
 const secretKey = process.env.CLERK_SECRET_KEY?.trim();

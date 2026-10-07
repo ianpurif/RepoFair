@@ -74,6 +74,7 @@ declare const verifiedUserBrand: unique symbol;
 export type VerifiedGitHubUser = Readonly<{ principalId: string; githubUserId: number; login: string; [verifiedUserBrand]: true }>;
 declare const repositoryAuthorizationBrand: unique symbol;
 export type AuthorizedGitHubRepository = GitHubRepository & Readonly<{ principalId: string; installationId: number; [repositoryAuthorizationBrand]: true }>;
+export type GitHubPublishingAuthority = Readonly<{ repository: AuthorizedGitHubRepository; principalId: string; githubUserId: number; authority: 'personal-owner' | 'repository-admin' }>;
 export type GitHubCommit = Readonly<{ sha: string; treeSha: string }>;
 export type GitHubSourceTree = Readonly<{ commitSha: string; treeSha: string; files: readonly Readonly<{ path: string; size: number; blobSha: string }>[]; limitations: readonly string[] }>;
 export type GitHubImportLimits = Readonly<{ maxFiles: number; maxFileBytes: number; maxTotalBytes: number }>;
@@ -202,6 +203,24 @@ export class GitHubAppClient {
     if (!Number.isFinite(expiresAt) || expiresAt <= this.now() || /\s/.test(token)) return invalid('Invalid GitHub installation access token');
     const authorized = Object.freeze({ ...selected, principalId: user.principalId, installationId: installed.id }) as AuthorizedGitHubRepository;
     this.repositories.set(authorized, { user, token, expiresAt: Math.min(expiresAt, this.now() + 300_000) }); return authorized;
+  }
+  /** Distinct sale-claim authority; read access and installation permissions never suffice. */
+  async authorizePublication(user: VerifiedGitHubUser, selection: Readonly<{ owner: string; name: string; repositoryId?: number; installationId?: number }>): Promise<GitHubPublishingAuthority> {
+    const identity = record(await this.request('/user', this.userSecret(user).token));
+    if (integer(identity.id) !== user.githubUserId) throw new GitHubError('unauthorized', 'Publishing identity changed');
+    const authorized = await this.authorizeRepository(user, selection);
+    const secret = this.repositorySecret(authorized);
+    if (secret.personalOwner) {
+      // authorizePersonalOwner has just verified GET /user identity, the User
+      // installation account and numeric repository owner using the narrow token.
+      return Object.freeze({ repository: authorized, principalId: user.principalId, githubUserId: user.githubUserId, authority: 'personal-owner' });
+    }
+    const item = record(await this.request(`/repos/${segment(authorized.owner)}/${segment(authorized.name)}`, this.userSecret(user).token));
+    const current = repository(item); const permissions = record(item.permissions);
+    if (current.id !== authorized.id || current.fullName.toLowerCase() !== authorized.fullName.toLowerCase() || item.disabled === true || permissions.admin !== true) {
+      throw new GitHubError('unauthorized', 'Repository administrative publishing authority is required');
+    }
+    return Object.freeze({ repository: authorized, principalId: user.principalId, githubUserId: user.githubUserId, authority: 'repository-admin' });
   }
   /** A verified personal owner needs no broad OAuth repo scope; content still uses a single-repo read-only App token. */
   private async authorizePersonalOwner(user: VerifiedGitHubUser, selection: Readonly<{ owner: string; name: string; repositoryId?: number; installationId?: number }>): Promise<AuthorizedGitHubRepository> {
