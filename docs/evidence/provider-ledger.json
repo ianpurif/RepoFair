@@ -1,0 +1,20 @@
+{
+  "checkedAt": "2026-10-07T09:38:49.757Z",
+  "status": "verified",
+  "scope": "Real hosted quote/claim/unknown persistence with synthetic authorization; no real sale",
+  "checks": [
+    "separate-postgres-backends",
+    "eight-concurrent-quotes-one-immutable-row",
+    "quote-expiry-remains-frozen",
+    "eight-concurrent-claims-one-winner-seven-pending",
+    "unknown-retained-without-receipt-or-reclaim",
+    "altered-idempotent-terms-rejected",
+    "injected-authorization-revocation-denies-read",
+    "anonymous-and-authenticated-role-denied"
+  ],
+  "failure": null,
+  "generatedRecordsCleaned": true,
+  "paymentSubmitted": false,
+  "settlementVerified": false,
+  "liveEntitlementVerified": false
+}
