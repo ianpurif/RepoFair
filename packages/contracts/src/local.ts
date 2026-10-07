@@ -17,6 +17,9 @@ export type LocalIndex = Readonly<{
   evidence: readonly SourceEvidence[]; dependencies: readonly DependencyBinding[];
   unresolved: readonly string[]; limitations: readonly string[];
 }>;
+/** Git source is separately authorized and always identified by an immutable commit. */
+export type RepositoryIndex = Omit<LocalIndex, 'mode'> & Readonly<{ mode: 'git' }>;
+export type SourceIndex = LocalIndex | RepositoryIndex;
 export type Activity = Readonly<{
   id: string; operation: string; startedAt: string; durationMs: number;
   status: 'complete' | 'failed'; detail: string;

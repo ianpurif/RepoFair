@@ -239,15 +239,17 @@ browserTest('mobile panels, keyboard evidence navigation and reduced motion fit 
   expect(geometry.transition).toBe('0s'); expect(geometry.animation).toBe('none');
 });
 
-browserTest('unavailable publishing and sign-in explain setup and disable unavailable actions', async ({ page }) => {
+browserTest('publishing remains gated and configured Clerk sign-in offers real authentication', async ({ page }) => {
   await page.goto('/app/publish');
   await expect(page.getByText('Publishing is unavailable', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Publish service' })).toBeDisabled();
   await expect(page.getByRole('region', { name: 'Required publishing steps' })).toContainText('Private source is never exposed by default.');
   await page.goto('/sign-in');
-  await expect(page.getByText('Authentication setup required.', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Continue with Google' })).toBeDisabled();
-  await page.getByRole('link', { name: 'Explore the fixtures' }).click();
+  await expect(page.getByRole('textbox', { name: 'Email address', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Continue with Google', exact: true })).toBeEnabled();
+  const account = await page.request.get('/api/account');
+  expect(account.status()).toBe(401);
+  await page.getByRole('link', { name: 'Explore the public fixtures' }).click();
   await expect(page.getByText('Snapshot ready', { exact: true })).toBeVisible();
 });
 

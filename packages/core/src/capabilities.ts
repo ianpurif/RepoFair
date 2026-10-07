@@ -18,9 +18,10 @@ export function applicationCapabilities(): Capabilities {
   const starter = starterCapabilities();
   return { ...starter, stage: 'local-fixture', capabilities: { ...starter.capabilities,
     'source-graph-parser': 'available', 'extractive-questions': 'available',
+    'graph-grounded-generation': 'disabled', 'clerk-session': 'available',
     'fixture-provider-http': 'available', 'fixture-federation': 'available', 'fixture-mcp-stdio': 'available',
   }, limitations: ['Public catalog fixtures only; arbitrary repository import is unavailable.',
-    'External integrations and payments are disabled. Fixture provider HTTP is real; no settlement is attempted.',
+    'Voyage/DeepSeek generation is implemented and requires explicit local enablement and disclosure approval. Payments remain disabled.',
     'Extractive source retrieval is available without a generation model.',
-    'Hosted identity, RLS and multi-connection budget tests remain unverified.'] };
+    'Clerk session UI is implemented; hosted identity-to-tenant, RLS and concurrent database tests remain unverified.'] };
 }

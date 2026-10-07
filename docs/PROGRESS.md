@@ -65,3 +65,7 @@ Actual engineering and architecture task handles are recorded. Review identified
 Checks: 62 AI tests passed (mocked HTTP), 14 browser tests passed (AI responses mocked; existing fixture services real), 105 starter checks passed; lint/provider-policy audit, source typecheck, frozen install and production build passed. Full product suite passed 108 tests before one final added HTTP-pipeline test; the final focused AI run includes that added passing test. First browser run had 13 passing tests and one ambiguous alert selector; scoped to the actual error panel and reran all 14 successfully.
 
 No live API call or spending occurred. Keys remain local; values were not printed. Existing untracked Supabase files were preserved; only obsolete provider lines were removed from its local config. Real provider access/quality and public authenticated AI remain unverified. Setup: AI.md.
+
+## Live integration audit — 2026-10-07 (in progress)
+
+Configured keys were tested against real services. Corrected GitHub private-key file configuration and database pooler/TLS CA setup; user corrected database password and installed App with read permissions. Native Voyage/DeepSeek workflow passed with8citations and estimated$0.000682 usage. Clerk UI/proxy integrated; dynamic-key middleware error reproduced and fixed. Real Edge widget rendered withoutpageerrors,14browserchecks passed. Native GitHub and pg adapters added; hostedtenant/concurrency and signed-in acceptance continue. No fullreleaseclaim.

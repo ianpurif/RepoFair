@@ -71,6 +71,30 @@ describe('unwired Tempo testnet adapter', () => {
     expect((await adapter.handle(request(true))).status).toBe(409); expect(dependencies.markUnknown).toHaveBeenCalledTimes(1);
     expect(dependencies.deliver).not.toHaveBeenCalled();
   });
+  it('rejects a saved purchase belonging to another provider before delivery', async () => {
+    const { config, dependencies, request, body, now } = configured();
+    dependencies.lookup = vi.fn(async () => ({ state: 'settled', terms: {
+      providerId: 'other-provider', operation: 'context.retrieve', requestDigest: BodyDigest.compute(body),
+      packageName: '@test/lib', version: '1.0.0', network: 'eip155:42431', token: config.token,
+      recipient: config.recipient, atomicAmount: '500', expiresAtMs: now - 1,
+    } }));
+    const response = await createTempoTestnetAdapter(config, dependencies).handle(request());
+    expect(response.status).toBe(503); expect(dependencies.verifySettlement).not.toHaveBeenCalled();
+    expect(dependencies.deliver).not.toHaveBeenCalled(); expect(dependencies.quote).not.toHaveBeenCalled();
+  });
+  it('preserves settled terms across price and recipient rotation without requoting', async () => {
+    const { config, dependencies, request, body, now } = configured();
+    dependencies.lookup = vi.fn(async () => ({ state: 'settled', terms: {
+      providerId: config.providerId, operation: 'context.retrieve', requestDigest: BodyDigest.compute(body),
+      packageName: '@test/lib', version: '1.0.0', network: 'eip155:42431', token: config.token,
+      recipient: `0x${'3'.repeat(40)}`, atomicAmount: '500', expiresAtMs: now - 1,
+    } }));
+    const response = await createTempoTestnetAdapter(config, dependencies).handle(request());
+    expect(response.status).toBe(503);
+    expect((await response.json()).error).toContain('Saved settlement cannot be verified');
+    expect(dependencies.quote).not.toHaveBeenCalled(); expect(dependencies.claim).not.toHaveBeenCalled();
+    expect(dependencies.getClient).not.toHaveBeenCalled();
+  });
   it('does not issue another charge when a settled durable record cannot yet provide delivery evidence', async () => {
     const { config, dependencies, request, body, now } = configured();
     dependencies.lookup = vi.fn(async () => ({ state: 'settled', terms: {

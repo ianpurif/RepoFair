@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "product": "Chronos Atlas",
   "stage": "implementation",
-  "currentPhase": "P6-local-checkpoint",
-  "nextAction": "Configure external integrations and complete missing production adapters and acceptance gates listed in BLOCKERS.md. Local fixture checkpoint is verified.",
+  "currentPhase": "live-integration-audit",
+  "nextAction": "Complete hosted identity/RLS/concurrency acceptance and durable authenticated import, publication and testnet payment integrations.",
   "milestones": [
     {
       "id": "P0",
@@ -75,10 +75,12 @@
     "generationProvider": "DeepSeek",
     "implementation": "native REST, bounded grounding, explicit local disclosure",
     "defaultEnabled": false,
-    "liveVerified": false,
+    "liveVerified": true,
     "evidence": [
       "docs/evidence/ai-provider-migration.json",
-      "docs/AI.md"
-    ]
+      "docs/AI.md",
+      "docs/evidence/ai-live.json"
+    ],
+    "liveScope": "Bounded public fixture workflow; four real requests; private/hosted AI not accepted"
   }
 }

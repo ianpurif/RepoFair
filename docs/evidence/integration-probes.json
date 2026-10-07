@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-07T07:38:31.331Z",
+  "scope": "Read-only integration probes; no AI inference, payments, migrations, private repository downloads, or signed-in user acceptance.",
+  "results": [
+    {
+      "id": "clerk",
+      "status": "verified",
+      "httpStatus": 200,
+      "development": true
+    },
+    {
+      "id": "supabase-auth",
+      "status": "verified",
+      "httpStatus": 200
+    },
+    {
+      "id": "supabase-storage",
+      "status": "verified",
+      "httpStatus": 200,
+      "bucketCount": 0,
+      "tenantIsolationVerified": false
+    },
+    {
+      "id": "database",
+      "status": "verified",
+      "tlsVerified": true,
+      "atlasTables": 9,
+      "rlsVerified": false
+    },
+    {
+      "id": "github-app",
+      "status": "verified",
+      "idMatches": true,
+      "permissions": {
+        "contents": "read",
+        "metadata": "read"
+      },
+      "events": [],
+      "repositoryRead": {
+        "status": "verified",
+        "httpStatus": 200,
+        "accessibleRepositoryCount": 72,
+        "userOAuthAuthorizationVerified": false
+      },
+      "installationsHttpStatus": 200,
+      "installationCount": 1,
+      "webhookConfigurationHttpStatus": 404,
+      "webhookConfigured": false
+    },
+    {
+      "id": "deepseek-models",
+      "status": "verified",
+      "httpStatus": 200,
+      "configuredModelAvailable": true
+    }
+  ]
+}

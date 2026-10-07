@@ -6,7 +6,9 @@
   "exports": {
     "./fixtures": "./src/fixture-service.ts",
     "./federation": "./src/federation.ts",
-    "./ai": "./src/ai-service.ts"
+    "./ai": "./src/ai-service.ts",
+    "./database": "./src/database.ts",
+    "./github": "./src/github.ts"
   },
   "dependencies": {
     "@atlas/core": "workspace:*",

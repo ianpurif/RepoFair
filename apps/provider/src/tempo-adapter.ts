@@ -106,7 +106,10 @@ export function createTempoTestnetAdapter(config: TempoProviderConfig | null, de
     try {
       const existing = await dependencies!.lookup(authorized, proposed.requestDigest);
       if (existing) {
-        validateTestnetTermsShape(existing.terms); sameTerms(existing.terms);
+        validateTestnetTermsShape(existing.terms);
+        // Saved purchase terms remain authoritative after a provider changes its current selling terms.
+        for (const field of ['providerId', 'operation', 'requestDigest', 'packageName', 'version', 'network'] as const)
+          requireAdapter(existing.terms[field] === proposed[field], 'Persisted purchase belongs to a different request');
         if (existing.state === 'settled') return resumeDelivery(existing.terms, existing);
         return reply(409, 'Payment is pending, unknown or rejected; reconcile before any new purchase', existing.state === 'rejected' ? 'not-attempted' : 'unknown');
       }

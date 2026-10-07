@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-07",
+  "status": "evidence_ready",
+  "models": {
+    "embedding": "voyage-code-3",
+    "reranking": "rerank-2.5",
+    "generation": "deepseek-flash"
+  },
+  "citationCount": 8,
+  "activities": [
+    "voyage.embed.documents",
+    "voyage.embed.query",
+    "voyage.rerank",
+    "deepseek.generate"
+  ],
+  "usage": [
+    {
+      "endpoint": "/v1/embeddings",
+      "status": 200,
+      "usage": {
+        "total_tokens": 420
+      }
+    },
+    {
+      "endpoint": "/v1/embeddings",
+      "status": 200,
+      "usage": {
+        "total_tokens": 4
+      }
+    },
+    {
+      "endpoint": "/v1/rerank",
+      "status": 200,
+      "usage": {
+        "total_tokens": 337
+      }
+    },
+    {
+      "endpoint": "/chat/completions",
+      "status": 200,
+      "usage": {
+        "prompt_tokens": 808,
+        "completion_tokens": 288,
+        "total_tokens": 1096,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 808
+      }
+    }
+  ],
+  "approvedUsd": 1,
+  "maximumRequests": 4,
+  "conservativePreflightUsd": 0.1,
+  "estimatedUsdAtPublishedPeakRates": 0.00068157,
+  "costBasis": "424 Voyage code3 tokens at $0.18/M;337 rerank2.5 tokens at $0.05/M;808 DeepSeek uncached input at $0.30/M and288 output at $1.20/M. Estimate, not billing statement."
+}

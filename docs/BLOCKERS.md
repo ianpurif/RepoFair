@@ -1,38 +1,23 @@
-# External setup and blockers
+# Current integration blockers
 
-Current checkpoint: local tools verified; external integrations remain unavailable.
+Audit in progress, 2026-10-07. Environment presence is not acceptance evidence.
 
-## Confirmed 2026-10-03
+## Resolved setup blockers
 
-User confirmed external credentials are not configured and directed completion
-of all safe local work. Do not request secrets in chat. Clerk/Supabase/GitHub App
-and real Tempo testnet purchase acceptance remain blocked on setup.
+- Clerk development instance and real sign-in widget respond successfully; anonymous protected API requests return401. Signed-in acceptance is being tested.
+- Supabase Auth and Storage APIs accept configured keys. Database pooler now connects with verified TLS after correcting endpoint, installing the official Supabase CA locally, and the user correcting the database password. Nine Atlas tables are present. Hosted RLS/concurrency verification is in progress.
+- GitHub App RSA key file is valid. Contents/Metadata read permissions and one installation are confirmed after user configuration. The prior40-character value was not an App private key and is no longer used.
+- Voyage document/query embeddings, reranking and DeepSeek grounded generation passed a real four-request workflow with eight canonical citations. Estimated cost belowUS$0.001 against approvedUS$1. No alternative AI provider or fallback.
+- Independent payment-adapter review completed; the old agent scheduling blocker is obsolete. Saved purchase terms now survive changes to current provider pricing/recipient without requoting.
 
-Docker executable exists but its Linux engine pipe is unavailable. No psql was
-found on PATH. Database migrations can be reviewed; actual multi-connection
-PostgreSQL/RLS tests remain unverified until a test database is available.
-No global tools, trust or permission settings were changed.
+## Still open
 
-Subsequent local PostgreSQL-WASM migration tests passed with a test claim shim.
-This narrows SQL/policy uncertainty but leaves hosted auth and multi-connection
-database testing blocked. See tests/database and the integration ledger.
+1. **Authentication and tenant acceptance:** verify real signed-in session, personal workspace provisioning, Clerk third-party authentication in Supabase, and organization membership. The database transaction adapter and Clerk UI exist; these alone do not establish every flow.
+2. **GitHub import and webhooks:** native App authorization/download/HMAC boundaries are implemented and tested. Durable import routes/jobs, real Git snapshot parsing, repository UI wiring and revocation processing are incomplete. App reports no event subscriptions; webhook configuration request returns404. Public webhook delivery requires a reachable approved deployment; localhost is not reachable by GitHub.
+3. **Hosted persistence:** real RLS/concurrency audit is running. Storage currently has zero buckets; private object isolation is not configured or verified. Do not infer isolation from service-key access.
+4. **Publishing:** repository administrative authority, endpoint control, exposure preview and durable publication/revocation remain incomplete. Fixture providers do not satisfy this gate.
+5. **Tempo settlement:** RPC chain42431 and configured token contract/6decimals verified. No approved signer, second independent recipient or durable payment/replay/delivery route is configured. Real testnet settlement, interrupted delivery recovery and no-double-charge acceptance remain open.
+6. **Production AI and agent access:** live AI verification uses authorized public fixture source. Private authenticated AI, operating-cost reservations, durable traces and authenticated SDK/MCP paths remain incomplete. AI is disabled by default and has no fallback.
+7. **Release:** full product acceptance remains blocked. No public deployment, real-money Tempo payment, package publication or full completion is claimed.
 
-Toolchain, trusted workspace and real role delegation are available. Bootstrap
-completed successfully with Bun 1.4.1 and generated the real lockfile.
-
-- Clerk/Supabase project credentials and approved configuration (P5; private data gates sooner).
-- Read-only GitHub App setup and selected repository permissions.
-- Voyage AI and DeepSeek server credentials and explicitly approved usage for live AI acceptance; the native local AI path is implemented and HTTP-mock tested.
-- Tempo testnet endpoints/asset details, signer approval and two provider recipients for real payment evidence.
-
-None of these permits fabrication. Continue the local fixture pipeline while external capabilities are blocked. Batch required user inputs, explain why each is needed, and never request secrets in source-controlled files or public chat output.
-
-## Resume checklist
-
-1. Configure Clerk/Supabase third-party auth and a read-only GitHub App locally; never share secret values in chat. Implement and verify identity-to-tenant, import and durable worker adapters before private source is accepted.
-2. Provide an isolated PostgreSQL/Supabase test database. Apply reviewed migrations and verify hosted identities, Storage isolation and concurrent reservations.
-3. Complete verified publisher/repository authority, endpoint control and exposure-reviewed publication. Local fixture process publication is not this workflow.
-4. Configure approved Tempo Moderato asset, signer and two independent provider recipients. Complete durable quote/reservation/replay/finality/delivery adapters and independent security review before wiring payment routes. Capture actual testnet settlement and interrupted-delivery recovery evidence.
-5. Repeat full acceptance checks and release gate. Public deployment, package publication and real-money spending require separate explicit authorization.
-
-The later independent payment-adapter review could not be scheduled because the client returned `agent thread limit reached`. Lead review and offline tests were completed; this independent gate remains open.
+Evidence: integration-probes.json, ai-live.json and browser-verification.json under docs/evidence. Completed setup failures are removed from the active list; historical evidence remains in PROGRESS.md.

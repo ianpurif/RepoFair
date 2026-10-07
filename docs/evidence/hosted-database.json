@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-10-07T07:38:19.724Z",
+  "auditId": "632c9537-b1ca-4457-a361-79e9249f62a5",
+  "status": "passed",
+  "scope": "Real hosted PostgreSQL TLS, isolated synthetic tenant RLS, native separate-backend concurrent reservations, idempotency, revocation and cleanup",
+  "checks": [
+    {
+      "id": "schema-and-security-preflight",
+      "status": "passed",
+      "tlsVerified": true,
+      "tlsEvidence": "Native pg client socket encrypted=true and authorized=true; certificate verification remains enabled",
+      "poolerToDatabaseTlsReported": false,
+      "tables": [
+        {
+          "name": "budgets",
+          "rls": true,
+          "authenticatedRead": true,
+          "authenticatedWrite": false,
+          "anonymousRead": false,
+          "anonymousWrite": false
+        },
+        {
+          "name": "graphs",
+          "rls": true,
+          "authenticatedRead": true,
+          "authenticatedWrite": false,
+          "anonymousRead": false,
+          "anonymousWrite": false
+        },
+        {
+          "name": "jobs",
+          "rls": true,
+          "authenticatedRead": true,
+          "authenticatedWrite": false,
+          "anonymousRead": false,
+          "anonymousWrite": false
+        },
+        {
+          "name": "memberships",
+          "rls": true,
+          "authenticatedRead": true,
+          "authenticatedWrite": false,
+          "anonymousRead": false,
+          "anonymousWrite": false
+        },
+        {
+          "name": "purchases",
+          "rls": true,
+          "authenticatedRead": true,
+          "authenticatedWrite": false,
+          "anonymousRead": false,
+          "anonymousWrite": false
+        },
+        {
+          "name": "repositories",
+          "rls": true,
+          "authenticatedRead": true,
+          "authenticatedWrite": false,
+          "anonymousRead": false,
+          "anonymousWrite": false
+        },
+        {
+          "name": "snapshots",
+          "rls": true,
+          "authenticatedRead": true,
+          "authenticatedWrite": false,
+          "anonymousRead": false,
+          "anonymousWrite": false
+        },
+        {
+          "name": "source_files",
+          "rls": true,
+          "authenticatedRead": true,
+          "authenticatedWrite": false,
+          "anonymousRead": false,
+          "anonymousWrite": false
+        },
+        {
+          "name": "workspaces",
+          "rls": true,
+          "authenticatedRead": true,
+          "authenticatedWrite": false,
+          "anonymousRead": false,
+          "anonymousWrite": false
+        }
+      ],
+      "installedFunctionBodiesMatchMigration": true,
+      "integerUnits": true
+    },
+    {
+      "id": "isolated-audit-setup",
+      "status": "passed",
+      "workspacesCreated": 2,
+      "claims": "Synthetic audit subjects; no actual Clerk JWT verification",
+      "sourceRows": "Synthetic policy fixtures, not imported Git commits"
+    },
+    {
+      "id": "real-separate-connection-tenant-isolation",
+      "status": "passed",
+      "simultaneouslyHeldDistinctBackends": 2,
+      "tenantA": {
+        "workspaces": 1,
+        "memberships": 1,
+        "repositories": 1,
+        "snapshots": 1,
+        "source_files": 1,
+        "graphs": 1,
+        "jobs": 1,
+        "budgets": 1,
+        "purchases": 0
+      },
+      "tenantB": {
+        "workspaces": 1,
+        "memberships": 1,
+        "repositories": 1,
+        "snapshots": 1,
+        "source_files": 1,
+        "graphs": 1,
+        "jobs": 1,
+        "budgets": 1,
+        "purchases": 0
+      },
+      "privateSourceAndGraphIsolation": true
+    },
+    {
+      "id": "anonymous-and-direct-mutation-denial",
+      "status": "passed",
+      "anonymousReadDenied": true,
+      "authenticatedMutationDenied": true,
+      "clientBudgetReservationDenied": true,
+      "emptyClaimsSeeNoRows": true
+    },
+    {
+      "id": "concurrent-integer-budget-reservations",
+      "status": "passed",
+      "attempts": 12,
+      "accepted": 4,
+      "rejected": 8,
+      "simultaneousUnitsPerRequest": "25",
+      "observedBackendCount": 4,
+      "allowance": "100",
+      "reserved": "100",
+      "spent": "0",
+      "purchase_count": 4,
+      "purchase_amount": "100",
+      "realDatabaseRowLockRace": true
+    },
+    {
+      "id": "concurrent-idempotency-and-frozen-terms",
+      "status": "passed",
+      "concurrentCalls": 8,
+      "uniquePurchaseRows": 1,
+      "changedTermsRejected": true,
+      "nullReplayRejected": true,
+      "fractionalUnitsRejected": true,
+      "allowance": "100",
+      "reserved": "40",
+      "spent": "0",
+      "purchase_count": 1,
+      "purchase_amount": "40"
+    },
+    {
+      "id": "unknown-settlement-preserves-reservation",
+      "status": "passed",
+      "reservationRetained": true,
+      "invalidUnknownTransitionDenied": true,
+      "deliveryRemainsAwaitingPayment": true,
+      "receiptIsNull": true,
+      "chainBroadcasts": 0,
+      "allowance": "100",
+      "reserved": "100",
+      "spent": "0",
+      "purchase_count": 4,
+      "purchase_amount": "100"
+    },
+    {
+      "id": "membership-revocation-removes-all-private-visibility",
+      "status": "passed",
+      "newRequestVisibilityRemoved": true,
+      "sourceAndGraphHidden": true,
+      "budgetAndPurchasesHidden": true,
+      "reservationAfterRevocationDenied": true,
+      "counts": {
+        "workspaces": 0,
+        "memberships": 0,
+        "repositories": 0,
+        "snapshots": 0,
+        "source_files": 0,
+        "graphs": 0,
+        "jobs": 0,
+        "budgets": 0,
+        "purchases": 0
+      }
+    }
+  ],
+  "cleanup": {
+    "status": "passed",
+    "target": "Only the two UUID workspaces generated by this run",
+    "remainingRows": {
+      "workspaces": 0,
+      "memberships": 0,
+      "repositories": 0,
+      "snapshots": 0,
+      "source_files": 0,
+      "graphs": 0,
+      "jobs": 0,
+      "budgets": 0,
+      "purchases": 0
+    }
+  },
+  "limitations": [
+    "Claims are synthetic subjects injected by the trusted native adapter; Clerk JWT signature verification, browser sign-in and Supabase third-party identity configuration are not established.",
+    "Audit source/snapshot rows are synthetic database policy fixtures, not GitHub imports or real Git commits.",
+    "No real provider purchase, Tempo broadcast, transaction ID, settlement receipt or AI inference was created.",
+    "Current policy checks and row-lock races do not prove all future migrations or arbitrary workload behavior."
+  ]
+}

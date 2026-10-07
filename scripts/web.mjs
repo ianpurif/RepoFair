@@ -1,8 +1,11 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
+import { parseEnv } from 'node:util';
 import { ROOT } from './lib.mjs';
+const localEnvPath=join(ROOT,'.env.local');
+const runtimeEnv={...(existsSync(localEnvPath)?parseEnv(readFileSync(localEnvPath,'utf8')):{}),...process.env};
 const action=process.argv[2];
 if(!['dev','build','start'].includes(action))throw new Error('Use dev, build, or start.');
 const next=[join(ROOT,'apps/web/node_modules/next/dist/bin/next'),join(ROOT,'node_modules/next/dist/bin/next')].find(existsSync);
@@ -15,7 +18,7 @@ if(action!=='build'){
   }).catch(e=>{console.error(e.message);process.exit(1);});
 }
 const args=[next,action,...(action==='build'?[]:['--hostname','localhost','--port','3000'])];
-const child=spawn(process.execPath,args,{cwd:join(ROOT,'apps/web'),stdio:'inherit',env:{...process.env,ATLAS_LOOPBACK_SERVER:action==='build'?'false':'true'}});
+const child=spawn(process.execPath,args,{cwd:join(ROOT,'apps/web'),stdio:'inherit',env:{...runtimeEnv,ATLAS_LOOPBACK_SERVER:action==='build'?'false':'true'}});
 child.once('error',e=>{console.error(e.message);process.exitCode=1;});
 for(const sig of ['SIGINT','SIGTERM'])process.on(sig,()=>child.kill(sig));
 child.once('exit',(code)=>{process.exitCode=code ?? 1;});

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-07T06:39:58.538Z",
-  "finishedAt": "2026-10-07T06:40:21.343Z",
+  "startedAt": "2026-10-07T07:31:44.886Z",
+  "finishedAt": "2026-10-07T07:32:18.107Z",
   "exitStatus": "passed",
   "command": "Playwright test invocation with evidence reporter",
   "url": "http://localhost:3000",
@@ -21,7 +21,7 @@
       "title": "AI disclosure is bound to the edited question and consumed; generated citations open real source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1521,
+      "durationMs": 3116,
       "errors": [],
       "console": null
     },
@@ -29,7 +29,7 @@
       "title": "AI failure stays visible and never triggers local extraction as a fallback",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1305,
+      "durationMs": 1504,
       "errors": [],
       "console": null
     },
@@ -37,146 +37,170 @@
       "title": "parsed graph selection and list relationships open actual immutable source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1180,
+      "durationMs": 1782,
       "errors": [],
       "console": {
         "pageErrors": [],
         "consoleErrors": [],
-        "consoleWarnings": []
+        "consoleWarnings": [
+          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        ]
       }
     },
     {
       "title": "local question citations match original files and exact selected lines",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1246,
+      "durationMs": 1833,
       "errors": [],
       "console": {
         "pageErrors": [],
         "consoleErrors": [],
-        "consoleWarnings": []
+        "consoleWarnings": [
+          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        ]
       }
     },
     {
       "title": "unanswerable runtime guarantees and unsupported versions abstain without citations",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1498,
+      "durationMs": 1812,
       "errors": [],
       "console": {
         "pageErrors": [],
         "consoleErrors": [],
-        "consoleWarnings": []
+        "consoleWarnings": [
+          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        ]
       }
     },
     {
       "title": "search shortcut, empty state, and keyboard resizing remain usable",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1186,
+      "durationMs": 1737,
       "errors": [],
       "console": {
         "pageErrors": [],
         "consoleErrors": [],
-        "consoleWarnings": []
+        "consoleWarnings": [
+          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        ]
       }
     },
     {
       "title": "provider approval explicitly discloses a separate bounded outbound question",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1300,
+      "durationMs": 2953,
       "errors": [],
       "console": {
         "pageErrors": [],
         "consoleErrors": [],
-        "consoleWarnings": []
+        "consoleWarnings": [
+          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        ]
       }
     },
     {
       "title": "two real providers extend graph with distinct exact-version provenance and clickable source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1369,
+      "durationMs": 1996,
       "errors": [],
       "console": {
         "pageErrors": [],
         "consoleErrors": [],
-        "consoleWarnings": []
+        "consoleWarnings": [
+          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        ]
       }
     },
     {
       "title": "buyer version change clears stale provider context, approval, question and source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 5722,
+      "durationMs": 6240,
       "errors": [],
       "console": {
         "pageErrors": [],
         "consoleErrors": [],
-        "consoleWarnings": []
+        "consoleWarnings": [
+          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        ]
       }
     },
     {
       "title": "mobile panels, keyboard evidence navigation and reduced motion fit the viewport",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 817,
+      "durationMs": 1204,
       "errors": [],
       "console": {
         "pageErrors": [],
         "consoleErrors": [],
-        "consoleWarnings": []
+        "consoleWarnings": [
+          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        ]
       }
     },
     {
-      "title": "unavailable publishing and sign-in explain setup and disable unavailable actions",
+      "title": "publishing remains gated and configured Clerk sign-in offers real authentication",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 797,
+      "durationMs": 2208,
       "errors": [],
       "console": {
         "pageErrors": [],
         "consoleErrors": [],
-        "consoleWarnings": []
+        "consoleWarnings": [
+          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        ]
       }
     },
     {
       "title": "activity records actual index/source/retrieval/provider operations and can be cleared",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1486,
+      "durationMs": 2416,
       "errors": [],
       "console": {
         "pageErrors": [],
         "consoleErrors": [],
-        "consoleWarnings": []
+        "consoleWarnings": [
+          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        ]
       }
     },
     {
       "title": "invalid snapshot, private path and cross-origin HTTP operations fail closed",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 739,
+      "durationMs": 1137,
       "errors": [],
       "console": {
         "pageErrors": [],
         "consoleErrors": [],
-        "consoleWarnings": []
+        "consoleWarnings": [
+          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        ]
       }
     },
     {
       "title": "injected indexing transport failure shows retry and records failed then actual recovered operation",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 797,
+      "durationMs": 1212,
       "errors": [],
       "console": {
         "pageErrors": [],
         "consoleErrors": [
           "Failed to load resource: net::ERR_FAILED"
         ],
-        "consoleWarnings": []
+        "consoleWarnings": [
+          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        ]
       }
     }
   ],
