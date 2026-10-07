@@ -1,6 +1,29 @@
 # Provider publishing specification
 
-The local fixture service below is implemented. Verified owner publication remains a milestone specification.
+Private administrative drafts and the local fixture service are implemented.
+External publication remains unavailable pending endpoint control, explicit
+approval and the independent provider delivery/payment integration.
+
+## Private administrative drafts
+
+The signed-in `/app/publish` page uses `/api/publications` and the durable
+`atlas.publication_drafts` table. Creation, reads, saves and revocation require
+workspace owner/admin status plus fresh GitHub personal ownership or repository
+administration. Repository read permission is insufficient. Every mutation
+rechecks membership and repository revisions after acquiring locks.
+
+Drafts start private with no exposed files, endpoint or payment terms. The
+preview contains exact selected paths, line/byte counts and source digests bound
+to an immutable commit. Package export mappings must match explicit package.json
+entries; a module's exported symbol is not proof of a package subpath export.
+Updates require the expected revision. Every exposure/terms change changes the
+revision digest. A newer imported snapshot requires a new draft. Fifty retained
+drafts per workspace bound the history; revoked records remain readable.
+
+Administration, declared rights, accuracy, endpoint proof, publication and
+payment are separate fields. Database constraints prevent a draft from becoming
+a publication or enabling payment. Saving proposed public access is still a
+private draft mutation and does not disclose source to an external provider.
 
 ## Local implementation
 
@@ -15,8 +38,8 @@ shared across buyers; previously delivered content cannot be recalled.
 Each request validates package, exact version, body bounds and provider state
 before indexing. Each response has provider identity, source snapshot and
 fixture/no-payment fields. Provider origin/redirect handling uses a fixed
-loopback allowlist in this mode. Production endpoint registration, administrative
-authority and content-rights attestations still require implementation and tests.
+loopback allowlist in this mode. Production endpoint registration, publication
+approval and independent paid delivery still require implementation and tests.
 
 Verify repository administrative authority and endpoint control separately. Show authorized exposure before publication. Store declared rights/licensing and accuracy status separately; don't award an all-purpose trusted badge.
 

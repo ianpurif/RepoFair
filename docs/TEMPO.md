@@ -1,6 +1,6 @@
 # Tempo / MPP implementation plan
 
-Status: **not integrated**. No valid network addresses, credentials, payment challenges or receipts are bundled.
+Status: **partially implemented; settlement unavailable**. Real testnet settlement and delivery recovery remain unverified.
 
 ## Implemented but unwired testnet adapter
 
@@ -15,6 +15,27 @@ atomic claim, authoritative settlement verification, persistence, unknown-state
 handling, resumable delivery, AtomicStore and an RPC client. Production adapters
 remain unavailable. Pending/unknown purchases cannot automatically charge again;
 settled delivery can resume after quote expiry.
+
+`postgres-replay-store.ts` now supplies a provider-owned durable AtomicStore.
+Migration `202610070005_provider_replay.sql` creates its isolated schema. Every
+writer takes a transaction advisory lock, including when a key does not yet
+exist. Namespaces separate providers; authenticated and anonymous roles cannot
+read or write replay state. Hosted verification passed eight concurrent first
+claims with exactly one winner and eight concurrent updates without lost writes.
+Generated audit rows were removed. See `docs/evidence/provider-replay.json`.
+
+Buyer approval and budget reservation belong to the buyer SDK/database.
+An independent provider's claim owns credential processing in its own ledger;
+it must never require access to the buyer's database or budget credentials.
+`postgres-purchase-ledger.ts` and migration 006 now implement immutable quotes,
+single processing claims, retained unknown outcomes and immutable receipt
+persistence with a mandatory authoritative verifier. Hosted storage checks
+passed eight concurrent quotes/one row and eight processing claims/one winner;
+authorization was synthetic and no settlement receipt was fabricated. SQL
+constraints and triggers reject null/wrong-type terms, altered bindings,
+reopening processed sales and enabling delivery. Real entitlement, authoritative
+chain reconciliation and delivery callbacks are still missing. The charge
+adapter remains unwired. See `docs/evidence/provider-ledger.json`.
 
 `packages/sdk/src/payment-policy.ts` validates the official challenge against
 approved terms, observed provider origin, body digest, exact version,

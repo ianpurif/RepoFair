@@ -148,6 +148,65 @@
       "allowedWritePaths": [],
       "status": "completed",
       "completedAt": "2026-10-07T08:59:31.580Z"
+    },
+    {
+      "task": "/root/remaining_backend_plan",
+      "role": "atlas_architect",
+      "status": "completed",
+      "allowedWritePaths": [],
+      "completedAt": "2026-10-07T09:08:17.185Z"
+    },
+    {
+      "task": "/root/github_backend",
+      "role": "atlas_engineer",
+      "status": "completed",
+      "phase": "private-publication-drafts",
+      "allowedWritePaths": [
+        "apps/worker/src/publication-service.ts",
+        "apps/worker/src/github.ts",
+        "packages/contracts/src/publication.ts",
+        "packages/contracts/src/index.ts",
+        "supabase/migrations/202610070004_publication_drafts.sql",
+        "tests/integration/publication-service.test.ts",
+        "tests/integration/github.test.ts"
+      ],
+      "recordedAt": "2026-10-07T09:08:17.185Z",
+      "completedAt": "2026-10-07T09:27:37.850Z"
+    },
+    {
+      "task": "/root/publication_security",
+      "role": "atlas_security",
+      "status": "completed",
+      "allowedWritePaths": [],
+      "completedAt": "2026-10-07T09:27:37.850Z",
+      "findings": "Exact package exports and bounded draft history corrected; canonical workspace UUID correction applied after follow-up."
+    },
+    {
+      "task": "/root/clerk_frontend",
+      "role": "atlas_frontend",
+      "status": "completed",
+      "phase": "private-publication-drafts",
+      "allowedWritePaths": [
+        "apps/web/src/components/publication-editor.tsx",
+        "apps/web/src/app/app/publish/page.tsx",
+        "scripts/verify-publication-draft-ui.ts",
+        "docs/evidence/publication-draft.json"
+      ],
+      "recordedAt": "2026-10-07T09:08:17.185Z",
+      "completedAt": "2026-10-07T09:44:33.805Z"
+    },
+    {
+      "task": "/root/github_backend",
+      "role": "atlas_engineer",
+      "status": "completed",
+      "phase": "provider-durable-ledger",
+      "allowedWritePaths": [
+        "apps/provider/src/postgres-purchase-ledger.ts",
+        "tests/integration/provider-ledger.test.ts",
+        "supabase/migrations/202610070006_provider_ledger.sql"
+      ],
+      "recordedAt": "2026-10-07T09:27:37.850Z",
+      "completedAt": "2026-10-07T09:44:33.805Z"
     }
   ],
   "note": "Populate only with actual task handles and path ownership from the current session."

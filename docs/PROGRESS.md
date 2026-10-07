@@ -83,3 +83,41 @@ Hosted multi-connection reservation/RLS tests passed, including transaction-loca
 Final import-boundary security review found no critical/high issue in its read-only scope. Product suite: 192 passed, focused import/auth/webhook suite: 81 passed, fixture browser: 14 passed, source types/lint/provider policy and production build passed. Private browser verification is recorded separately; its initial missing-screen result was a test navigation/reload race, not proof of a broken API. Graph defaults and stale pending labels were corrected, and malformed private requests now return 400/413 rather than 503. Full publication, organization/storage, private AI, authenticated agent and Tempo settlement/recovery acceptance remain open.
 
 The final real private-browser run passed source equality, progressive graph expansion, all node/edge list counts, relationship origins, question submission, eight validated source citations and navigation, keyboard controls and 390 px layout. Negative authenticated request and anonymous denial checks passed. It saved no source, tokens, screenshots or browser state; the new verification session was revoked and existing sessions preserved. See private-repository-ui.json and live-audit-checkpoint.json. The persistent worker and production web server remain running locally.
+## 2026-10-07 — Private draft and provider persistence checkpoint
+
+After the connected GitHub account completed the real private RepoFair import
+and browser workflow, the next slice added private administrative publication
+drafts. Fresh GitHub ownership/admin rights are separate from read permission.
+The real browser created an empty private draft, selected one source file by
+keyboard, saved its exact commit/line/byte/SHA-256 preview, reloaded persistence,
+and revoked it. Anonymous, malformed, oversized, stale-revision and cross-origin
+requests were rejected. Existing sessions and drafts were preserved. Initial
+browser verifier failures were label/readiness lookups; control-role selectors
+fixed the harness, and no UI success was claimed until the final run passed.
+
+Independent review found a package-export provenance defect and an unbounded
+draft-history defect. Removed module-symbol-to-package-export inference; only
+exact package.json mappings qualify. Added a canonical workspace capacity lock
+and bounded retained history. A follow-up identified case-insensitive UUID lock
+keys; canonicalization fixed it. Hosted contention using the actual helper, two
+repositories and mixed-case IDs admitted one of two contenders at 49 records,
+ending at 50; synthetic rows were cleaned. No external source was published.
+
+Added provider-owned PostgreSQL replay and quote/claim ledgers in a separate
+schema, with no buyer budget credentials. Hosted replay contention produced
+one winner from eight claims and no lost increments. Hosted quote/claim tests
+produced one immutable row and one processing winner from eight contenders;
+unknown state cannot be reopened. The ledger independently invokes a required
+authoritative settlement callback before receipt persistence. SQL guards
+immutable terms, receipt reuse, null/type errors and forbidden transitions.
+Synthetic authorization is clearly labelled; no payment, receipt or settlement
+was fabricated. Independent bounded review found no remaining concrete defect
+in those storage boundaries. Real entitlement, finality and delivery remain
+unwired.
+
+Final local checks: 233 product tests across 21 files, 14 fixture browser tests,
+ESLint/provider-policy/hygiene and full TypeScript passed. Real draft browser,
+hosted database, capacity, replay and ledger reports are under `docs/evidence`.
+The release gate still correctly rejects incomplete publication, settlement,
+recovery and full acceptance. `BLOCKERS.md` removes resolved authority/draft and
+storage items while retaining the actual external and implementation gaps.

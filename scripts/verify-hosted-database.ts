@@ -97,7 +97,7 @@ try {
         has_table_privilege('anon',c.oid,'SELECT') AS anonymous_read,
         (has_table_privilege('anon',c.oid,'INSERT') OR has_table_privilege('anon',c.oid,'UPDATE') OR has_table_privilege('anon',c.oid,'DELETE') OR has_table_privilege('anon',c.oid,'TRUNCATE')) AS anonymous_write
       FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='atlas' AND c.relkind='r' ORDER BY c.relname`)).rows;
-    assert(rows.length === tables.length + 2 && ['personal_workspaces','webhook_deliveries'].every(name => rows.some(row => row.name === name)) && tables.every(table => rows.some(row => row.name === table)), 'audit-hosted-table-layout-differs');
+    assert(rows.length === tables.length + 3 && ['personal_workspaces','webhook_deliveries','publication_drafts'].every(name => rows.some(row => row.name === name)) && tables.every(table => rows.some(row => row.name === table)), 'audit-hosted-table-layout-differs');
     assert(rows.every(row => row.rls && (row.name === 'webhook_deliveries' ? !row.authenticated_read : row.authenticated_read) && !row.authenticated_write && !row.anonymous_read && !row.anonymous_write), 'audit-hosted-table-permissions-differ');
     const roles = (await transaction.query<{ name: string; bypass: boolean; superuser: boolean }>("SELECT rolname AS name, rolbypassrls AS bypass, rolsuper AS superuser FROM pg_roles WHERE rolname IN ('authenticated','anon')")).rows;
     assert(roles.length === 2 && roles.every(role => !role.bypass && !role.superuser), 'audit-untrusted-role-bypasses-rls');

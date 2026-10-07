@@ -48,3 +48,23 @@ Actual `/root/webhook_verifier` independently passed 16 local tests and 17 hoste
 The earlier payment-review scheduling limitation was resolved by `/root/payment_backend_audit`. Saved immutable purchase terms remain authoritative after provider configuration changes; mismatched provider identity remains denied. This review and regression tests do not establish real settlement or durable payment delivery.
 
 Final actual read-only `/root/import_final_security` review found no critical/high defect in the scoped import boundary after the bounded parallel downloader, parser diagnostics and bulk insert changes. It checked fresh authorization before reads/publication, numeric personal-owner binding, transaction-local grant reset/RLS, immutable hashes, isolated parsing, repository-first locks and extractive private questions. No tests or live requests were performed by this reviewer; the separate hosted/API/browser reports supply execution evidence. This is not a full-product security certification.
+
+## Private publication and provider storage review — 2026-10-07
+
+Actual read-only `/root/publication_security` review identified false package
+subpath export claims from parsed module symbols and an unlimited-create/bounded-
+list history failure. Exact package.json export declarations and bounded retained
+history fixed these. Follow-up found UUID case could split capacity locks; the
+service now uses canonical UUIDs. The actual capacity helper subsequently passed
+hosted contention across two repositories and mixed-case IDs with one remaining
+slot. Generated metadata was inaccessible to ordinary users and was cleaned.
+
+The same role independently reviewed provider replay and quote/claim ledgers.
+It found no remaining concrete defect in the bounded scope: provider state is
+independent from buyer credentials, missing-key locks serialize writers, unknown
+outcomes cannot reopen claims, receipt references are unique and settlement
+persistence invokes a required authoritative verifier. SQL rejects malformed
+null/type fields and mutation of immutable terms. The reviewer performed no
+tests or live requests; separate hosted evidence covers storage contention only.
+Real entitlement/finality verification and durable paid delivery remain unwired.
+No scoped review is a full-product release security certification.

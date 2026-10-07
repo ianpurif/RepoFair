@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-10-07T08:59:31.580Z",
-  "scope": "Configured local application, hosted development Clerk/Supabase and user-authorized private RepoFair import; no public deployment or payment settlement",
+  "recordedAt": "2026-10-07T09:44:33.805Z",
+  "scope": "Configured local application, real Clerk/Supabase/private RepoFair and private draft browser flows, plus synthetic hosted provider storage contention; no public deployment or payment settlement",
   "checks": [
     {
       "command": "bun run test:product",
       "exitCode": 0,
-      "testFiles": 18,
-      "testsPassed": 192,
+      "testFiles": 21,
+      "testsPassed": 233,
       "scope": "Local unit/integration suites; mocks and PostgreSQL-WASM are labelled in tests"
     },
     {
@@ -18,7 +18,7 @@
       "scope": "Focused import/auth/webhook regressions; shell invoked six explicit paths"
     },
     {
-      "command": "bun run test:browser --reporter=list,./tests/browser/evidence-reporter.ts",
+      "command": "bun run test:browser",
       "exitCode": 0,
       "testsPassed": 14,
       "evidence": "docs/evidence/browser-verification.json"
@@ -36,7 +36,7 @@
     {
       "command": "bun run build",
       "exitCode": 0,
-      "scope": "Production Next build including authenticated repository and webhook routes"
+      "scope": "Final production Next build including authenticated repository, publication draft and webhook routes"
     },
     {
       "command": "node scripts/worker.mjs --once",
@@ -68,8 +68,29 @@
       "command": "bun run verify:release",
       "exitCode": 1,
       "scope": "Expected blocked result: full publishing, payment/recovery, federation and product acceptance remain incomplete"
+    },
+    {
+      "command": "bun scripts/verify-publication-draft-ui.ts --allow-test-session --allow-private-draft",
+      "exitCode": 0,
+      "evidence": "docs/evidence/publication-draft.json"
+    },
+    {
+      "command": "bun scripts/verify-publication-capacity.ts",
+      "exitCode": 0,
+      "evidence": "docs/evidence/publication-capacity.json"
+    },
+    {
+      "command": "bun scripts/verify-provider-replay.ts",
+      "exitCode": 0,
+      "evidence": "docs/evidence/provider-replay.json"
+    },
+    {
+      "command": "bun scripts/verify-provider-ledger.ts",
+      "exitCode": 0,
+      "evidence": "docs/evidence/provider-ledger.json"
     }
   ],
   "privateSourceSentToAi": false,
-  "fullProductComplete": false
+  "fullProductComplete": false,
+  "paymentSubmitted": false
 }

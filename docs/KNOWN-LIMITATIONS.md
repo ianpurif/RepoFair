@@ -9,6 +9,8 @@
 - PostgreSQL-WASM tests run real SQL with a local JWT-claim shim. They do not prove Clerk signature verification, hosted Supabase configuration or concurrent networked reservations.
 - Federation joins exact packages and explicit exports. Cross-repository symbol calls remain unresolved. Buyer independently checks fixture source/graph and re-extracts citations; provider activity is not execution evidence.
 - Fixture publication uses an explicit local process flag. Stop the process to revoke future requests; already delivered source cannot be erased.
+- Real private publication drafts support administrative authority, exact exposure previews and retained revocation records. They do not publish source. History is bounded to 50 drafts per workspace; a newer imported snapshot requires a new draft. Only explicit package.json export mappings are accepted; conditional/wildcard exports remain unsupported.
+- Provider replay and quote/claim/unknown storage have hosted concurrency evidence. Real provider entitlement, authoritative Tempo settlement verification and durable paid delivery remain unwired; database storage evidence is not a successful purchase.
 - Browser activity history is device-local, not a durable tenant audit log.
 - Evaluation uses tiny authored fixtures. Equal-access BM25 results support no general accuracy, latency or cost claims.
 

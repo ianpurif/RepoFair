@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "product": "Chronos Atlas",
   "stage": "implementation",
-  "currentPhase": "personal-private-import-verified",
-  "nextAction": "Complete organization scope, verified publishing, durable Tempo settlement/recovery, private AI cost/disclosure controls and authenticated SDK/MCP. Remote webhook delivery requires an approved reachable HTTPS deployment.",
+  "currentPhase": "remaining-integration-acceptance",
+  "nextAction": "Complete external publication/endpoint control, provider entitlement/finality/delivery, remaining identity/storage and private AI/SDK/MCP adapters; validate approved external flows without treating storage tests as settlement.",
   "milestones": [
     {
       "id": "P0",
@@ -27,7 +27,9 @@
       "status": "partial",
       "acceptanceEvidence": [
         "apps/provider/src/fixture-server.ts",
-        "docs/PROVIDER-PUBLISHING.md"
+        "docs/PROVIDER-PUBLISHING.md",
+        "docs/evidence/publication-draft.json",
+        "docs/evidence/publication-capacity.json"
       ]
     },
     {
@@ -36,7 +38,9 @@
       "status": "blocked",
       "acceptanceEvidence": [
         "tests/tempo",
-        "supabase/migrations/202610030001_atlas.sql"
+        "supabase/migrations/202610030001_atlas.sql",
+        "docs/evidence/provider-replay.json",
+        "docs/evidence/provider-ledger.json"
       ]
     },
     {
@@ -94,6 +98,12 @@
     "privateImport": true,
     "fullProduct": false,
     "privateBrowser": true,
-    "privateSourceSentToAi": false
+    "privateSourceSentToAi": false,
+    "privatePublicationDraft": true,
+    "publicationCapacity": true,
+    "providerReplayStorage": true,
+    "providerSaleStorage": true,
+    "externalPublication": false,
+    "tempoSettlement": false
   }
 }

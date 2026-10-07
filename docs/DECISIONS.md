@@ -34,3 +34,18 @@ pure helpers. Live adapters stay disabled until independently tested.
 ## D008 — Exclusive application AI providers (2026-10-07)
 
 Explicit user decision: Voyage AI owns embeddings and semantic retrieval/reranking; DeepSeek owns all LLM/chat/reasoning/generation. Use native REST and fixed endpoints, with no alternate provider dependency or fallback. Existing deterministic source navigation is a separate local operation. AI disclosure must bind to the current question and snapshot. Local server enablement and both credentials are required; hosted AI remains gated on authorization and usage controls. See AI.md for interfaces and acceptance boundaries.
+
+## D009 — Private proposals and independent payment state (2026-10-07)
+
+Private publication drafts require both workspace administration and fresh GitHub
+personal ownership or repository administration. Read access is insufficient.
+Proposals start with no exposed paths and private access; exact commit, exposure
+and terms bind to a revision digest. Database constraints forbid this draft table
+from claiming publication, approval, endpoint proof or enabled payment. Rights
+are a declaration and accuracy remains unverified.
+
+The architecture review separated buyer budgets from independent provider sale
+state. Providers own their replay/quote/settlement/delivery persistence and never
+receive buyer database credentials. The first durable component is a namespaced
+PostgreSQL AtomicStore, verified on separate hosted connections. Payment and
+publication acceptance still require their actual external flows.

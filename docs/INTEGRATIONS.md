@@ -17,7 +17,8 @@ meets Next/Supabase requirements. Install and runtime outcomes are tracked separ
 - Auth: https://clerk.com/docs/guides/development/integrations/databases/supabase
   and https://supabase.com/docs/guides/auth/third-party/clerk. Third-party auth
   uses accessToken callback and Clerk text subject via auth.jwt()->>'sub'.
-  Dashboard integration and actual cross-user RLS tests still required.
+  Dashboard integration and hosted cross-user RLS were subsequently verified;
+  see the dated hosted audit below for the evidence scope.
 - MPP: https://mpp.dev/quickstart/server.md and
   https://mpp.dev/sdk/typescript/client/Mppx.create and
   https://mpp.dev/payment-methods/tempo/charge.md. Server Mppx.create with
@@ -60,8 +61,8 @@ multi-connection concurrency proof.
 | TypeScript | 5.9.3; full source checks pass | Recheck future changes. |
 | ts-morph / React Flow | Real 144-file Git snapshot parsed and persisted; Node child with hard timeout/memory bounds | Unsupported syntax/resolution remains explicit; no runtime execution claims. |
 | Clerk / Supabase | Real sign-in, native session JWT acceptance, personal workspace provisioning, hosted RLS and concurrent reservations verified | Organization membership and private Storage remain open. |
-| GitHub App | Linked-user/App authorization, durable private import, immutable readback and extractive citations verified | Remote delivery and publisher authority remain open. |
-| MPP / Tempo | Unwired testnet adapter and offline official SDK challenge tests | Durable adapters, independent final review and actual settlement/recovery. |
+| GitHub App | Linked-user/App authorization, durable private import, readback, citations and personal-owner draft administration verified | Remote webhook delivery and external publication remain open. |
+| MPP / Tempo | Unwired testnet charge adapter plus hosted provider replay/quote/claim storage | Real entitlement, authoritative settlement verification and paid delivery/recovery. |
 | Independent providers | Two separate fixture HTTP processes | Verified ownership, publication and distinct real recipients. |
 | MCP | Official stdio tools and protocol tests | Authenticated/paid transport not implemented. |
 | Application AI | Native Voyage embeddings/reranking + DeepSeek generation passed a four-request public-fixture workflow | Private authenticated AI and operating-cost reservations remain open. See AI.md. |
@@ -80,8 +81,20 @@ User requires Voyage AI for embeddings/retrieval and DeepSeek for all LLM/chat/r
 
 Clerk Next 7.9.11 is installed. Static environment middleware configuration avoids the encryption-key requirement caused by dynamic key options. Native Clerk session JWTs use the supported Supabase third-party integration (no legacy token template). A publishable key cannot read the Supabase OpenAPI root: the verification instead uses an intentionally nonexistent table, which returns authenticated schema-cache 404 for valid tokens and 401 for an invalid token.
 
-PostgreSQL uses the project's session pooler with certificate and hostname verification. The official Supabase CA is loaded through DATABASE_SSL_CA_FILE; verification is never disabled. Eleven Atlas tables and three subsequent migrations are present. Client-to-pooler verified TLS is distinct from the pooler's internal database hop.
+PostgreSQL uses the project's session pooler with certificate and hostname verification. The official Supabase CA is loaded through DATABASE_SSL_CA_FILE; verification is never disabled. Twelve Atlas tables, including private publication drafts, are present. A separate provider-owned schema stores atomic replay state. Client-to-pooler verified TLS is distinct from the pooler's internal database hop.
 
 Private repository reads require verified Clerk identity, workspace membership, a linked GitHub identity and fresh repository authorization. A personal owner's verified numeric GitHub user ID must match both the installation account and repository owner; organization/collaborator access requires independent user repository-read permission. Only then does the server set a transaction-local repository grant used by PostgreSQL RLS. Direct client JWT claims cannot supply this grant. GitHub permissions reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/repository-access-and-collaboration/permission-levels-for-a-personal-account-repository.
 
 The App has one installation and read-only Contents/Metadata permission. The latest read-only probe found 73 accessible repositories, no event subscriptions, and HTTP 404 for webhook configuration. Local HMAC, replay, persistence and revocation tests pass, including hosted concurrent delivery tests; this does not establish remote GitHub delivery.
+
+## Private publishing and provider storage — 2026-10-07
+
+Private draft administration independently verifies GitHub ownership/admin rights,
+not merely repository read access. Real signed-in create, explicit exposure,
+save, reload and revoke passed with immutable source digests and revision checks.
+Hosted capacity contention and native provider replay/quote/claim contention
+passed with generated-record cleanup. The provider's sale ledger is independent
+of buyer budgets, requires a fresh entitlement callback and independently checks
+settlement through a required authoritative callback before saving it. These
+callbacks are not yet wired to a live paid service. No source was published and
+no payment or settlement receipt was created by the hosted storage audits.
