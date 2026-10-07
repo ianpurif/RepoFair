@@ -241,9 +241,10 @@ browserTest('mobile panels, keyboard evidence navigation and reduced motion fit 
 
 browserTest('publishing remains gated and configured Clerk sign-in offers real authentication', async ({ page }) => {
   await page.goto('/app/publish');
-  await expect(page.getByText('Publishing is unavailable', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Publish service' })).toBeDisabled();
-  await expect(page.getByRole('region', { name: 'Required publishing steps' })).toContainText('Private source is never exposed by default.');
+  await expect(page.getByText('Private drafts are available; publication is unavailable', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Sign in to manage drafts' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Create private draft' })).toHaveCount(0);
+  expect((await page.request.post('/api/publications', { data: {} })).status()).toBe(401);
   await page.goto('/sign-in');
   await expect(page.getByRole('textbox', { name: 'Email address', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Continue with Google', exact: true })).toBeEnabled();

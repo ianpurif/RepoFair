@@ -1,0 +1,116 @@
+{
+  "checkedAt": "2026-10-07T09:34:27.369Z",
+  "scope": "Real authorized private repository draft create, explicit exposure selection, save, reload and revoke through the application UI. No publication, endpoint probing, payment, AI, or existing draft mutations.",
+  "command": "bun scripts/verify-publication-draft-ui.ts --allow-test-session --allow-private-draft",
+  "browser": {
+    "engine": "Edge",
+    "freshContext": true,
+    "savedAuthState": false,
+    "screenshotsOrTracesSaved": false,
+    "pageErrors": 0,
+    "expectedHttpErrors": 3,
+    "unexpectedConsoleErrors": 0,
+    "aiRequests": 0,
+    "externalBearerRequests": 0,
+    "paymentRequests": 0
+  },
+  "sources": [
+    "https://clerk.com/docs/reference/backend/sign-in-tokens/create-sign-in-token",
+    "https://clerk.com/docs/nextjs/reference/objects/sign-in",
+    "https://clerk.com/docs/reference/backend/sign-in-tokens/revoke-sign-in-token",
+    "https://clerk.com/docs/reference/backend/sessions/revoke-session"
+  ],
+  "credentialsOrIdentifiersPersistedByVerifier": false,
+  "privateSourceOrPathsPersistedByVerifier": false,
+  "session": {
+    "status": "verified",
+    "newSessionOnly": true,
+    "ticketSingleUse": true,
+    "ticketTtlSeconds": 120,
+    "principalMatches": true
+  },
+  "create": {
+    "status": "verified",
+    "httpStatus": 201,
+    "privateDefault": true,
+    "emptyExposure": true,
+    "emptyExports": true,
+    "nullEndpointAndTerms": true,
+    "sourceChoiceCount": 144,
+    "noPreselectedSource": true,
+    "savedRevision": 1,
+    "immutableSnapshotBound": true,
+    "administrationVerified": true,
+    "rightsNotDeclared": true,
+    "accuracyUnverified": true,
+    "published": false,
+    "approval": null,
+    "endpointProof": "unverified",
+    "payment": "disabled"
+  },
+  "save": {
+    "status": "verified",
+    "httpStatus": 200,
+    "revision": 2,
+    "selectedFiles": 1,
+    "exactSelectedPath": true,
+    "exactLinesBytesAndSourceDigest": true,
+    "termsDigestChanged": true,
+    "immutableSnapshotBound": true,
+    "separateAuthorityRightsAccuracyEndpointPublicationPaymentStates": true,
+    "noPublicationOrPayment": true
+  },
+  "reload": {
+    "status": "verified",
+    "httpStatus": 200,
+    "persistedProposalAndDigest": true,
+    "selectionRestored": true,
+    "noUnsavedChanges": true
+  },
+  "revoke": {
+    "status": "verified",
+    "httpStatus": 200,
+    "state": "revoked",
+    "revision": 3,
+    "readOnlyUi": true,
+    "savedRecordRetainedForAudit": true,
+    "published": false,
+    "approval": null,
+    "payment": "disabled"
+  },
+  "negativeRoutes": {
+    "status": "verified",
+    "malformedJson": 400,
+    "oversizedBody": 413,
+    "staleRevision": 409,
+    "crossOrigin": 403,
+    "recordUnchanged": true,
+    "actualBrowserSessionCookies": true
+  },
+  "accessibility": {
+    "status": "verified",
+    "keyboardPathCheckbox": true,
+    "labelledEditorFocus": true,
+    "narrowWidth": 390,
+    "noHorizontalPageOverflow": true,
+    "reducedMotionEnabled": true
+  },
+  "cleanup": {
+    "status": "verified",
+    "existingSessionsRevokedByTest": 0,
+    "existingDraftsMutatedByTest": 0,
+    "draftAlreadyRevokedByUi": true,
+    "ownedDraftRevoked": true,
+    "revokedAuditRecordRetained": true,
+    "existingDraftsUnchanged": true,
+    "sessionRevokeHttpStatus": 200,
+    "newSessionRevoked": true,
+    "ticketConsumedSingleUse": true
+  },
+  "anonymous": {
+    "status": 401,
+    "denied": true
+  },
+  "status": "verified",
+  "completedAt": "2026-10-07T09:36:12.305Z"
+}
