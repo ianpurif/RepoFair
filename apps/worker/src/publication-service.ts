@@ -103,6 +103,14 @@ function response(row: DraftRow, proof: Proof): PublicationDraft {
     rights: proposal.rightsStatement ? 'declared' : 'not-declared', accuracy: 'unverified', createdAt: new Date(row.created_at).toISOString(), updatedAt: new Date(row.updated_at).toISOString() };
 }
 
+/** Call only inside the draft insertion transaction, after repository locking. */
+export async function assertPublicationCapacity(tx: AtlasTransaction, workspaceId: string): Promise<void> {
+  const canonical = uuid(workspaceId);
+  await tx.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [`atlas-publication-capacity:${canonical}`]);
+  const count = (await tx.query<{ count: number }>('SELECT count(*)::int AS count FROM atlas.publication_drafts WHERE workspace_id=$1', [canonical])).rows[0]?.count;
+  assert(typeof count === 'number' && count < 50, 'draft-limit', 'Workspace draft history is limited to 50 records; existing drafts remain available', 422);
+}
+
 export function createPublicationService(database: AtlasDatabase, env: Readonly<Record<string, string | undefined>>) {
   const repositories = createRepositoryService(database, env);
   async function member(principalId: string, workspaceId: string): Promise<string> {
@@ -180,9 +188,7 @@ export function createPublicationService(database: AtlasDatabase, env: Readonly<
       await lockGrant(tx, principalId, selected);
       // Serialize workspace-wide capacity even when drafts target different
       // repositories. Retained revoked drafts remain visible as bounded history.
-      await tx.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [`atlas-publication-capacity:${selected.workspace_id}`]);
-      const count = (await tx.query<{ count: number }>('SELECT count(*)::int AS count FROM atlas.publication_drafts WHERE workspace_id=$1', [workspaceId])).rows[0]?.count;
-      assert(typeof count === 'number' && count < 50, 'draft-limit', 'Workspace draft history is limited to 50 records; existing drafts remain available', 422);
+      await assertPublicationCapacity(tx, selected.workspace_id);
       const snapshot = (await tx.query('SELECT id FROM atlas.snapshots WHERE id=$1 AND repository_id=$2 AND workspace_id=$3 AND revision=$4 AND status=\'complete\' FOR SHARE', [index.snapshot.snapshotId, selected.id, workspaceId, index.snapshot.revision])).rows[0];
       assert(snapshot, 'snapshot-changed', 'A complete immutable repository snapshot is required', 409);
       const identity = { id: randomUUID(), workspace_id: workspaceId, repository_id: selected.id, snapshot_id: index.snapshot.snapshotId, commit_sha: index.snapshot.revision, state: 'draft' as const };
