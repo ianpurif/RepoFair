@@ -1,0 +1,17 @@
+{
+  "verifiedAt": "2026-10-07T09:16:35.175Z",
+  "status": "verified",
+  "checks": [
+    "separate-native-postgres-backends",
+    "eight-concurrent-claims-exactly-one-winner",
+    "eight-concurrent-updates-no-lost-write",
+    "provider-namespaces-isolated",
+    "callback-failure-rolls-back",
+    "committed-delete-visible-to-other-backend",
+    "anonymous-and-authenticated-role-denied"
+  ],
+  "failure": null,
+  "generatedRecordsCleaned": true,
+  "paymentSubmitted": false,
+  "settlementVerified": false
+}

@@ -22,7 +22,7 @@ export type TempoProviderDependencies = Readonly<{
   quote(authorization: AuthorizedRetrieval, proposed: PurchaseTerms): Promise<PurchaseTerms>;
   /** Read the bound durable purchase before quoting, so paid delivery resumes even after quote expiry. */
   lookup(authorization: AuthorizedRetrieval, requestDigest: string): Promise<(DurablePurchaseClaim & { terms: PurchaseTerms }) | null>;
-  /** Verify explicit testnet spending approval and an existing atomic budget reservation; atomically claim broadcast once. */
+  /** Provider-owned atomic claim of credential processing. Buyer approval and budget reservation belong to the calling SDK, not this independent provider's database. */
   claim(authorization: AuthorizedRetrieval, terms: PurchaseTerms): Promise<DurablePurchaseClaim>;
   /** Separate authoritative finality/terms reconciliation. An untrusted receipt header is never enough. */
   verifySettlement(authorization: AuthorizedRetrieval, terms: PurchaseTerms, receipt: Receipt.Receipt): Promise<boolean>;
