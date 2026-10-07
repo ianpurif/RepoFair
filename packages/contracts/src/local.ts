@@ -27,6 +27,11 @@ export type LocalAnswer = Readonly<{
   nodeIds: readonly string[]; edgeIds: readonly string[];
   missingEvidence: readonly string[]; activities: readonly Activity[];
 }>;
+export type AiAnswer = Omit<LocalAnswer, 'mode'> & Readonly<{
+  mode: 'voyage-deepseek';
+  models: Readonly<{ embedding: string; reranking: string; generation: string }>;
+}>;
+export type WorkspaceAnswer = LocalAnswer | AiAnswer;
 export const FIXTURE_IDS: readonly FixtureId[] = [
   'jobboard-app@1.0.0', 'jobboard-app@2.0.0', 'retry-kit@1.0.0', 'retry-kit@2.0.0', 'event-log@1.0.0',
 ];

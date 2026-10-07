@@ -15,7 +15,7 @@ if(action!=='build'){
   }).catch(e=>{console.error(e.message);process.exit(1);});
 }
 const args=[next,action,...(action==='build'?[]:['--hostname','localhost','--port','3000'])];
-const child=spawn(process.execPath,args,{cwd:join(ROOT,'apps/web'),stdio:'inherit'});
+const child=spawn(process.execPath,args,{cwd:join(ROOT,'apps/web'),stdio:'inherit',env:{...process.env,ATLAS_LOOPBACK_SERVER:action==='build'?'false':'true'}});
 child.once('error',e=>{console.error(e.message);process.exitCode=1;});
 for(const sig of ['SIGINT','SIGTERM'])process.on(sig,()=>child.kill(sig));
 child.once('exit',(code)=>{process.exitCode=code ?? 1;});

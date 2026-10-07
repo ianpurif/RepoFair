@@ -12,7 +12,10 @@ function score(evidence: SourceEvidence, query: readonly string[]): number {
   const content = terms(`${evidence.source.path} ${evidence.original}`);
   return query.reduce((sum, term) => sum + (content.includes(term) ? 1 : 0), 0);
 }
-function versionConflict(index: LocalIndex, question: string): string | null {
+export function sourceQuestionLimitation(index: LocalIndex, question: string): string | null {
+  if (/\b(prove|guarantee|certify)\b/i.test(question) && /\b(production|runtime|always|never|ever|all|no)\b/i.test(question)) {
+    return 'Static source cannot establish that runtime or production guarantee. Independent execution evidence is unavailable.';
+  }
   const releases = [{ packageName: index.packageName, version: index.version }, ...index.dependencies];
   for (const release of releases) {
     const shortName = release.packageName.split('/').at(-1)!;
@@ -37,10 +40,7 @@ export function answerLocal(index: LocalIndex, rawQuestion: string): LocalAnswer
   function abstain(reason: string): LocalAnswer {
     return { schemaVersion: 1, mode: 'extractive', status: 'abstained', answer: reason, citations: [], nodeIds: [], edgeIds: [], missingEvidence: [reason], activities };
   }
-  const conflict = versionConflict(index, question); if (conflict) return abstain(conflict);
-  if (/\b(prove|guarantee|certify)\b/i.test(question) && /\b(production|runtime|always|never|ever|all|no)\b/i.test(question)) {
-    return abstain('Static source cannot establish that runtime or production guarantee. Independent execution evidence is unavailable.');
-  }
+  const conflict = sourceQuestionLimitation(index, question); if (conflict) return abstain(conflict);
   const ranked = timed('lexical-source-search', value => `Searched ${index.evidence.length} passages; selected ${value.length} bounded candidates.`, () => {
     const candidates = index.evidence.map(item => ({ item, score: score(item, query) }))
       .filter(candidate => candidate.score > 0 && /\.(?:[cm]?ts|tsx|[cm]?js|jsx)$/.test(candidate.item.source.path))

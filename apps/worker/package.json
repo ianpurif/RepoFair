@@ -3,6 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "exports": {"./fixtures":"./src/fixture-service.ts","./federation":"./src/federation.ts"},
-  "dependencies": {"@atlas/core":"workspace:*","@atlas/contracts":"workspace:*","pg":"8.23.1"}
+  "exports": {
+    "./fixtures": "./src/fixture-service.ts",
+    "./federation": "./src/federation.ts",
+    "./ai": "./src/ai-service.ts"
+  },
+  "dependencies": {
+    "@atlas/core": "workspace:*",
+    "@atlas/contracts": "workspace:*",
+    "pg": "8.23.1"
+  }
 }
