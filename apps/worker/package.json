@@ -8,7 +8,9 @@
     "./federation": "./src/federation.ts",
     "./ai": "./src/ai-service.ts",
     "./database": "./src/database.ts",
-    "./github": "./src/github.ts"
+    "./github": "./src/github.ts",
+    "./repositories": "./src/repository-service.ts",
+    "./github-webhook": "./src/github-webhook.ts"
   },
   "dependencies": {
     "@atlas/core": "workspace:*",

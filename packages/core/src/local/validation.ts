@@ -1,10 +1,10 @@
-import type { LocalIndex, SourceEvidence } from '../../../contracts/src/index.ts';
+import type { LocalIndex, SourceEvidence, SourceIndex } from '../../../contracts/src/index.ts';
 import { checkSourcePassage, isSafeRelativePath, sameScope } from '../evidence.ts';
 import { nodeId, validateGraph } from '../graph.ts';
 import { isExactVersion } from '../versions.ts';
 import { assertLocal, LOCAL_LIMITS, record, sourceLines } from './limits.ts';
 
-export function evidenceId(index: Pick<LocalIndex, 'snapshot'>, path: string, start: number, end: number): string {
+export function evidenceId(index: Pick<SourceIndex, 'snapshot'>, path: string, start: number, end: number): string {
   return JSON.stringify([index.snapshot.repositoryId, index.snapshot.snapshotId, index.snapshot.revision, path, start, end]);
 }
 function string(value: unknown, max = 2_000): value is string { return typeof value === 'string' && value.length > 0 && value.length <= max; }
@@ -14,15 +14,20 @@ function validScope(value: unknown): boolean {
 /** Structural/source validation is not authentication or a semantic truth check. */
 export function validateLocalIndex(value: unknown): asserts value is LocalIndex {
   assertLocal(record(value) && value.schemaVersion === 1 && value.mode === 'fixture', 'Unsupported local index');
+  validateSourceIndex(value);
+}
+/** Supports real Git indexes without accepting fixture/Git identity substitution. */
+export function validateSourceIndex(value: unknown): asserts value is SourceIndex {
+  assertLocal(record(value) && value.schemaVersion === 1 && (value.mode === 'fixture' || value.mode === 'git'), 'Unsupported source index');
   assertLocal(validScope(value.scope) && record(value.snapshot), 'Invalid index identity');
   const snapshot = value.snapshot;
-  assertLocal(string(snapshot.repositoryId) && string(snapshot.snapshotId) && snapshot.kind === 'fixture'
-    && typeof snapshot.revision === 'string' && /^sha256:[a-f0-9]{64}$/.test(snapshot.revision), 'Invalid immutable fixture snapshot');
+  assertLocal(string(snapshot.repositoryId) && string(snapshot.snapshotId) && snapshot.kind === value.mode
+    && typeof snapshot.revision === 'string' && (value.mode === 'fixture' ? /^sha256:[a-f0-9]{64}$/ : /^[a-f0-9]{40}$/).test(snapshot.revision), `Invalid immutable ${value.mode} snapshot`);
   assertLocal(string(value.packageName) && typeof value.version === 'string' && isExactVersion(value.version), 'Invalid package identity');
   for (const field of ['files', 'nodes', 'edges', 'evidence', 'dependencies', 'unresolved', 'limitations']) {
     assertLocal(Array.isArray(value[field]), `Invalid ${field}`);
   }
-  const index = value as unknown as LocalIndex;
+  const index = value as unknown as SourceIndex;
   assertLocal(index.files.length > 0 && index.files.length <= LOCAL_LIMITS.files && index.nodes.length <= LOCAL_LIMITS.nodes
     && index.edges.length <= LOCAL_LIMITS.edges && index.evidence.length <= LOCAL_LIMITS.evidence
     && index.dependencies.length <= LOCAL_LIMITS.edges, 'Index exceeds limits');
@@ -34,6 +39,13 @@ export function validateLocalIndex(value: unknown): asserts value is LocalIndex 
     characters += file.text.length; files.set(file.path, file.text);
   }
   assertLocal(characters <= LOCAL_LIMITS.totalCharacters, 'Index source exceeds limits');
+  if (index.mode === 'git') {
+    const text = files.get('package.json'); assertLocal(text !== undefined, 'Git index requires a root package.json manifest');
+    let manifest: unknown;
+    try { manifest = JSON.parse(text); } catch { throw new Error('Invalid Git package.json manifest'); }
+    assertLocal(record(manifest) && typeof manifest.version === 'string' && isExactVersion(manifest.version)
+      && manifest.name === index.packageName && manifest.version === index.version, 'Git package identity differs from its source manifest');
+  }
   for (const node of index.nodes) {
     assertLocal(record(node) && string(node.id, 10_000) && string(node.localId) && string(node.label)
       && node.repositoryId === index.snapshot.repositoryId && node.snapshotId === index.snapshot.snapshotId
@@ -82,8 +94,8 @@ export function validateLocalIndex(value: unknown): asserts value is LocalIndex 
     && [...index.unresolved, ...index.limitations].every(item => string(item, 4_000)), 'Invalid index limitations');
 }
 
-export function lookupSource(index: LocalIndex, path: string, startLine: number, endLine: number): SourceEvidence {
-  validateLocalIndex(index);
+export function lookupSource(index: SourceIndex, path: string, startLine: number, endLine: number): SourceEvidence {
+  validateSourceIndex(index);
   assertLocal(typeof path === 'string' && isSafeRelativePath(path), 'Invalid source path');
   assertLocal(Number.isSafeInteger(startLine) && Number.isSafeInteger(endLine) && startLine >= 1 && endLine >= startLine
     && endLine - startLine < LOCAL_LIMITS.passageLines, 'Invalid or oversized source range');

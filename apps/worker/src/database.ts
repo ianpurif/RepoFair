@@ -102,6 +102,7 @@ export class AtlasDatabase {
       await execute("SET LOCAL statement_timeout = '10000ms'");
       await execute("SET LOCAL lock_timeout = '3000ms'");
       await execute("SET LOCAL idle_in_transaction_session_timeout = '15000ms'");
+      await execute("SELECT set_config('atlas.authorized_repository_ids', '[]', true)");
       if (principalId !== null) {
         await execute('SET LOCAL ROLE authenticated');
         await execute("SELECT set_config('request.jwt.claims', $1, true)", [JSON.stringify({ sub: principalId, role: 'authenticated' })]);

@@ -75,9 +75,11 @@ export type VerifiedGitHubUser = Readonly<{ principalId: string; githubUserId: n
 declare const repositoryAuthorizationBrand: unique symbol;
 export type AuthorizedGitHubRepository = GitHubRepository & Readonly<{ principalId: string; installationId: number; [repositoryAuthorizationBrand]: true }>;
 export type GitHubCommit = Readonly<{ sha: string; treeSha: string }>;
+export type GitHubSourceTree = Readonly<{ commitSha: string; treeSha: string; files: readonly Readonly<{ path: string; size: number; blobSha: string }>[]; limitations: readonly string[] }>;
+export type GitHubImportLimits = Readonly<{ maxFiles: number; maxFileBytes: number; maxTotalBytes: number }>;
 export type GitHubSourceSnapshot = Readonly<{ repository: GitHubRepository; commitSha: string; treeSha: string; files: readonly Readonly<{ path: string; text: string; lineCount: number; blobSha: string }>[]; limitations: readonly string[] }>;
 type UserSecret = { token: string; expiresAt: number };
-type RepositorySecret = { user: VerifiedGitHubUser; token: string; expiresAt: number };
+type RepositorySecret = { user: VerifiedGitHubUser; token: string; expiresAt: number; personalOwner?: boolean };
 function installation(value: unknown): GitHubInstallation {
   const item = record(value); const selection = item.repository_selection;
   if (selection !== 'all' && selection !== 'selected') return invalid('Invalid installation repository selection');
@@ -113,9 +115,9 @@ export class GitHubAppClient {
   private readonly users = new WeakMap<VerifiedGitHubUser, UserSecret>();
   private readonly repositories = new WeakMap<AuthorizedGitHubRepository, RepositorySecret>();
   constructor(private readonly config: GitHubConfiguration, private readonly fetchImpl: typeof fetch = fetch, private readonly now: () => number = Date.now) {}
-  private async request(path: string, token: string, body?: unknown): Promise<unknown> {
+  private async request(path: string, token: string, body?: unknown, timeoutMs = 15_000): Promise<unknown> {
     if (!path.startsWith('/') || path.startsWith('//') || new URL(path, API).origin !== API) return invalid('Invalid GitHub API path');
-    const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), 15_000);
+    const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), Math.max(1, Math.min(15_000, timeoutMs)));
     try {
       const response = await this.fetchImpl(`${API}${path}`, { method: body === undefined ? 'GET' : 'POST', redirect: 'error', signal: controller.signal,
         headers: { Accept: 'application/vnd.github+json', Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': GITHUB_API_VERSION, 'User-Agent': 'Chronos-Atlas', ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) },
@@ -189,6 +191,7 @@ export class GitHubAppClient {
   }
   /** Caller must separately verify workspace membership. Client selections never establish permission. */
   async authorizeRepository(user: VerifiedGitHubUser, selection: Readonly<{ owner: string; name: string; repositoryId?: number; installationId?: number }>): Promise<AuthorizedGitHubRepository> {
+    if (user.login.toLowerCase() === selection.owner.toLowerCase()) return this.authorizePersonalOwner(user, selection);
     const selected = await this.verifyRepositoryRead(user, selection.owner, selection.name);
     if (selection.repositoryId !== undefined && selected.id !== integer(selection.repositoryId)) throw new GitHubError('unauthorized', 'Repository identity does not match selection');
     const installed = installation(await this.appRequest(`/repos/${segment(selected.owner)}/${segment(selected.name)}/installation`));
@@ -200,9 +203,35 @@ export class GitHubAppClient {
     const authorized = Object.freeze({ ...selected, principalId: user.principalId, installationId: installed.id }) as AuthorizedGitHubRepository;
     this.repositories.set(authorized, { user, token, expiresAt: Math.min(expiresAt, this.now() + 300_000) }); return authorized;
   }
+  /** A verified personal owner needs no broad OAuth repo scope; content still uses a single-repo read-only App token. */
+  private async authorizePersonalOwner(user: VerifiedGitHubUser, selection: Readonly<{ owner: string; name: string; repositoryId?: number; installationId?: number }>): Promise<AuthorizedGitHubRepository> {
+    this.userSecret(user);
+    const raw = record(await this.appRequest(`/repos/${segment(selection.owner)}/${segment(selection.name)}/installation`));
+    const account = record(raw.account); const installed = installation(raw);
+    if (account.type !== 'User' || integer(account.id) !== user.githubUserId || installed.account.toLowerCase() !== user.login.toLowerCase()
+      || String(installed.appId) !== this.config.appId || installed.suspended || !['read','write'].includes(String(installed.permissions.contents))
+      || (selection.installationId !== undefined && installed.id !== integer(selection.installationId))) throw new GitHubError('unauthorized', 'Personal repository ownership is not verified');
+    const value = record(await this.appRequest(`/app/installations/${installed.id}/access_tokens`, { repositories: [selection.name], permissions: { contents: 'read', metadata: 'read' } }));
+    const token = boundedString(value.token, 4096); const expiresAt = Date.parse(boundedString(value.expires_at));
+    if (!Number.isFinite(expiresAt) || expiresAt <= this.now() || /\s/.test(token)) return invalid('Invalid GitHub installation access token');
+    const item = record(await this.request(`/repos/${segment(selection.owner)}/${segment(selection.name)}`, token));
+    const owner = record(item.owner); const selected = repository(item);
+    if (owner.type !== 'User' || integer(owner.id) !== user.githubUserId || selected.owner.toLowerCase() !== user.login.toLowerCase()
+      || selected.fullName.toLowerCase() !== `${selection.owner}/${selection.name}`.toLowerCase() || item.disabled === true
+      || (selection.repositoryId !== undefined && selected.id !== integer(selection.repositoryId))) throw new GitHubError('unauthorized', 'Personal repository ownership is not verified');
+    const authorized = Object.freeze({ ...selected, principalId: user.principalId, installationId: installed.id }) as AuthorizedGitHubRepository;
+    this.repositories.set(authorized, { user, token, expiresAt: Math.min(expiresAt, this.now() + 300_000), personalOwner: true }); return authorized;
+  }
   private async authorizeRead(authorized: AuthorizedGitHubRepository): Promise<RepositorySecret> {
     const secret = this.repositorySecret(authorized);
-    const current = await this.verifyRepositoryRead(secret.user, authorized.owner, authorized.name);
+    let current: GitHubRepository;
+    if (secret.personalOwner) {
+      const user = record(await this.request('/user', this.userSecret(secret.user).token));
+      const item = record(await this.request(`/repos/${segment(authorized.owner)}/${segment(authorized.name)}`, secret.token));
+      const owner = record(item.owner);
+      if (integer(user.id) !== secret.user.githubUserId || owner.type !== 'User' || integer(owner.id) !== secret.user.githubUserId || item.disabled === true) throw new GitHubError('unauthorized', 'Personal repository access changed');
+      current = repository(item);
+    } else current = await this.verifyRepositoryRead(secret.user, authorized.owner, authorized.name);
     if (current.id !== authorized.id) throw new GitHubError('unauthorized', 'Repository identity changed');
     return secret;
   }
@@ -212,14 +241,15 @@ export class GitHubAppClient {
     const commit = record(await this.request(`/repos/${segment(authorized.owner)}/${segment(authorized.name)}/commits/${encodeURIComponent(ref)}`, secret.token));
     return Object.freeze({ sha: sha(commit.sha), treeSha: sha(record(record(commit.commit).tree).sha) });
   }
-  async downloadSnapshot(authorized: AuthorizedGitHubRepository, commitSha: string): Promise<GitHubSourceSnapshot> {
+  /** Authorized immutable tree metadata only. No blobs or source text are read. */
+  async inspectSnapshot(authorized: AuthorizedGitHubRepository, commitSha: string): Promise<GitHubSourceTree> {
     sha(commitSha);
     const commit = await this.resolveCommit(authorized, commitSha);
     if (commit.sha !== commitSha) return invalid('GitHub resolved a different immutable commit');
     const secret = this.repositorySecret(authorized); const base = `/repos/${segment(authorized.owner)}/${segment(authorized.name)}`;
     const tree = record(await this.request(`${base}/git/trees/${commit.treeSha}?recursive=1`, secret.token));
     if (tree.sha !== commit.treeSha || tree.truncated !== false || !Array.isArray(tree.tree) || tree.tree.length > 10_000) throw new GitHubError('limit', 'Repository tree is truncated or exceeds its bound');
-    const files: { path: string; text: string; lineCount: number; blobSha: string }[] = []; const limitations: string[] = []; let totalBytes = 0; const deadline = this.now() + 90_000; const paths = new Set<string>();
+    const files: { path: string; size: number; blobSha: string }[] = []; const limitations: string[] = []; let totalBytes = 0; const paths = new Set<string>();
     for (const value of tree.tree) {
       const entry = record(value); const path = boundedString(entry.path, 1000);
       // eslint-disable-next-line no-control-regex -- reject dangerous source paths
@@ -230,22 +260,47 @@ export class GitHubAppClient {
       if (entry.type !== 'blob' || !['100644', '100755'].includes(String(entry.mode))) return invalid('Unsupported repository tree entry');
       if (path.split('/').some(part => ['node_modules', '.git', '.next', 'dist', 'build', 'vendor', 'coverage'].includes(part))) continue;
       if (!/\.(?:tsx?|jsx?|mjs|cjs)$/.test(path) && !/(?:^|\/)(?:package(?:-lock)?\.json|npm-shrinkwrap\.json|tsconfig(?:\.[\w-]+)?\.json)$/.test(path)) continue;
-      if (files.length >= 300 || this.now() > deadline) throw new GitHubError('limit', 'Repository source import exceeded its file or time limit');
+      if (files.length >= 300) throw new GitHubError('limit', 'Repository source import exceeded its file limit');
       if (typeof entry.size !== 'number' || !Number.isSafeInteger(entry.size) || entry.size < 0 || entry.size > 512_000) throw new GitHubError('limit', 'Repository source file exceeded its byte limit');
-      const blobSha = sha(entry.sha); const blob = record(await this.request(`${base}/git/blobs/${blobSha}`, secret.token));
+      totalBytes += entry.size;
+      if (totalBytes > 5_000_000) throw new GitHubError('limit', 'Repository source exceeded its total byte limit');
+      files.push({ path, size: entry.size, blobSha: sha(entry.sha) });
+    }
+    if (!files.length) return invalid('Repository has no supported source files');
+    return Object.freeze({ commitSha, treeSha: commit.treeSha, files: Object.freeze(files.map(file => Object.freeze(file))), limitations: Object.freeze(limitations) });
+  }
+  async downloadSnapshot(authorized: AuthorizedGitHubRepository, commitSha: string, limits: GitHubImportLimits = { maxFiles: 300, maxFileBytes: 512_000, maxTotalBytes: 5_000_000 }): Promise<GitHubSourceSnapshot> {
+    if (![limits.maxFiles, limits.maxFileBytes, limits.maxTotalBytes].every(value => Number.isSafeInteger(value) && value > 0)
+      || limits.maxFiles > 300 || limits.maxFileBytes > 512_000 || limits.maxTotalBytes > 5_000_000) return invalid('Invalid trusted repository import limits');
+    const tree = await this.inspectSnapshot(authorized, commitSha);
+    if (tree.files.length > limits.maxFiles) throw new GitHubError('limit', 'Repository source count exceeds the supported parser limit');
+    if (tree.files.some(file => file.size > limits.maxFileBytes)) throw new GitHubError('limit', 'Repository source file exceeds the supported storage limit');
+    if (tree.files.reduce((sum, file) => sum + file.size, 0) > limits.maxTotalBytes) throw new GitHubError('limit', 'Repository source exceeds the supported total byte limit');
+    const secret = this.repositorySecret(authorized); const base = `/repos/${segment(authorized.owner)}/${segment(authorized.name)}`;
+    const files: { path: string; text: string; lineCount: number; blobSha: string }[] = new Array(tree.files.length);
+    const deadline = this.now() + 90_000; let nextFile = 0; let stopped = false;
+    const download = async (): Promise<void> => {
+      try { for (;;) {
+        if (stopped) return;
+        const position = nextFile++; const file = tree.files[position]; if (!file) return;
+        if (this.now() > deadline) throw new GitHubError('limit', 'Repository source import exceeded its time limit');
+        const { blobSha, path } = file; const blob = record(await this.request(`${base}/git/blobs/${blobSha}`, secret.token, undefined, deadline - this.now()));
       if (blob.sha !== blobSha || blob.encoding !== 'base64' || typeof blob.content !== 'string' || blob.content.length > 700_000) return invalid('Invalid GitHub source blob');
       const encoded = blob.content.replace(/\n/g, '');
       if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(encoded)) return invalid('Invalid GitHub blob encoding');
-      const bytes = Buffer.from(encoded, 'base64'); totalBytes += bytes.length;
-      if (bytes.length !== entry.size || blob.size !== bytes.length || totalBytes > 5_000_000) throw new GitHubError('limit', 'Repository source bytes differ or exceed their limit');
+      const bytes = Buffer.from(encoded, 'base64');
+      if (bytes.length !== file.size || blob.size !== bytes.length) throw new GitHubError('limit', 'Repository source bytes differ from their immutable tree size');
       if (createHash('sha1').update(`blob ${bytes.length}\0`).update(bytes).digest('hex') !== blobSha) return invalid('GitHub source blob does not match its immutable object');
       let text: string;
       try { text = new TextDecoder('utf-8', { fatal: true }).decode(bytes); } catch { return invalid('Repository source is not UTF-8'); }
       if (text.includes('\0')) return invalid('Repository source contains binary data');
-      files.push({ path, text, lineCount: text.split('\n').length, blobSha });
-    }
-    if (!files.length) return invalid('Repository has no supported source files');
-    return Object.freeze({ repository: Object.freeze({ id: authorized.id, owner: authorized.owner, name: authorized.name, fullName: authorized.fullName, private: authorized.private, defaultBranch: authorized.defaultBranch }), commitSha, treeSha: commit.treeSha, files: Object.freeze(files), limitations: Object.freeze(limitations) });
+        files[position] = { path, text, lineCount: text.split('\n').length, blobSha };
+      } } catch (error) { stopped = true; throw error; }
+    };
+    const results = await Promise.allSettled(Array.from({ length: Math.min(4, tree.files.length) }, () => download()));
+    const failure = results.find(result => result.status === 'rejected');
+    if (failure?.status === 'rejected') throw failure.reason;
+    return Object.freeze({ repository: Object.freeze({ id: authorized.id, owner: authorized.owner, name: authorized.name, fullName: authorized.fullName, private: authorized.private, defaultBranch: authorized.defaultBranch }), commitSha, treeSha: tree.treeSha, files: Object.freeze(files), limitations: tree.limitations });
   }
 }
 export async function createGitHubAppClient(env: Readonly<Record<string, string | undefined>>, options: Readonly<{ fetch?: typeof fetch; now?: () => number }> = {}): Promise<GitHubAppClient> {

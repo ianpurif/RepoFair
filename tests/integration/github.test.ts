@@ -98,6 +98,29 @@ describe('GitHub App authentication and authorization', () => {
       await expect(authorized({ '/repos/owner/repository/installation': changed })).rejects.toThrow('cannot read');
     }
   });
+  it('authorizes a verified personal owner without broad repository OAuth scopes', async () => {
+    const owner = { login: 'owner', id: 10, type: 'User' };
+    const api = mockApi({ '/user': { id: 10, login: 'owner' }, '/repos/owner/repository': { ...repo, owner }, '/repos/owner/repository/installation': { ...installed, account: owner } });
+    const client = await createGitHubAppClient(env, { fetch: api.fetch, now: () => now });
+    const user = await client.verifyUser({ principalId: 'clerk-owner', githubUserId: 10, userAccessToken: 'identity-only-token' });
+    const access = await client.authorizeRepository(user, { owner: 'owner', name: 'repository' });
+    expect(access.id).toBe(100);
+    const issued = api.calls.find(call => call.path.endsWith('/access_tokens'));
+    expect(JSON.parse(String(issued?.init?.body))).toEqual({ repositories: ['repository'], permissions: { contents: 'read', metadata: 'read' } });
+    const metadata = api.calls.find(call => call.path === '/repos/owner/repository');
+    expect((metadata?.init?.headers as Record<string,string>).Authorization).toBe('Bearer ghs_test_only');
+    api.entries['/repos/owner/repository'] = { ...repo, owner: { ...owner, id: 11 } };
+    await expect(client.resolveCommit(access, 'main')).rejects.toThrow('access changed');
+  });
+  it('rejects personal-owner claims for organization installations or a different numeric owner', async () => {
+    for (const account of [{ login: 'owner', id: 10, type: 'Organization' }, { login: 'owner', id: 11, type: 'User' }]) {
+      const api = mockApi({ '/user': { id: 10, login: 'owner' }, '/repos/owner/repository/installation': { ...installed, account } });
+      const client = await createGitHubAppClient(env, { fetch: api.fetch, now: () => now });
+      const user = await client.verifyUser({ principalId: 'clerk-owner', githubUserId: 10, userAccessToken: 'identity-only-token' });
+      await expect(client.authorizeRepository(user, { owner: 'owner', name: 'repository' })).rejects.toThrow('ownership');
+      expect(api.calls.some(call => call.path.endsWith('/access_tokens'))).toBe(false);
+    }
+  });
   it('lists only user-accessible installations and repository intersections', async () => {
     const { client, user, api } = await authorized();
     api.entries['/user/installations?per_page=100&page=1'] = { installations: [installed, { ...installed, id: 88, app_id: 456 }] };
@@ -116,6 +139,40 @@ describe('GitHub App authentication and authorization', () => {
   });
 });
 describe('bounded immutable GitHub source download', () => {
+  it('inspects immutable authorized tree metadata without reading any source blob', async () => {
+    const { client, access, api } = await authorized();
+    expect(await client.inspectSnapshot(access, commitSha)).toEqual({ commitSha, treeSha, files: [{ path: 'src/index.ts', size: bytes.length, blobSha }], limitations: [] });
+    expect(api.calls.some(call => call.path.includes('/git/blobs/'))).toBe(false);
+  });
+  it('preflights complete tree file, per-file and total byte bounds before any blob request', async () => {
+    const treePath = `/repos/owner/repository/git/trees/${treeSha}?recursive=1`;
+    const entry = { path: 'src/index.ts', sha: blobSha, type: 'blob', mode: '100644', size: bytes.length };
+    for (const limits of [{ maxFiles: 1, maxFileBytes: 512000, maxTotalBytes: 5000000 }, { maxFiles: 300, maxFileBytes: bytes.length - 1, maxTotalBytes: 5000000 }, { maxFiles: 300, maxFileBytes: 512000, maxTotalBytes: bytes.length }]) {
+      const { client, access, api } = await authorized({ [treePath]: { sha: treeSha, truncated: false, tree: [entry, { ...entry, path: 'src/other.ts' }] } });
+      await expect(client.downloadSnapshot(access, commitSha, limits)).rejects.toMatchObject({ code: 'limit' });
+      expect(api.calls.some(call => call.path.includes('/git/blobs/'))).toBe(false);
+    }
+    const { client, access } = await authorized();
+    await expect(client.downloadSnapshot(access, commitSha, { maxFiles: 301, maxFileBytes: 512000, maxTotalBytes: 5000000 })).rejects.toThrow('trusted');
+  });
+  it('bounds blob concurrency at four and preserves complete source order and hashes', async () => {
+    const entry = { sha: blobSha, type: 'blob', mode: '100644', size: bytes.length };
+    const api = mockApi({ [`/repos/owner/repository/git/trees/${treeSha}?recursive=1`]: { sha: treeSha, truncated: false, tree: Array.from({ length: 11 }, (_, index) => ({ ...entry, path: `src/${index}.ts` })) } });
+    let active = 0; let maximum = 0;
+    const fetcher: typeof fetch = async (input, init) => {
+      if (!String(input).includes('/git/blobs/')) return api.fetch(input, init);
+      active++; maximum = Math.max(maximum, active);
+      try { await new Promise(resolve => setTimeout(resolve, 5)); return await api.fetch(input, init); }
+      finally { active--; }
+    };
+    const client = await createGitHubAppClient(env, { fetch: fetcher, now: () => now });
+    const user = await client.verifyUser({ principalId: 'clerk-user-1', githubUserId: 10, userAccessToken: 'user-test-only' });
+    const access = await client.authorizeRepository(user, { owner: 'owner', name: 'repository' });
+    const result = await client.downloadSnapshot(access, commitSha);
+    expect(maximum).toBe(4); expect(active).toBe(0);
+    expect(result.files.map(file => file.path)).toEqual(Array.from({ length: 11 }, (_, index) => `src/${index}.ts`));
+    expect(result.files.every(file => file.text === source && file.blobSha === blobSha)).toBe(true);
+  });
   it('resolves exact commit and verifies source blob bytes without executing source', async () => {
     const { client, access } = await authorized();
     expect(await client.resolveCommit(access, 'main')).toEqual({ sha: commitSha, treeSha });

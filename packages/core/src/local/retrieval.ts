@@ -1,7 +1,7 @@
-import type { Activity, LocalAnswer, LocalIndex, SourceEvidence } from '../../../contracts/src/index.ts';
+import type { Activity, LocalAnswer, SourceEvidence, SourceIndex } from '../../../contracts/src/index.ts';
 import { parseQuestion } from '../../../contracts/src/local.ts';
 import { LOCAL_LIMITS } from './limits.ts';
-import { validateLocalIndex } from './validation.ts';
+import { validateSourceIndex } from './validation.ts';
 
 const STOP = new Set('a an and are as at be by can code could did do does for from how i if in into is it me of on or our should that the their them these they this to us was what when where which who why will with would you your'.split(' '));
 function terms(text: string): string[] {
@@ -12,7 +12,7 @@ function score(evidence: SourceEvidence, query: readonly string[]): number {
   const content = terms(`${evidence.source.path} ${evidence.original}`);
   return query.reduce((sum, term) => sum + (content.includes(term) ? 1 : 0), 0);
 }
-export function sourceQuestionLimitation(index: LocalIndex, question: string): string | null {
+export function sourceQuestionLimitation(index: SourceIndex, question: string): string | null {
   if (/\b(prove|guarantee|certify)\b/i.test(question) && /\b(production|runtime|always|never|ever|all|no)\b/i.test(question)) {
     return 'Static source cannot establish that runtime or production guarantee. Independent execution evidence is unavailable.';
   }
@@ -27,14 +27,14 @@ export function sourceQuestionLimitation(index: LocalIndex, question: string): s
 }
 
 /** Bounded lexical retrieval + a real parsed graph neighborhood. No model call. */
-export function answerLocal(index: LocalIndex, rawQuestion: string): LocalAnswer {
+export function answerLocal(index: SourceIndex, rawQuestion: string): LocalAnswer {
   const activities: Activity[] = [];
   function timed<T>(operation: string, detail: (value: T) => string, work: () => T): T {
     const started = Date.now(); const value = work();
     activities.push({ id: `${operation}:${started}:${activities.length}`, operation, startedAt: new Date(started).toISOString(),
       durationMs: Math.max(0, Date.now() - started), status: 'complete', detail: detail(value) }); return value;
   }
-  timed('validate-index', () => `Checked ${index.files.length} files, ${index.evidence.length} original source passages and graph endpoints.`, () => validateLocalIndex(index));
+  timed('validate-index', () => `Checked ${index.files.length} files, ${index.evidence.length} original source passages and graph endpoints.`, () => validateSourceIndex(index));
   const question = parseQuestion(rawQuestion);
   const query = terms(question);
   function abstain(reason: string): LocalAnswer {
@@ -54,7 +54,7 @@ export function answerLocal(index: LocalIndex, rawQuestion: string): LocalAnswer
     }
     return result;
   });
-  if (!ranked.length) return abstain('No matching original source evidence was found in this fixture snapshot.');
+  if (!ranked.length) return abstain(`No matching original source evidence was found in this ${index.mode === 'git' ? 'Git commit' : 'fixture snapshot'}.`);
   const selectedEvidence = new Map(ranked.map(item => [item.id, item]));
   const selectedNodes = new Set<string>(); const selectedEdges = new Set<string>();
   const filePaths = new Set(ranked.map(item => item.source.path));
@@ -100,7 +100,7 @@ export function answerLocal(index: LocalIndex, rawQuestion: string): LocalAnswer
     citations.push(item); body += excerpt;
   }
   if (!citations.length) return abstain('Matching source exceeded the bounded response size; use exact source navigation.');
-  timed('validate-citations', () => `Validated ${citations.length} citations against this exact fixture snapshot.`, () => {
+  timed('validate-citations', () => `Validated ${citations.length} citations against this exact ${index.mode === 'git' ? 'Git commit' : 'fixture snapshot'}.`, () => {
     for (const item of citations) if (!index.evidence.some(original => original.id === item.id && original.original === item.original)) throw new Error('Citation is outside indexed evidence');
   });
   return { schemaVersion: 1, mode: 'extractive', status: 'evidence_ready', answer: body, citations,

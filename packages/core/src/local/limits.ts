@@ -1,8 +1,8 @@
 /** Limits apply before parsing and again when accepting a serialized index. */
 export const LOCAL_LIMITS = Object.freeze({
-  files: 64, fileCharacters: 256_000, totalCharacters: 2_000_000,
+  files: 192, fileCharacters: 256_000, totalCharacters: 2_000_000,
   linesPerFile: 4_000, nodes: 4_000, edges: 12_000, evidence: 12_000,
-  astNodes: 100_000, parseMs: 10_000, passageLines: 120,
+  astNodes: 200_000, parseMs: 10_000, passageLines: 120,
   candidates: 8, graphDepth: 2, graphNodes: 40, answerEdges: 160, answerCharacters: 12_000,
 });
 export function assertLocal(condition: unknown, message: string): asserts condition {

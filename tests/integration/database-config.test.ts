@@ -58,8 +58,8 @@ describe('principal and trusted admin transactions', () => {
     const principal = "user'; RESET ROLE; --";
     const value = await database.withPrincipalTransaction(principal, async transaction => (await transaction.query<{ value: number }>('SELECT 1 AS value')).rows[0]?.value);
     expect(value).toBe(1); const client = harness.clients[0];
-    expect(client?.queries.map(query => query.text)).toEqual(['BEGIN', "SET LOCAL statement_timeout = '10000ms'", "SET LOCAL lock_timeout = '3000ms'", "SET LOCAL idle_in_transaction_session_timeout = '15000ms'", 'SET LOCAL ROLE authenticated', "SELECT set_config('request.jwt.claims', $1, true)", 'SELECT 1 AS value', 'COMMIT']);
-    expect(client?.queries[5]?.values).toEqual([JSON.stringify({ sub: principal, role: 'authenticated' })]);
+    expect(client?.queries.map(query => query.text)).toEqual(['BEGIN', "SET LOCAL statement_timeout = '10000ms'", "SET LOCAL lock_timeout = '3000ms'", "SET LOCAL idle_in_transaction_session_timeout = '15000ms'", "SELECT set_config('atlas.authorized_repository_ids', '[]', true)", 'SET LOCAL ROLE authenticated', "SELECT set_config('request.jwt.claims', $1, true)", 'SELECT 1 AS value', 'COMMIT']);
+    expect(client?.queries[6]?.values).toEqual([JSON.stringify({ sub: principal, role: 'authenticated' })]);
     expect(client?.release).toHaveBeenCalledWith(false); await database.close();
   });
   it('rejects empty/unverified principals before acquiring a connection', async () => {

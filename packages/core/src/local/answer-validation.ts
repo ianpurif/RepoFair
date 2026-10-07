@@ -1,10 +1,10 @@
-import type { LocalAnswer, LocalIndex } from '../../../contracts/src/index.ts';
+import type { LocalAnswer, SourceIndex } from '../../../contracts/src/index.ts';
 import { checkSourcePassage, sameScope } from '../evidence.ts';
 import { assertLocal, record, LOCAL_LIMITS } from './limits.ts';
-import { validateLocalIndex } from './validation.ts';
+import { validateSourceIndex } from './validation.ts';
 /** Validate hostile serialized answers. Structural validity is not semantic truth. */
-export function validateLocalAnswer(value: unknown, index: LocalIndex): asserts value is LocalAnswer {
-  validateLocalIndex(index);
+export function validateLocalAnswer(value: unknown, index: SourceIndex): asserts value is LocalAnswer {
+  validateSourceIndex(index);
   assertLocal(record(value) && value.schemaVersion === 1 && value.mode === 'extractive'
     && ['evidence_ready','abstained'].includes(String(value.status))
     && typeof value.answer === 'string' && value.answer.length <= LOCAL_LIMITS.answerCharacters, 'Invalid answer');

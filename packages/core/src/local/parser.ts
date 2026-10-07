@@ -1,13 +1,13 @@
 import { Project, Node, ScriptTarget, ModuleKind, ModuleResolutionKind, SyntaxKind } from 'ts-morph';
 import type { SourceFile as AstFile, Node as AstNode, Identifier } from 'ts-morph';
-import type { DependencyBinding, GraphNode, LocalIndex, ParsedEdge, Scope, Snapshot, SourceEvidence } from '../../../contracts/src/index.ts';
+import type { DependencyBinding, GraphNode, LocalIndex, ParsedEdge, RepositoryIndex, Scope, Snapshot, SourceEvidence, SourceIndex } from '../../../contracts/src/index.ts';
 import { isSafeRelativePath } from '../evidence.ts';
 import { nodeId } from '../graph.ts';
 import { isExactVersion } from '../versions.ts';
 import { assertLocal, LOCAL_LIMITS, record, sourceLines } from './limits.ts';
 import { bindDependency, packageSpecifier } from './versions.ts';
 import type { TrustedFixtureLink } from './versions.ts';
-import { evidenceId, validateLocalIndex } from './validation.ts';
+import { evidenceId, validateSourceIndex } from './validation.ts';
 
 export type ParseLocalInput = Readonly<{
   scope: Scope; snapshot: Snapshot; packageName: string; version: string;
@@ -15,6 +15,8 @@ export type ParseLocalInput = Readonly<{
   trustedLinks?: readonly TrustedFixtureLink[];
   observedAt: string;
 }>;
+/** Authorization and immutable Git download verification belong to the caller. */
+export type ParseRepositoryInput = Omit<ParseLocalInput, 'trustedLinks'>;
 type Declaration = { ast: AstNode; graph: GraphNode; name: string };
 type ReExport = { module: string | null; name: string; exported: string; ast: AstNode };
 type Target = { nodeId: string; callable: boolean };
@@ -48,9 +50,21 @@ function callable(ast: AstNode): boolean {
 }
 
 export function parseLocalIndex(input: ParseLocalInput): LocalIndex {
+  return parseSourceIndex(input, 'fixture');
+}
+export function parseRepositoryIndex(input: ParseRepositoryInput): RepositoryIndex {
+  assertLocal(input && !Object.hasOwn(input, 'trustedLinks'), 'Fixture trusted links are not permitted for Git repositories');
+  return parseSourceIndex(input, 'git');
+}
+function parseSourceIndex(input: ParseLocalInput, mode: 'fixture'): LocalIndex;
+function parseSourceIndex(input: ParseRepositoryInput, mode: 'git'): RepositoryIndex;
+function parseSourceIndex(input: ParseLocalInput, mode: 'fixture' | 'git'): SourceIndex {
   const started = Date.now();
-  assertLocal(input && input.snapshot?.kind === 'fixture' && /^sha256:[a-f0-9]{64}$/.test(input.snapshot.revision), 'Immutable fixture snapshot required');
-  assertLocal(isExactVersion(input.version) && Number.isFinite(Date.parse(input.observedAt)), 'Invalid fixture metadata');
+  const revisionPattern = mode === 'fixture' ? /^sha256:[a-f0-9]{64}$/ : /^[a-f0-9]{40}$/;
+  assertLocal(input && input.snapshot?.kind === mode && typeof input.snapshot.revision === 'string'
+    && revisionPattern.test(input.snapshot.revision), `Immutable ${mode === 'git' ? '40-character Git commit' : 'fixture snapshot'} required`);
+  assertLocal(typeof input.version === 'string' && isExactVersion(input.version)
+    && typeof input.observedAt === 'string' && Number.isFinite(Date.parse(input.observedAt)), `Invalid ${mode} metadata: supported exact package version and observation time are required`);
   assertLocal(Array.isArray(input.files) && input.files.length > 0 && input.files.length <= LOCAL_LIMITS.files, 'Invalid source count');
   const paths = new Set<string>(); let total = 0;
   const files = input.files.map(file => {
@@ -62,6 +76,11 @@ export function parseLocalIndex(input: ParseLocalInput): LocalIndex {
   });
   assertLocal(total <= LOCAL_LIMITS.totalCharacters, 'Source total limit exceeded');
   const manifest = json(files.find(file => file.path === 'package.json')?.text, 'package.json');
+  if (mode === 'git') {
+    assertLocal(record(manifest), 'Git repository requires a root package.json manifest');
+    assertLocal(typeof manifest.version === 'string' && isExactVersion(manifest.version), 'Git package.json must declare a supported exact version');
+    assertLocal(typeof manifest.name === 'string' && manifest.name.trim().length > 0, 'Git package.json must declare its package name');
+  }
   assertLocal(record(manifest) && manifest.name === input.packageName && manifest.version === input.version, 'Package identity differs from snapshot');
   const lock = json(files.find(file => file.path === 'package-lock.json')?.text, 'package-lock.json');
   const project = new Project({ useInMemoryFileSystem: true, skipAddingFilesFromTsConfig: true, skipFileDependencyResolution: true,
@@ -188,7 +207,7 @@ export function parseLocalIndex(input: ParseLocalInput): LocalIndex {
   function external(path: string, specifier: string, names: readonly string[], ast: AstNode): Target | null {
     const parsed = packageSpecifier(specifier);
     if (!parsed) { unresolved.add(`${path}:${ast.getStartLineNumber()}: unsupported module ${specifier}`); return null; }
-    const binding = bindDependency(parsed.packageName, names, path, manifest, lock, input.trustedLinks ?? []);
+    const binding = bindDependency(parsed.packageName, names, path, manifest, lock, mode === 'fixture' ? input.trustedLinks ?? [] : []);
     dependencies.push(binding);
     const graph = addNode(`package:${parsed.packageName}@${binding.version ?? 'unresolved'}`, 'package', `${parsed.packageName}@${binding.version ?? 'unresolved'}`);
     edge(fileNodes.get(path)!.id, graph.id, 'package-binding', 'ts-morph-import', source(ast));
@@ -282,15 +301,17 @@ export function parseLocalIndex(input: ParseLocalInput): LocalIndex {
       edge(packageNode.id, fileNodes.get(target.slice(2))!.id, 'exports', 'explicit-release-export', passage('package.json', 1, files.find(file => file.path === 'package.json')!.lineCount));
     } else unresolved.add(`package.json: unsupported/absent export mapping ${name}`);
   }
-  const index: LocalIndex = { schemaVersion: 1, mode: 'fixture', scope: input.scope, snapshot: input.snapshot,
+  const index: SourceIndex = { schemaVersion: 1, mode, scope: input.scope, snapshot: input.snapshot,
     packageName: input.packageName, version: input.version, files, nodes: [...nodes.values()], edges: [...edges.values()],
     evidence: [...evidence.values()], dependencies, unresolved: [...unresolved], limitations: [
-      'Public authored fixture only; no production repository authorization is established.',
+      mode === 'fixture' ? 'Public authored fixture only; no production repository authorization is established.'
+        : 'Git commit identity and original supplied source are retained. The caller must authorize repository access before supplying source; parsing does not authenticate users or verify repository ownership.',
       'Static TypeScript/JavaScript relationships indicate potential impact, not confirmed runtime behavior or breakage.',
       'Local named/default/namespace imports and named/wildcard re-exports are supported. Dynamic imports, require, computed members, class dispatch and executable configuration are unsupported.',
-      'Only package-lock v3 top-level resolutions and explicitly trusted fixture links bind exact dependency versions.',
+      mode === 'fixture' ? 'Only package-lock v3 top-level resolutions and explicitly trusted fixture links bind exact dependency versions.'
+        : 'Only package-lock v3 top-level resolutions bind exact dependency versions. File/workspace links, other lockfile formats and missing resolutions remain unresolved.',
       'External source and export evidence requires a separate exact-version provider workflow.',
       'Parsing has bounded files, bytes, AST size and a checked deadline; the synchronous parser cannot interrupt a single AST operation.',
     ] };
-  validateLocalIndex(index); return index;
+  validateSourceIndex(index); return index;
 }
