@@ -9,6 +9,7 @@ import { ThemeToggle } from './theme-provider';
 
 const links = [
   { href: '/app', title: 'Workspace', icon: GitBranch },
+  { href: '/app/repositories', title: 'Repositories', icon: Layers3 },
   { href: '/app/providers', title: 'Providers', icon: Boxes },
   { href: '/app/publish', title: 'Publish', icon: Upload },
   { href: '/app/activity', title: 'Activity', icon: Activity },

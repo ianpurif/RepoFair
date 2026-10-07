@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { applyNodeChanges, Background, BackgroundVariant, Controls, Handle, MarkerType, Position, ReactFlow } from '@xyflow/react';
 import type { Edge, Node, NodeProps, ReactFlowInstance } from '@xyflow/react';
-import type { GraphNode, LocalIndex, ParsedEdge } from '@atlas/contracts';
+import type { GraphNode, SourceIndex, ParsedEdge } from '@atlas/contracts';
 import { Box, Braces, FileCode2 } from 'lucide-react';
 
 type SourceNode = Node<{ label: string; kind: GraphNode['kind']; caption: string; related: boolean }, 'source'>;
@@ -17,6 +17,7 @@ function SourceGraphNode({ data, selected }: NodeProps<SourceNode>) {
   </div>;
 }
 const nodeTypes = { source: SourceGraphNode };
+const emptyProviderMetadata: Readonly<Record<string, string>> = Object.freeze({});
 export function nodePath(node: GraphNode): string | null {
   if (node.kind === 'file') return node.localId;
   if (node.kind === 'symbol') return node.localId.split('#')[0] ?? null;
@@ -24,8 +25,8 @@ export function nodePath(node: GraphNode): string | null {
 }
 export function expansionKey(node: GraphNode): string { return `${node.snapshotId}:${nodePath(node) ?? node.localId}`; }
 
-export function GraphCanvas({ index, expandedPaths, selectedId, highlightedEdges, onSelect, onEdgeSelect, providerOrigins = {}, providerBindings = {} }: {
-  index: LocalIndex; expandedPaths: ReadonlySet<string>; selectedId: string | null; highlightedEdges: readonly string[];
+export function GraphCanvas({ index, expandedPaths, selectedId, highlightedEdges, onSelect, onEdgeSelect, providerOrigins = emptyProviderMetadata, providerBindings = emptyProviderMetadata }: {
+  index: SourceIndex; expandedPaths: ReadonlySet<string>; selectedId: string | null; highlightedEdges: readonly string[];
   onSelect: (node: GraphNode) => void; onEdgeSelect: (edge: ParsedEdge) => void;
   providerOrigins?: Readonly<Record<string, string>>;
   providerBindings?: Readonly<Record<string, string>>;

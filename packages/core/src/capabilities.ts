@@ -13,15 +13,17 @@ export function starterCapabilities(): Capabilities {
     limitations: ['Development starter, not the completed product.', 'Domain helpers are not a payment verifier or authorization service.'],
   };
 }
-/** Locally implemented capabilities; no environment variable enables live access. */
+/** Implemented interfaces; protected routes still verify configured identity and access per request. */
 export function applicationCapabilities(): Capabilities {
   const starter = starterCapabilities();
   return { ...starter, stage: 'local-fixture', capabilities: { ...starter.capabilities,
     'source-graph-parser': 'available', 'extractive-questions': 'available',
     'graph-grounded-generation': 'disabled', 'clerk-session': 'available',
+    'github-import': 'available', 'clerk-supabase-auth': 'available', 'private-repository-source': 'available',
     'fixture-provider-http': 'available', 'fixture-federation': 'available', 'fixture-mcp-stdio': 'available',
-  }, limitations: ['Public catalog fixtures only; arbitrary repository import is unavailable.',
+  }, limitations: ['Fixture APIs accept public catalog IDs. Private GitHub routes require a verified session, linked GitHub authorization, workspace membership and a running worker.',
     'Voyage/DeepSeek generation is implemented and requires explicit local enablement and disclosure approval. Payments remain disabled.',
     'Extractive source retrieval is available without a generation model.',
-    'Clerk session UI is implemented; hosted identity-to-tenant, RLS and concurrent database tests remain unverified.'] };
+    'Personal workspace and bounded Git imports are implemented; organizations, verified publishing, private AI and paid agent transport remain incomplete.',
+    'Capability availability describes implementation, not the health or credentials of a particular deployment.'] };
 }
