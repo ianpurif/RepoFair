@@ -22,7 +22,7 @@ completed successfully with Bun 1.4.1 and generated the real lockfile.
 
 - Clerk/Supabase project credentials and approved configuration (P5; private data gates sooner).
 - Read-only GitHub App setup and selected repository permissions.
-- Application generation/embedding provider configuration when that feature is implemented.
+- Voyage AI and DeepSeek server credentials and explicitly approved usage for live AI acceptance; the native local AI path is implemented and HTTP-mock tested.
 - Tempo testnet endpoints/asset details, signer approval and two provider recipients for real payment evidence.
 
 None of these permits fabrication. Continue the local fixture pipeline while external capabilities are blocked. Batch required user inputs, explain why each is needed, and never request secrets in source-controlled files or public chat output.

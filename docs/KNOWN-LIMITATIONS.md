@@ -3,7 +3,7 @@
 - Only public authored fixtures are supported. Arbitrary GitHub/private imports, verified owner publication, endpoint ownership verification and a durable PostgreSQL indexing worker are not implemented.
 - Clerk/Supabase and GitHub App credentials are absent. Hosted authentication, Storage policies, organizations and live RLS integration remain unverified.
 - Tempo testnet settlement, interrupted paid delivery recovery and paid MCP transport remain unverified. No transaction hashes or receipts are fabricated.
-- Retrieval is extractive. No generation/embedding model is configured. Structural/source validation does not prove semantic correctness.
+- Local source excerpts are deterministic. Opt-in AI uses Voyage embeddings/reranking and DeepSeek generation; live API access/quality is unverified. Generated citations validate source identity, not semantic correctness. AI supports the loopback public-fixture workflow only.
 - Parser supports bounded TS/JS, relative resolution, import aliases, supported re-exports and local declarations. tsconfig path aliases, dynamic imports and computed runtime dispatch remain unresolved.
 - File/AST/graph limits and cooperative elapsed checks exist; synchronous ts-morph has no hard interrupt. General imports require an isolated worker first.
 - PostgreSQL-WASM tests run real SQL with a local JWT-claim shim. They do not prove Clerk signature verification, hosted Supabase configuration or concurrent networked reservations.

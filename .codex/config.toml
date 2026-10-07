@@ -20,7 +20,3 @@ multi_agent = true
 # Codex may request narrowly scoped permission for dependency installation.
 [sandbox_workspace_write]
 network_access = false
-
-[mcp_servers.openaiDeveloperDocs]
-url = "https://developers.openai.com/mcp"
-startup_timeout_sec = 20

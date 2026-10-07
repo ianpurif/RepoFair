@@ -1,71 +1,47 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-03T15:10:44.453Z",
-  "finishedAt": "2026-10-03T15:11:04.959Z",
+  "startedAt": "2026-10-07T06:39:58.538Z",
+  "finishedAt": "2026-10-07T06:40:21.343Z",
   "exitStatus": "passed",
-  "command": "bun run test:browser --reporter=list,./tests/browser/evidence-reporter.ts",
+  "command": "Playwright test invocation with evidence reporter",
   "url": "http://localhost:3000",
-  "serverMode": "production Next server, fixture integration mode",
+  "serverMode": "externally started server; mode not independently detected",
   "browser": "Microsoft Edge via Playwright",
   "payments": "not attempted",
   "providerEndpoints": [
     "http://127.0.0.1:4311",
     "http://127.0.0.1:4312"
   ],
-  "total": 12,
-  "passed": 12,
+  "total": 14,
+  "passed": 14,
   "failed": 0,
   "skipped": 0,
-  "additionalVerification": [
-    {
-      "command": "bunx vitest run tests/integration/mcp-stdio.test.ts",
-      "exitCode": 0,
-      "passed": 2,
-      "failed": 0,
-      "skipped": 0,
-      "scope": "Actual bun subprocess with official MCP stdio client; initialize, list, version-specific question/source, private/version/path/size denial and later valid request."
-    },
-    {
-      "command": "bunx vitest run tests/integration/answer-boundary.test.ts tests/database/migrations.test.ts",
-      "exitCode": 0,
-      "passed": 7,
-      "failed": 0,
-      "skipped": 0,
-      "scope": "Independent execution of existing source/provider answer integrity and SQL replay regression tests. Database checks use PostgreSQL-WASM and synthetic test claims; hosted identity and multiple backend connections remain unverified."
-    },
-    {
-      "command": "bunx eslint tests/browser tests/integration/mcp-stdio.test.ts",
-      "exitCode": 0
-    },
-    {
-      "command": "git diff --check -- tests/browser tests/integration/mcp-stdio.test.ts docs/evidence/browser-verification.json",
-      "exitCode": 0
-    }
-  ],
-  "findings": [
-    {
-      "severity": "low",
-      "observation": "The initial browser page logs one resource404. Separately confirmed favicon request returns404; no JavaScript exceptions or console warnings occurred in any of the12 final tests.",
-      "reproduction": "curl.exe -I http://localhost:3000/favicon.ico",
-      "result": "HTTP/1.1 404 Not Found; curl exit0 only establishes successful HTTP request, not application success."
-    },
-    {
-      "severity": "expected fault injection",
-      "observation": "The recovery test deliberately aborts one fixture indexing request, producing net::ERR_FAILED. It then verifies a real successful retry and failed/complete activity records."
-    }
-  ],
   "observations": [
+    {
+      "title": "AI disclosure is bound to the edited question and consumed; generated citations open real source",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 1521,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "AI failure stays visible and never triggers local extraction as a fallback",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 1305,
+      "errors": [],
+      "console": null
+    },
     {
       "title": "parsed graph selection and list relationships open actual immutable source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1331,
+      "durationMs": 1180,
       "errors": [],
       "console": {
         "pageErrors": [],
-        "consoleErrors": [
-          "Failed to load resource: the server responded with a status of 404 (Not Found)"
-        ],
+        "consoleErrors": [],
         "consoleWarnings": []
       }
     },
@@ -73,7 +49,7 @@
       "title": "local question citations match original files and exact selected lines",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1477,
+      "durationMs": 1246,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -85,7 +61,7 @@
       "title": "unanswerable runtime guarantees and unsupported versions abstain without citations",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1260,
+      "durationMs": 1498,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -97,7 +73,7 @@
       "title": "search shortcut, empty state, and keyboard resizing remain usable",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1146,
+      "durationMs": 1186,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -109,7 +85,7 @@
       "title": "provider approval explicitly discloses a separate bounded outbound question",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1325,
+      "durationMs": 1300,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -121,7 +97,7 @@
       "title": "two real providers extend graph with distinct exact-version provenance and clickable source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1421,
+      "durationMs": 1369,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -133,7 +109,7 @@
       "title": "buyer version change clears stale provider context, approval, question and source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 5742,
+      "durationMs": 5722,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -145,7 +121,7 @@
       "title": "mobile panels, keyboard evidence navigation and reduced motion fit the viewport",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 979,
+      "durationMs": 817,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -157,7 +133,7 @@
       "title": "unavailable publishing and sign-in explain setup and disable unavailable actions",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 936,
+      "durationMs": 797,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -169,7 +145,7 @@
       "title": "activity records actual index/source/retrieval/provider operations and can be cleared",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1516,
+      "durationMs": 1486,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -181,7 +157,7 @@
       "title": "invalid snapshot, private path and cross-origin HTTP operations fail closed",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 826,
+      "durationMs": 739,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -193,7 +169,7 @@
       "title": "injected indexing transport failure shows retry and records failed then actual recovered operation",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 832,
+      "durationMs": 797,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -204,14 +180,6 @@
       }
     }
   ],
-  "earlierRun": {
-    "command": "bun run test:browser",
-    "exitCode": 1,
-    "passed": 11,
-    "failed": 1,
-    "skipped": 0,
-    "observation": "Graph-source/list test timed out selecting an imported shouldRetry symbol absent from the local graph boundary. Corrected test to select the actual parsed package import edge and verify its exact original source locator. No production change."
-  },
   "limitations": [
     "Public fixture browser checks do not establish Clerk identity, hosted RLS, real database concurrency, or Tempo settlement.",
     "The indexing recovery case deliberately aborts one browser request; the successful retry uses the actual server."

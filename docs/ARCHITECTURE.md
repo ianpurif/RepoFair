@@ -23,3 +23,7 @@ Use a single PostgreSQL database initially. Node/edge tables are enough. Avoid a
 Graph IDs include repo + snapshot + local identity. No name-only joins. No latest-version fallback. Provider-supplied graph claims are labeled until checked against source. Public repository status does not bypass paid-provider terms or private purchaser scope.
 
 See BUILD sections 6–12. Interfaces below are scaffolding, not shipped integrations.
+
+## Application AI implementation (2026-10-07)
+
+The loopback fixture AI route validates explicit disclosure before parsing a catalog snapshot, uses Voyage document/query embeddings and reranking, then DeepSeek JSON generation. The model returns citation IDs; deterministic code resolves canonical source evidence. Every request is isolated; no shared embedding cache exists. Source navigation remains local. Native clients permit only the two fixed provider hosts, with bounded bodies, deadlines and no retries/fallbacks. This unauthenticated fixture capability is not enabled for public deployment.

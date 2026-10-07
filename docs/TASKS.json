@@ -67,6 +67,23 @@
         "docs/evidence/browser-verification.json"
       ],
       "completedAt": "2026-10-03T15:15:56.670068+00:00"
+    },
+    {
+      "task": "/root/ai_native_clients",
+      "role": "atlas_engineer",
+      "allowedWritePaths": [
+        "packages/core/src/ai/providers.ts",
+        "tests/ai/providers.test.ts"
+      ],
+      "status": "completed",
+      "completedAt": "2026-10-07"
+    },
+    {
+      "task": "/root/ai_boundary_review",
+      "role": "atlas_architect",
+      "allowedWritePaths": [],
+      "status": "completed",
+      "completedAt": "2026-10-07"
     }
   ],
   "note": "Populate only with actual task handles and path ownership from the current session."

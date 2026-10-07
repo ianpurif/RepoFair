@@ -69,5 +69,16 @@
   ],
   "liveIntegrationsVerified": false,
   "lastUpdatedBy": "lead",
-  "updatedAt": "2026-10-03T15:15:56.670068+00:00"
+  "updatedAt": "2026-10-07",
+  "applicationAi": {
+    "embeddingProvider": "Voyage AI",
+    "generationProvider": "DeepSeek",
+    "implementation": "native REST, bounded grounding, explicit local disclosure",
+    "defaultEnabled": false,
+    "liveVerified": false,
+    "evidence": [
+      "docs/evidence/ai-provider-migration.json",
+      "docs/AI.md"
+    ]
+  }
 }

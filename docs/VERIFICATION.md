@@ -37,3 +37,7 @@ These passing tests validate **the starter foundations**. They are not proof tha
 | Favicon follow-up |HTTP200 | Asset-only correction after browser run; rebuilt app |
 
 Evidence: `docs/evidence/local-execution.json`, `browser-verification.json`, and `retrieval-evaluation.json`. Browser report retains the earlier selector timeout. Independent review scope and remaining review gap are in SECURITY.md. Release remains blocked on hosted auth, real multi-connection database safety, verified publication and real Tempo settlement/recovery. No CI, public deployment or payment transaction is claimed.
+
+## Application AI change — 2026-10-07
+
+62 focused AI tests and 14 browser checks pass; 105 starter tests, full types, lint, frozen install and production build pass. The new provider audit reports no forbidden application runtime dependency/call/configuration. Tests use mocked Voyage/DeepSeek HTTP and browser answer transport, with no live paid requests. See `docs/evidence/ai-provider-migration.json` and AI.md for scope and the first browser selector correction. Earlier checkpoint counts above remain historical.

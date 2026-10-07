@@ -11,6 +11,9 @@ Use the six project custom-agent roles. Maximum two concurrent subagents; no nes
 
 Only the lead owns root manifests, lockfiles, shared contracts, migrations and shared progress by default. Assign disjoint path sets before parallel writes. Subagents do not commit. Respect existing edits. Never use destructive resets/cleaning to resolve conflicts.
 
+## Application AI providers
+Voyage AI exclusively handles embeddings and semantic retrieval/reranking. DeepSeek exclusively handles LLM/chat/reasoning/generation. Use native provider HTTP APIs; no alternative provider SDK, endpoint, environment variable or fallback. Development-agent settings above do not configure application AI.
+
 ## Non-negotiable product invariants
 - Authorize before reading/searching/caching; graph, storage, traces and exports follow the same tenant boundaries.
 - Parsing is not execution. Never install/run imported repository code or scripts during indexing.

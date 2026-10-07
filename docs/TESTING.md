@@ -22,3 +22,5 @@ Payment tests generate an official SDK challenge offline and exercise approval c
 Browser tests exercise real fixture APIs, source navigation, original citations, version reset, explicit provider disclosure, failure states, keyboard and narrow layouts. Authenticated import and paid approval are unavailable, not passing fixtures for those features.
 
 See `docs/evidence/local-execution.json` and `docs/evidence/browser-verification.json` for actual results. Independent security findings and scope are recorded in SECURITY.md. No remote CI or production deployment is implied by local checks.
+
+Application AI checks: `bun run verify:ai` audits source/manifests/lock/environment names. `bunx vitest run tests/ai` covers 62 provider and grounding boundary cases using mocked HTTP. Browser AI tests explicitly mock generation responses and assert disclosure, citation navigation and no fallback after failure. They never prove live model quality, account access or billing.

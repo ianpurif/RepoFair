@@ -53,3 +53,15 @@ Frozen install, 105 starter tests, 47 product tests, 12 independent browser chec
 Independent security findings were fixed with regressions. A later adapter review could not start due to the client's agent thread limit; lead reviewed it and fixed unverifiable saved settlement reporting. Reviewer favicon404 fixed and HTTP200 verified after final build. Browser evidence preserves the initial test selector timeout and subsequent12-pass run.
 
 Implementation units are committed separately (more than 10 substantive commits); no push/deployment occurred. Web production server remains on localhost:3000, with independent fixture providers on 4311/4312. External configuration is absent by user confirmation. Follow BLOCKERS.md for exact next work; credentials alone do not activate missing production adapters.
+
+## Application AI provider change — 2026-10-07
+
+Implemented the user's exclusive Voyage AI + DeepSeek decision. No application SDK/call existed to migrate; removed the obsolete environment entries, Supabase Studio vendor-key configuration, optional documentation MCP endpoint and direct vendor-package launcher fallback. Existing Codex development model records remain separate from application execution.
+
+Native provider clients perform Voyage document/query embeddings and reranking, then DeepSeek JSON generation. The web AI option requires explicit enablement, both server keys, loopback launch and disclosure bound to the current question/snapshot. Generated claims resolve to canonical original source; unsupported versions abstain before egress. Errors do not trigger provider/model/extractive fallback or retries. Source excerpts remain an explicit deterministic local operation.
+
+Actual engineering and architecture task handles are recorded. Review identified approval reuse after edits; fixed and browser-tested. The local launcher sets a server marker so the AI route stays disabled when started outside the supported loopback launcher. This is not hosted authentication.
+
+Checks: 62 AI tests passed (mocked HTTP), 14 browser tests passed (AI responses mocked; existing fixture services real), 105 starter checks passed; lint/provider-policy audit, source typecheck, frozen install and production build passed. Full product suite passed 108 tests before one final added HTTP-pipeline test; the final focused AI run includes that added passing test. First browser run had 13 passing tests and one ambiguous alert selector; scoped to the actual error panel and reran all 14 successfully.
+
+No live API call or spending occurred. Keys remain local; values were not printed. Existing untracked Supabase files were preserved; only obsolete provider lines were removed from its local config. Real provider access/quality and public authenticated AI remain unverified. Setup: AI.md.

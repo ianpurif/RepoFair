@@ -4,6 +4,7 @@ import { ROOT, walk } from './lib.mjs';
 const errors=[];
 for (const path of walk(ROOT)) {
   const name = relative(ROOT,path).replaceAll('\\','/');
+  if (name.startsWith('supabase/.temp/') || name.startsWith('supabase/.branches/')) continue; // Supabase CLI state, not source.
   if (/\.(json|md|ts|tsx|mjs|toml|css|yml|sh)$/.test(name) || name === 'AGENTS.md') {
     const text=readFileSync(path,'utf8');
     if (text.includes('\0')) errors.push(`${name}: NUL byte`);

@@ -42,3 +42,12 @@ These are reference starting points from the approved product brief, not a state
 The latest user-approved 16-section Atlas prompt controls the product scope. BUILD.md retains it with the requested multi-agent mapping and startup clarifications. Architecture choices, task decomposition, scaffold code and acceptance gates are implementation proposals, not competitor/performance claims.
 
 The earlier user-supplied ChronosRAG whitepaper v2.1 is background only: source/evidence contracts (section 6), cache scope (section 7), bounded repair (section 8), unknown evidence (section 9), and data boundaries (section 14). Its original support-runtime focus and graph/payment exclusions are superseded by the user's later Atlas brief. The original DOCX is not bundled.
+
+## Application AI interfaces verified — 2026-10-07
+
+- https://docs.voyageai.com/reference/embeddings-api
+- https://docs.voyageai.com/reference/reranker-api
+- https://api-docs.deepseek.com/api/create-chat-completion/
+- https://api-docs.deepseek.com/quick_start/pricing/
+
+Verified native HTTP request shapes and model allowlists; account access and paid calls were not tested. See AI.md.

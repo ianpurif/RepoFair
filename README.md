@@ -31,6 +31,10 @@ These are separate HTTP processes on 127.0.0.1:4311 and :4312, with separate ide
 - Typed local SDK and genuine MCP stdio tools. See [MCP setup](docs/MCP.md).
 - Tenant and purchase SQL foundation with PostgreSQL-WASM policy tests. Hosted identity and concurrent database safety are separate gates.
 
+## Application AI
+
+Voyage AI provides embeddings and reranking; DeepSeek provides generated answers and reasoning. Use the explicit AI option in the workspace after configuring server keys and reviewing the disclosure. See [AI setup and verification](docs/AI.md). Provider failures return errors without switching services. `bun run verify:ai` enforces the application provider policy.
+
 ## Source and authorization boundary
 
 The running application accepts only catalog fixture IDs, never arbitrary filesystem roots, client tenant claims or private repositories. Files are bounded, digest-checked and parsed without executing scripts, installing dependencies, loading plugins or following symlinks.

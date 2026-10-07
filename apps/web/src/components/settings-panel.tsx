@@ -7,7 +7,8 @@ export function SettingsPanel() {
     <section className="settings-card"><div><h2>Development mode</h2><p>Original fixture repositories with immutable source revisions.</p></div><span className="status-tag fixture">Fixture</span></section>
     <section className="settings-card integrations"><div><h2>Integration status</h2><p>External operations require separately verified setup.</p></div><dl>{[
       ['Fixture graph and source', 'Available through local APIs'],
-      ['Local questions', 'Extractive retrieval; no generation model'],
+      ['Local questions', 'Deterministic source excerpts'],
+      ['AI answers', 'Voyage embeddings/reranking + DeepSeek generation; explicit enablement and disclosure approval required'],
       ['Local provider contexts', 'Fixture HTTP APIs; availability checked per request'],
       ['Clerk identity and organizations', 'Unavailable · authentication setup required'],
       ['GitHub import', 'Unavailable · authorized GitHub App required'],

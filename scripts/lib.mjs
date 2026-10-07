@@ -24,7 +24,7 @@ export function command(name, args = []) {
   const binary = findExecutable(name);
   if (!binary) throw new Error(`${name} is not installed/on PATH. Install it yourself or use the supported client; this script does not change global tools.`);
   if (!binary.toLowerCase().endsWith('.cmd')) return { bin: binary, args };
-  const relative = { npm: 'npm/bin/npm-cli.js', codex: '@openai/codex/bin/codex.js', tsc: 'typescript/bin/tsc' }[name];
+  const relative = { npm: 'npm/bin/npm-cli.js', tsc: 'typescript/bin/tsc' }[name];
   const entry = relative ? join(dirname(binary), 'node_modules', relative) : null;
   if (entry && existsSync(entry)) return {bin:process.execPath,args:[entry,...args]};
   throw new Error(`Unsupported ${name} Windows shim layout. Open the installed tool directly; no unsafe shell fallback was used.`);

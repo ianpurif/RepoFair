@@ -16,7 +16,7 @@
     "bootstrap": "node scripts/bootstrap.mjs --install",
     "verify:starter": "node scripts/verify-starter.mjs",
     "test": "node scripts/run-tests.mjs",
-    "lint": "eslint apps packages tests scripts/evaluate.ts && node scripts/check-hygiene.mjs",
+    "lint": "eslint apps packages tests scripts/evaluate.ts && node scripts/check-hygiene.mjs && node scripts/check-ai-providers.mjs",
     "test:product": "vitest run",
     "test:browser": "playwright test",
     "mcp": "bun packages/sdk/src/mcp.ts",
@@ -30,7 +30,8 @@
     "provider:b": "bun apps/provider/src/fixture-server.ts --identity fixture-events --publish",
     "worker:check": "node apps/worker/src/main.mjs --check",
     "verify": "node scripts/verify-starter.mjs && node scripts/typecheck.mjs && node scripts/web.mjs build",
-    "verify:release": "node scripts/release-gate.mjs"
+    "verify:release": "node scripts/release-gate.mjs",
+    "verify:ai": "node scripts/check-ai-providers.mjs"
   },
   "devDependencies": {
     "typescript": "5.9.3",

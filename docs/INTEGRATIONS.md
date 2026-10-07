@@ -64,10 +64,14 @@ multi-connection concurrency proof.
 | MPP / Tempo | Unwired testnet adapter and offline official SDK challenge tests | Durable adapters, independent final review and actual settlement/recovery. |
 | Independent providers | Two separate fixture HTTP processes | Verified ownership, publication and distinct real recipients. |
 | MCP | Official stdio tools and protocol tests | Authenticated/paid transport not implemented. |
-| Application generation | Extractive source evidence only | No generation/embedding model configured. |
+| Application AI | Native Voyage embeddings/reranking + DeepSeek JSON generation; local disclosure-gated path | HTTP-mocked acceptance only; live provider access unverified. See AI.md. |
 | LangSmith | Disabled | Optional redacted traces with approved handling. |
 | Vitest / ESLint / Playwright | Installed local verification tooling | Live acceptance remains separate. |
 
 Bootstrap resolves missing toolchain packages through npm publisher metadata and pins exact versions before Bun install. This step does not certify security, peer compatibility or runtime behavior. Inspect advisories and test rather than treating the newest tag as automatically safe.
 
 Add each verified API signature, package version, source URL, observation date, minimal real test, actual outcome and unresolved assumptions as implementation proceeds. Never enter a guessed success, a fabricated network constant or another user's credential.
+
+## Application AI provider decision — 2026-10-07
+
+User requires Voyage AI for embeddings/retrieval and DeepSeek for all LLM/chat/reasoning/generation. Implemented native fetch against fixed official endpoints, server-only keys, explicit enablement and per-question disclosure. No model SDK, generic model env selection, provider fallback or retry. Defaults and verified official API references are recorded in AI.md. Real paid calls were not authorized or performed.

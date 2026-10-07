@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-07",
+  "providers": {
+    "embeddings": "Voyage AI",
+    "reranking": "Voyage AI",
+    "generation": "DeepSeek",
+    "reasoning": "DeepSeek"
+  },
+  "liveApiCalls": false,
+  "newDependencies": [],
+  "checks": [
+    {
+      "command": "bunx vitest run tests/ai",
+      "exitCode": 0,
+      "passed": 62,
+      "scope": "Mocked HTTP and canonical source grounding; includes complete route-to-provider pipeline"
+    },
+    {
+      "command": "bun run test:product",
+      "exitCode": 0,
+      "passed": 108,
+      "scope": "Aggregate run before the final additional HTTP-pipeline test; that additional case passed in focused62 AI run"
+    },
+    {
+      "command": "bun run test:browser",
+      "exitCode": 0,
+      "passed": 14,
+      "scope": "AI transport mocked; public fixture APIs and two provider services real"
+    },
+    {
+      "command": "node scripts/verify-starter.mjs",
+      "exitCode": 0,
+      "passed": 105
+    },
+    {
+      "command": "bun run lint",
+      "exitCode": 0
+    },
+    {
+      "command": "bun run typecheck",
+      "exitCode": 0
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "exitCode": 0
+    },
+    {
+      "command": "bun run build",
+      "exitCode": 0
+    },
+    {
+      "command": "bun run verify:ai",
+      "exitCode": 0
+    },
+    {
+      "command": "Browser static bundle search for provider key variable names and forbidden API host",
+      "matches": 0
+    }
+  ],
+  "reviewCorrections": [
+    "Per-question disclosure is reset after edits/version changes and consumed on submission.",
+    "Local hostname checks are supplemented by the loopback launcher marker; public authenticated deployment remains unavailable.",
+    "First browserrun13pass/1selectorfailure: alert matched both app panel and Next route announcer; narrowed selector and all14 passed."
+  ],
+  "limitations": [
+    "Live provider account access, paid requests and generated answer quality unverified.",
+    "AI supports public catalog fixtures on the local launcher only.",
+    "No monetary usage cap; explicit enablement and disclosure required.",
+    "Earlier live auth/database/payment release gates remain incomplete."
+  ]
+}

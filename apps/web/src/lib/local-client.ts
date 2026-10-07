@@ -1,4 +1,4 @@
-import type { Activity, FederationResult, FixtureId, FixtureProviderInfo, LocalAnswer, LocalIndex, SourceEvidence } from '@atlas/contracts';
+import type { Activity, AiAnswer, FederationResult, FixtureId, FixtureProviderInfo, LocalAnswer, LocalIndex, SourceEvidence } from '@atlas/contracts';
 
 export const fixtures: readonly { id: FixtureId; name: string; version: string; detail: string }[] = [
   { id: 'jobboard-app@1.0.0', name: 'jobboard-app', version: '1.0.0', detail: 'Application' },
@@ -22,6 +22,9 @@ export function loadFixture(id: FixtureId, signal?: AbortSignal) {
 }
 export function askLocal(fixtureId: FixtureId, question: string, signal?: AbortSignal) {
   return request<LocalAnswer>('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fixtureId, question }), ...(signal ? { signal } : {}) });
+}
+export function askAi(fixtureId: FixtureId, question: string, approveAiDisclosure: boolean, signal?: AbortSignal) {
+  return request<AiAnswer>('/api/ai/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fixtureId, question, approveAiDisclosure }), ...(signal ? { signal } : {}) });
 }
 export function loadSource(fixtureId: FixtureId, path: string, startLine: number, endLine: number, signal?: AbortSignal) {
   const params = new URLSearchParams({ fixtureId, path, startLine: String(startLine), endLine: String(endLine) });

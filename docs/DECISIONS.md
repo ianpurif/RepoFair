@@ -30,3 +30,7 @@ server-only mutations. Budgets serialize on the allowance row; unknown payments
 retain reservations. SQL is not a claimed payment verifier. Docker is unavailable;
 database concurrency/RLS acceptance stays unverified rather than inferred from
 pure helpers. Live adapters stay disabled until independently tested.
+
+## D008 — Exclusive application AI providers (2026-10-07)
+
+Explicit user decision: Voyage AI owns embeddings and semantic retrieval/reranking; DeepSeek owns all LLM/chat/reasoning/generation. Use native REST and fixed endpoints, with no alternate provider dependency or fallback. Existing deterministic source navigation is a separate local operation. AI disclosure must bind to the current question and snapshot. Local server enablement and both credentials are required; hosted AI remains gated on authorization and usage controls. See AI.md for interfaces and acceptance boundaries.

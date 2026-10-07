@@ -68,7 +68,7 @@ Verify the selected models are available in the installed client/account. Use ac
 
 If the requested model or multi-agent feature is unavailable, report that exact blocker. Do not simulate the missing role or silently substitute another model. Active UI/session or administrator settings may override a requested project setting; reading this prompt does not change the current model. The optional project launcher makes the lead model/effort explicit.
 
-Keep the application's runtime model configuration separate from the models used to develop it.
+Keep the application's runtime model configuration separate from the models used to develop it. Application AI uses Voyage AI for embeddings/retrieval and DeepSeek for all LLM responses, reasoning and generation. No other model provider, SDK, endpoint or fallback is permitted in the application.
 
 Create and maintain:
 
@@ -85,7 +85,8 @@ Research the current official documentation for the chosen frameworks and integr
 
 Prioritize:
 
-- OpenAI's Codex configuration and application API documentation.
+- Voyage AI embeddings/reranking and DeepSeek generation API documentation.
+- Codex configuration documentation applies only to development tooling.
 - Next.js, TypeScript, ts-morph, and React Flow.
 - Clerk and Supabase's current authentication integration.
 - GitHub Apps, repository permissions, and webhook verification.
