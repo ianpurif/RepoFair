@@ -121,3 +121,24 @@ hosted database, capacity, replay and ledger reports are under `docs/evidence`.
 The release gate still correctly rejects incomplete publication, settlement,
 recovery and full acceptance. `BLOCKERS.md` removes resolved authority/draft and
 storage items while retaining the actual external and implementation gaps.
+
+## Agent configuration — 2026-10-11
+
+2026-10-11: Lead and all six development roles configured for gpt-6.1-sol / max exclusively, with no fallbacks. Configuration and launcher checks do not prove backend execution; reload the client/session before using updated roles.
+Validation: node --test tests/harness.test.mjs passed 10/10 checks, including all six role configurations and launcher dry-run; git diff --check passed. No backend model execution was asserted.
+
+User correction: use the exact reasoning token `max` for the lead and every role. Model remains `gpt-6.1-sol` exclusively; no fallbacks.
+
+## Production engineering overhaul — 2026-10-11
+
+Implemented general immutable repository maps and durable PostgreSQL import checkpoints, bounded downloads/parser isolation, transient/rate-limit retry, cancellation, previous-map availability and hash-verified unchanged-blob reuse. Removed normal-product fixture records; persisted UI now supports progressive source graphs, exact citations, job recovery, publication and purchase history.
+
+Connected selected signed owner exports and complete graph proofs, signed endpoint control, exact-version catalog discovery, revocation fences, immutable budget approvals, authenticated native SDK/stdio MCP and an independent provider Moderato charge/delivery/recovery runtime. Unknown payment cannot reopen dispatch or release its reservation. Actual security/verifier findings were corrected, including graph forgery, private metadata control, authenticated reader locks, nested provider connection acquisition and native Edge's SDK fetch receiver.
+
+Final local results: 350 product tests/28 files, 105 starter checks, 21 Edge browser checks, full TypeScript, lint/policy/hygiene, production build and worker/provider bundles passed. Browser scopes retain fixture transports; two fresh development sign-in controls verified the actual account route and cleaned only owned sessions/tickets. A real freshly authorized 199-file GitHub import passed through the new service into isolated local SQL in 94.6 seconds/nine checkpoints, including exact source/graph/five citations and same-commit reuse.
+
+Generated parser timing improved 145 files from 1,478 to 271 ms; formerly rejected 4,001-file input parsed in 2,398 ms. The generated SQL pipeline completed 4,001 files in 8.57 seconds; one changed file reused 4,000 blobs and cut simulated HTTP from 5,288 to 1,288. Zero indexing AI calls; RSS at return and unmeasured hosting/compute/storage costs are labelled.
+
+All six actual custom roles completed with disjoint ownership and no nested delegation/agent commits. Runtime model/effort metadata remains unavailable rather than inferred from configuration. Ten substantive commits were already made before final API/UI/evidence units.
+
+New hosted migrations/provider deployment were not performed. Actual external activation, second-account paid discovery, real wallet settlement/recovery, remote webhooks, organizations/Storage/private AI operating budgets and new hosted concurrency remain blocked as described in BLOCKERS.md. Docker's daemon was unavailable; PostgreSQL-WASM does not establish multi-backend safety. No private source AI egress, real spending, mainnet, public publication or production-ready claim occurred. Evidence and deployment configuration are in OVERHAUL.md and docs/evidence/overhaul-validation.json.

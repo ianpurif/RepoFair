@@ -1,23 +1,6 @@
 {
   "schemaVersion": 1,
-  "active": [
-    {
-      "task": "/root/overhaul_architecture",
-      "role": "atlas_architect",
-      "status": "running",
-      "allowedWritePaths": [],
-      "milestone": "production-overhaul",
-      "recordedAt": "2026-10-11T13:16:08.207Z"
-    },
-    {
-      "task": "/root/overhaul_research",
-      "role": "atlas_researcher",
-      "status": "running",
-      "allowedWritePaths": [],
-      "milestone": "production-overhaul",
-      "recordedAt": "2026-10-11T13:16:08.207Z"
-    }
-  ],
+  "active": [],
   "completed": [
     {
       "task": "/root/p0_architecture",
@@ -224,7 +207,106 @@
       ],
       "recordedAt": "2026-10-07T09:27:37.850Z",
       "completedAt": "2026-10-07T09:44:33.805Z"
+    },
+    {
+      "task": "/root/overhaul_architecture",
+      "role": "atlas_architect",
+      "status": "completed",
+      "allowedWritePaths": [],
+      "milestone": "production-overhaul",
+      "recordedAt": "2026-10-11T13:16:08.207Z",
+      "completionRecordedAt": "2026-10-11T15:25:50Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/overhaul_research",
+      "role": "atlas_researcher",
+      "status": "completed",
+      "allowedWritePaths": [],
+      "milestone": "production-overhaul",
+      "recordedAt": "2026-10-11T13:16:08.207Z",
+      "completionRecordedAt": "2026-10-11T15:25:50Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/overhaul_imports",
+      "role": "atlas_engineer",
+      "allowedWritePaths": [
+        "apps/worker/src/github.ts",
+        "apps/worker/src/repository-service.ts",
+        "apps/worker/src/github-webhook.ts",
+        "apps/worker/src/worker-main.ts",
+        "scripts/worker.mjs",
+        "tests/integration/github.test.ts",
+        "tests/integration/repository-service.test.ts",
+        "tests/integration/github-webhook.test.ts",
+        "tests/local/parser.test.ts"
+      ],
+      "status": "completed",
+      "milestone": "production-overhaul",
+      "completionRecordedAt": "2026-10-11T15:25:50Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/overhaul_ux",
+      "role": "atlas_frontend",
+      "allowedWritePaths": [
+        "apps/web/src/app except app/api",
+        "apps/web/src/components except lead-owned commerce integration",
+        "tests/browser/production-ux.spec.ts",
+        "tests/browser/workspace.spec.ts"
+      ],
+      "status": "completed",
+      "milestone": "production-overhaul",
+      "completionRecordedAt": "2026-10-11T15:25:50Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/overhaul_security",
+      "role": "atlas_security",
+      "allowedWritePaths": [
+        "tests/integration/sdk-production.test.ts",
+        "docs/evidence/overhaul-security.json"
+      ],
+      "status": "completed",
+      "milestone": "production-overhaul",
+      "completionRecordedAt": "2026-10-11T15:25:50Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/overhaul_verification",
+      "role": "atlas_verifier",
+      "allowedWritePaths": [
+        "tests/integration/commerce-overhaul-artifacts.test.ts",
+        "tests/integration/commerce-overhaul-buyer.test.ts",
+        "tests/integration/commerce-overhaul-registry.test.ts",
+        "tests/integration/commerce-overhaul-http.test.ts",
+        "tests/integration/import-history-capacity.test.ts",
+        "docs/evidence/overhaul-verifier-commerce.json"
+      ],
+      "status": "completed",
+      "milestone": "production-overhaul",
+      "completionRecordedAt": "2026-10-11T15:25:50Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
     }
   ],
-  "note": "Populate only with actual task handles and path ownership from the current session."
+  "note": "Actual delegated task handles; completed execution recorded after work. Requested model/effort configuration is not backend execution attestation. No nested delegation or agent commits."
 }

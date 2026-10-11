@@ -1,0 +1,262 @@
+{
+  "schemaVersion": 1,
+  "evidenceKind": "independent-security-review",
+  "reviewedAtUtc": "2026-10-11T14:42:45Z",
+  "reviewerRole": "atlas_security",
+  "reviewerTask": "/root/overhaul_security",
+  "requestedDevelopmentModel": "gpt-6.1-sol",
+  "requestedReasoningEffort": "max",
+  "modelEvidence": "A real Codex subagent performed this review. Repository configuration does not independently attest the backend model identity.",
+  "observedGitHead": "ddfbd64e6df7f01c1874058497578209a8d23e22",
+  "reviewedWorkingTreeChanges": true,
+  "diffBase": "8b2c1c8",
+  "ownedWrites": [
+    "tests/integration/sdk-production.test.ts",
+    "docs/evidence/overhaul-security.json"
+  ],
+  "reviewScope": [
+    "durable GitHub discovery, blob integrity, tenant authorization, checkpoint and lease fencing",
+    "isolated parsing, source and graph visibility, immutable snapshot citations",
+    "selected publication exports, source and graph signatures, provider control proofs",
+    "fresh administrative authority, buyer entitlement, scoped delegation and revocation races",
+    "independent provider databases, replay, canonical transaction binding and settlement verification",
+    "budget reservations, unknown outcomes, one-time credential dispatch and resumable delivery",
+    "authenticated API, SDK, MCP and browser wallet call boundaries"
+  ],
+  "findings": [
+    {
+      "id": "SEC-OVERHAUL-01",
+      "severity": "medium",
+      "title": "Signed passages accepted fabricated graph members",
+      "reportedLocation": "apps/worker/src/publication-artifact.ts:81",
+      "consequence": "An independent provider could attach invented graph nodes and relationships to an authentic source passage.",
+      "reproduction": "Before the fix, a local Bun reproduction accepted two invented nodes and one invented edge under one genuine synthetic passage signature.",
+      "fixLocation": "apps/worker/src/publication-artifact.ts:115",
+      "fix": "Mandatory Ed25519 node and edge proofs bind the complete graph member, kind, publication identity and digest. Passage proofs bind the complete normalized SourceEvidence. Strict shape, enums, duplicates and bounds are checked.",
+      "status": "closed-in-reviewed-working-tree",
+      "acceptance": "Altered node labels, kinds, edge semantics, source IDs, scope, provenance, missing proofs and foreign publisher proofs are rejected by the artifact regression suite."
+    },
+    {
+      "id": "SEC-OVERHAUL-02",
+      "severity": "medium",
+      "title": "No-content HTTP responses threw outside the transport rejection path",
+      "reportedLocation": "apps/worker/src/provider-http.ts:48",
+      "consequence": "A provider returning HTTP 204 could trigger an uncaught Response constructor exception in the response callback.",
+      "reproduction": "The original Response constructor with an empty buffer and status 204 raised TypeError in an isolated local Node check.",
+      "fixLocation": "apps/worker/src/provider-http.ts:30",
+      "fix": "Use a null body for 204, 205 and 304; catch response construction and header parsing errors inside the callback.",
+      "status": "closed-in-reviewed-working-tree",
+      "acceptance": "Local construction accepted 204/205/304 with empty bodies and rejected status 199."
+    },
+    {
+      "id": "SEC-OVERHAUL-03",
+      "severity": "high",
+      "title": "Anonymous provider discovery disclosed private publication metadata",
+      "reportedLocation": "apps/provider/src/runtime.ts:138",
+      "consequence": "Anonymous health and discovery responses exposed private package identity, exact version, commit, publication digest and selling terms.",
+      "reproduction": "Source tracing showed both endpoints returned the installed private artifact metadata without authorization; no live provider was probed.",
+      "fixLocation": "apps/provider/src/runtime.ts:141",
+      "fix": "Health returns generic mode/network status. Discovery requires a short-lived issuer-signed control proof bound to installed identity, revision, digest, provider origin and nonce.",
+      "status": "closed-in-reviewed-working-tree",
+      "acceptance": "Anonymous metadata requests deny access and contain none of the private binding values; exact signed control proofs work and widened or malformed proofs fail."
+    },
+    {
+      "id": "SEC-OVERHAUL-04",
+      "severity": "high",
+      "title": "Publishing used stale administrative authorization revisions",
+      "reportedLocation": "apps/worker/src/publication-registry.ts:46",
+      "consequence": "Revocation/regrant between fresh GitHub proof and signing or registration could reuse stale membership or repository authorization.",
+      "reproduction": "The original lock checked current role and draft content without comparing the revisions attached to the verified authorization candidate.",
+      "fixLocation": "apps/worker/src/publication-registry.ts:46",
+      "fix": "Reuse the publication service candidate and lockGrant revision fences; acquire repository locks before draft locks and sign inside the final transaction.",
+      "status": "closed-in-reviewed-working-tree",
+      "acceptance": "Registry tests deny administrative downgrade and retain repository-first lock ordering; authenticated readers keep SELECT-only privileges."
+    },
+    {
+      "id": "SEC-OVERHAUL-05",
+      "severity": "high",
+      "title": "Entitlement revocation during paid delivery did not prevent source return",
+      "reportedLocation": "apps/worker/src/commerce-service.ts:151",
+      "consequence": "An authorized request could return cached private context after publication or session entitlement was revoked while provider HTTP or durable delivery was pending.",
+      "reproduction": "Source tracing identified authorization only before the long provider request, with no fresh source entitlement check at the return boundary.",
+      "fixLocation": "apps/worker/src/commerce-service.ts:191",
+      "fix": "Buyer and provider reauthorize after saving/reading the durable delivery and before returning context. Verified payment remains settled even when delivery is revoked.",
+      "status": "closed-in-reviewed-working-tree",
+      "acceptance": "Buyer and provider regression tests revoke entitlement during transport or immediately after delivery save and withhold source while preserving settled accounting."
+    },
+    {
+      "id": "SEC-OVERHAUL-06",
+      "severity": "high",
+      "title": "Fresh delegation could authorize a replaced publication for an old purchase",
+      "reportedLocation": "apps/worker/src/commerce-service.ts:69",
+      "consequence": "A same-ID publication replacement could supply new entitlement for an old private purchase and forward its new grant to the obsolete provider endpoint.",
+      "reproduction": "The initial helper did not compare returned current metadata with the immutable saved approval. A bounded local mocked-registry check was run after the fix with positive and negative controls.",
+      "fixLocation": "apps/worker/src/commerce-service.ts:69",
+      "fix": "Compare current provider identity, exact release, digest, commit, snapshot, network, token, recipient, price, endpoint and realm with the saved purchase on every authorization refresh.",
+      "status": "closed-in-reviewed-working-tree",
+      "acceptance": "Unchanged synthetic metadata allowed signing claim; changed publication digest or endpoint returned purchase-entitlement-changed, with no pending transition."
+    },
+    {
+      "id": "SEC-OVERHAUL-07",
+      "severity": "high",
+      "title": "Clerk and GitHub awaits left an internal authorization race",
+      "reportedLocation": "apps/worker/src/publication-registry.ts:138",
+      "consequence": "Membership or publication state could change during remote session verification and introspection could still return active using the earlier database reads.",
+      "reproduction": "Source tracing found membership selection followed by the awaited session RPC without a final revision check.",
+      "fixLocation": "apps/worker/src/publication-registry.ts:53",
+      "fix": "After all remote awaits, fence current administrative proof, draft, active publication and full metadata, private source membership/repository revisions, and issuing-workspace membership under trusted database locks.",
+      "status": "closed-in-reviewed-working-tree",
+      "acceptance": "Real SQL with a paused synthetic session callback denied deletion, newer membership revision, revoked/regranted membership and publication revocation before grant creation or introspection return."
+    },
+    {
+      "id": "SEC-OVERHAUL-08",
+      "severity": "medium",
+      "title": "Public-only SSRF filter accepted special IPv6 ranges",
+      "reportedLocation": "apps/worker/src/provider-http.ts:20",
+      "consequence": "On networks routing special address space internally, attacker-controlled provider DNS could select non-global benchmarking or documentation IPv6 addresses despite the public-only policy.",
+      "reproduction": "The original local classifier accepted 2001:2::1, 3fff::1, 3fff:fff::1 and a leading-zero documentation address. No internal service or TLS exploitation was attempted.",
+      "primarySource": "https://www.iana.org/assignments/iana-ipv6-special-registry",
+      "fixLocation": "apps/worker/src/provider-http.ts:20",
+      "fix": "Normalize IPv6 before numeric prefix checks, conservatively reject special ranges, limit DNS results and bound DNS resolution before pinning the public TLS address.",
+      "status": "closed-in-reviewed-working-tree",
+      "acceptance": "Eight special, expanded, leading-zero or IPv4-mapped address fixtures denied; two ordinary globally routable fixtures allowed."
+    },
+    {
+      "id": "SEC-OVERHAUL-09",
+      "severity": "medium",
+      "title": "Read-only buyer transactions requested locking SELECT privileges",
+      "reportedLocation": "apps/worker/src/commerce-service.ts:37",
+      "consequence": "Normal purchase creation and history failed under the intended authenticated SELECT-only role because FOR SHARE requires UPDATE privilege.",
+      "reproduction": "The first actual-role buyer regression run had 22 failures. An isolated PostgreSQL-WASM reproduction returned SQLSTATE 42501 for FOR SHARE, while plain SELECT returned one row.",
+      "fixLocation": "apps/worker/src/commerce-service.ts:36",
+      "fix": "Principal read transactions use a nonlocking membership check; trusted reservation and allowance mutation transactions retain membership locks.",
+      "status": "closed-in-reviewed-working-tree",
+      "acceptance": "The final actual-role buyer suite passed without granting authenticated UPDATE privileges."
+    },
+    {
+      "id": "SEC-OVERHAUL-10",
+      "severity": "medium",
+      "title": "Dependency discovery returned source metadata after a long catalog await",
+      "reportedLocation": "apps/web/src/app/api/repositories/[id]/dependencies/route.ts:10",
+      "consequence": "Repository authorization could be revoked during catalog lookup while the route still returned the previously selected private dependency and snapshot metadata.",
+      "reproduction": "Source tracing identified an authorized graph read, remote catalog work, and cached source metadata return without another source boundary check.",
+      "fixLocation": "apps/web/src/app/api/repositories/[id]/dependencies/route.ts:15",
+      "fix": "Reauthorize the exact selected snapshot and node after catalog lookup, comparing permission revision, immutable commit and node identity before returning metadata.",
+      "status": "closed-in-reviewed-working-tree",
+      "acceptance": "The final route was independently read and the exact graph selector puts the selected node first. This fix has source-review evidence; a route-specific paused-catalog regression was not run by this reviewer."
+    }
+  ],
+  "verification": [
+    {
+      "command": "bun run test:product -- tests/integration/github.test.ts tests/integration/github-webhook.test.ts tests/integration/repository-service.test.ts tests/integration/clerk-github.test.ts tests/integration/publishing-authority.test.ts tests/integration/provider-ledger.test.ts tests/tempo",
+      "exitCode": 1,
+      "testsPassed": 114,
+      "testsFailed": 1,
+      "scope": "Initial pre-fix local review; sole failure was the old offline RPC stub missing eth_chainId. The stub was corrected without relaxing the remote network check."
+    },
+    {
+      "command": "bun run test:product -- tests/integration/sdk-production.test.ts tests/integration/commerce-overhaul-artifacts.test.ts tests/integration/commerce-overhaul-buyer.test.ts tests/integration/commerce-overhaul-registry.test.ts tests/tempo/provider-adapter.test.ts",
+      "exitCode": 0,
+      "testFilesPassed": 5,
+      "testsPassed": 86,
+      "testsFailed": 0,
+      "durationSeconds": 9.44,
+      "scope": "Final focused local suite, including actual native loopback HTTP, real MCP protocol and production stdio entrypoint, official offline MPP challenges, parser/signature code, and all 10 current SQL migrations in PostgreSQL-WASM. Identity and chain transports remain explicit synthetic fixtures."
+    },
+    {
+      "command": "node node_modules/eslint/bin/eslint.js tests/integration/sdk-production.test.ts",
+      "exitCode": 0,
+      "scope": "Owned SDK production test file lint."
+    },
+    {
+      "command": "node scripts/typecheck.mjs --core-only",
+      "exitCode": 0,
+      "scope": "Application worker/provider and contract/core/SDK source typecheck; does not include test files or the browser application."
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc --noEmit --strict --target ES2022 --lib ES2023,DOM --module ESNext --moduleResolution Bundler --allowImportingTsExtensions --skipLibCheck --esModuleInterop --noUncheckedIndexedAccess --exactOptionalPropertyTypes --isolatedModules --verbatimModuleSyntax --types node tests/integration/sdk-production.test.ts",
+      "exitCode": 0,
+      "scope": "Separate strict typecheck of the owned test and its imports."
+    },
+    {
+      "command": "bun -e <bounded in-memory SQL/RLS review script>",
+      "exitCode": 0,
+      "scope": "Nine migrations at the earlier pre-split checkpoint: no server repository grant denied source; another tenant with a forged repository grant denied source; correct grant allowed source and private publication; authenticated staging access denied; removed membership denied source. The final focused suite applied the 10 current migrations."
+    },
+    {
+      "command": "bun -e <bounded positive/negative immutable-entitlement checks>",
+      "exitCode": 0,
+      "scope": "Explicit mocked registry and SQL only. Unchanged provider terms claimed; changed digest/endpoint denied before pending transition."
+    },
+    {
+      "command": "bun -e <bounded IPv6 classifier and Response-construction checks>",
+      "exitCode": 0,
+      "scope": "No network probing. Eight special address cases denied, two ordinary global addresses allowed; valid no-content Response constructors accepted and invalid status rejected."
+    }
+  ],
+  "additionalReviewedBoundaries": [
+    "Imported source stays data; only the trusted parser child executes, with bounded memory/time/I/O and sanitized environment.",
+    "GitHub tree fallback omits the recursive parameter; skip symlinks/submodules, bound tree and source sizes, verify blob identity, retain complete snapshots and enforce lease/claim/revision ownership before atomic publication.",
+    "Publication export contains only owner-selected approved source and exact package version; deterministic retrieval cannot widen that selection based on question text.",
+    "The provider uses an independently configured database and issuer public key; ledger, submissions and delivery tables have no untrusted-role access.",
+    "Credential dispatch is persisted once before HTTP and same-provider signing claims are serialized; pending and unknown purchases retain reservations.",
+    "Payment verification requires the remote Moderato chain, canonical block, successful receipt, canonical stored transaction hash, sender and exact challenge-attributed token transfer.",
+    "The production SDK sends session credentials only to the exact Atlas origin, refuses redirects, bounds responses and claims signing before invoking the deferred official signer.",
+    "SDK negative-chain tests allowed only eth_chainId reads and observed zero signer calls, broadcast methods, credential forwarding or direct provider fetches.",
+    "Production MCP exposes authenticated source/discovery/status and resume tools; it cannot set budgets, approve new purchases or sign payments.",
+    "Browser wallet source uses explicit user connection and purchase approval, Moderato-only caller-owned pull signing, zero transport retries, no automatic chain switching, and recorded-purchase resume. Browser hardware behavior was not exercised."
+  ],
+  "unresolvedReviewedFindings": [],
+  "limitations": [
+    "This is a scoped security review and bounded local verification, not a production security certification.",
+    "PostgreSQL-WASM fixtures serialize database transactions; they do not establish multi-connection or hosted database concurrency safety.",
+    "No real Clerk/GitHub session, installation, external publication control endpoint, hosted migration or authenticated hosted tenant was verified by these tests.",
+    "No live wallet signed, no transaction was broadcast, no real settlement/delivery/recovery was independently observed, and no billable application AI request was made.",
+    "Provider chain fixtures and synthetic transaction signatures are local no-sale evidence. A test receipt or configured chain descriptor is not observed payment proof.",
+    "Browser wallet hardware, account/network change behavior and deployment were not independently exercised.",
+    "Changing the reviewed source invalidates the corresponding fix verification until it is reviewed again."
+  ],
+  "releaseDisposition": "External acceptance and existing release gates remain required. This evidence does not enable production publication or spending.",
+  "followUps": [
+    {
+      "id": "SEC-OVERHAUL-11",
+      "reviewedAtUtc": "2026-10-11T15:14:13Z",
+      "observedGitHead": "59c9813e458500b8d854ebadbd57dd9b53005610",
+      "reviewedWorkingTreeChanges": true,
+      "title": "Native browser fetch receiver compatibility",
+      "severity": "medium",
+      "leadReportedFailure": {
+        "source": "Lead agent browser follow-up report",
+        "browser": "Edge",
+        "trigger": "Purchase-history resume through AuthenticatedAtlasClient",
+        "reportedError": "Illegal invocation",
+        "reportedCause": "The SDK stored unbound native globalThis.fetch in a private instance field and invoked it with the Atlas client instance as its receiver.",
+        "independentlyObservedByThisReviewer": false
+      },
+      "independentSourceCheck": {
+        "location": "packages/sdk/src/authenticated.ts:32",
+        "observedCode": "this.#fetch=(options.fetch??globalThis.fetch).bind(globalThis)",
+        "invocationLocation": "packages/sdk/src/authenticated.ts:38",
+        "conclusion": "The stored bound transport retains the global receiver when invoked through the instance field. Both the default and injected transports take this path. The exact Atlas origin, redirect rejection, session isolation and response bounds remain in the request implementation.",
+        "productionFilesModifiedByReviewer": false
+      },
+      "independentVerification": {
+        "command": "bun run test:product -- tests/integration/sdk-production.test.ts",
+        "exitCode": 0,
+        "testFilesPassed": 1,
+        "testsPassed": 12,
+        "testsFailed": 0,
+        "durationSeconds": 5.96,
+        "scope": "Only the existing SDK production suite ran, using dynamically allocated loopback ports, explicit synthetic identity and RPC transports, actual native Node HTTP, real MCP protocol and the production stdio entrypoint.",
+        "otherTestSuitesRun": false,
+        "fixtureProvidersTouched": false,
+        "nativeEdgeRegressionRunByReviewer": false,
+        "liveSigningOrExternalEgress": false
+      },
+      "changedConclusion": "The earlier loopback/Node SDK pass did not establish native Edge fetch receiver compatibility and missed this browser availability defect. The source binding fix is independently confirmed and the narrow SDK suite passes. The lead's Playwright rerun remains separately attributed; this follow-up does not claim independently observed native Edge success.",
+      "status": "source-fix-reviewed-and-local-sdk-regression-passed",
+      "remainingEvidenceBoundary": "Native browser compatibility and wallet hardware behavior require their own browser evidence. Existing hosted authentication, database concurrency, real settlement and release limitations remain unchanged.",
+      "ownedWrite": "Appended this follow-up section only; no production files, tests, commits or other evidence were modified."
+    }
+  ]
+}

@@ -1,23 +1,62 @@
 # Production engineering overhaul
 
-Requested 2026-10-11. All commerce uses Tempo Moderato (42431); mainnet is forbidden.
+Updated 2026-10-11. Implementation and local verification are complete within the documented bounds. Hosted deployment and real payment acceptance remain blocked; this is not a production-readiness claim.
 
-## Priorities and acceptance
+## Root causes and fixes
 
-1. **Import reliability:** retain the PostgreSQL worker; checkpoint the immutable tree and verified blobs, process bounded download slices, fence leases, retry transient/rate-limit failures, and support cancellation and same-commit recovery. Keep the previous completed map available during updates. Reject duplicate jobs and publish a complete snapshot atomically. Test crashes, stale workers, revocation, truncated trees, and unchanged-blob reuse.
-2. **General repository maps:** remove the root npm-package prerequisite. Retain exact package identity only where source declares it. Add deterministic Python syntax support and honest file-level coverage for other languages. Keep analysis bounded and imported code inert. Measure small/medium/large generated repositories; distinguish those results from real GitHub import measurements.
-3. **Usable persisted workflows:** render durable import progress, recovery controls, grouped and bounded graphs, exact source navigation, real repository activity, and authenticated source retrieval. Remove fixture records from normal product discovery and navigation. Keep test fixtures behind explicit development configuration.
-4. **Owner publication and Moderato commerce:** connect explicit exposure-reviewed publications, exact release mappings, revocation, standalone provider delivery, MPP settlement verification, replay protection and delivery recovery. Require configured owner/recipient/signer and preserve unknown settlement. No paid AI calls or transactions without the appropriate authorization.
-5. **Independent acceptance:** security and verifier roles check final integration. Run starter, lint, types, product, browser, performance and production-build checks. Record live checks independently from generated/mock tests and keep the release gate blocked where evidence is missing.
+- Importing treated a small npm package as the universal repository model, repeated full downloads, and performed expensive TypeScript reference scans. General Git snapshots now have nullable package identity, deterministic multilingual coverage, bounded analysis and verified unchanged-blob reuse.
+- Long imports lacked durable tree/blob checkpoints and actionable phase progress. The existing PostgreSQL queue now records discovery manifests and 32-file slices, uses four download workers, fences leases, retries transient/rate-limit failures, handles expired tokens/truncated trees, and supports cancellation and recovery. Complete snapshots publish atomically; the previous map remains readable.
+- Normal product pages loaded fixture data. They now load authenticated persisted repositories, bounded graph pages, exact source ranges, job history, publication drafts and purchase states. Fixtures require explicit development enablement and are disabled in production.
+- Publication/payment boundaries accepted insufficient graph proofs, stale entitlements or mutable purchase terms. Selected owner exports now sign original source and complete graph members; signed endpoint control, fresh authorization fences, immutable quotes, atomic reservations, independent provider ledgers and one-time submission bind every purchase.
+- Native Edge exposed an unbound SDK fetch receiver; binding it fixed purchase-history recovery. Independent review also found and closed reader lock privilege, revocation race, provider URL/response and nested database connection defects.
 
-## Architectural decisions
+## Architecture and features
 
-- Extend the existing PostgreSQL queue and independent Node worker. No Redis, graph database, hosted tracing service or additional queue infrastructure is justified by the current failure.
-- Staging data is server-only. Readers receive only completed snapshots after fresh workspace and GitHub authorization; revocation invalidates worker claims and source reads.
-- A Git commit is a repository version. Repositories without an exact package release have nullable package identity rather than an invented npm version.
-- Deterministic indexing does not call AI. Optional Voyage/DeepSeek processing requires bounded input, explicit source disclosure and database-backed operating-cost reservations.
-- Candidate evaluations: retain ts-morph/React Flow; use PostgreSQL node/edge data and bounded graph projection. Tree-sitter may be useful when a packaged, isolated language grammar provides better supported extraction. LangSmith remains disabled because private-source egress and measured benefit have not been established.
+Retain PostgreSQL and the separate bounded Node worker, ts-morph for supported TypeScript/JavaScript, React Flow for bounded interactive maps, and exact npm release mappings. Add pinned Lezer Python syntax extraction; other languages retain honest file-level source evidence. No graph database, Redis queue or tracing service was justified.
 
-## Evidence boundary
+Imported scripts, dependencies and plugins are never executed. Analysis reaches at most 5,000 source files, 30 million characters, 50,000 nodes and 150,000 edges, with explicit omissions. The parser child has a 60-second deadline and 768 MiB V8 heap limit. Larger TypeScript sets retain declarations/imports/exports while expensive whole-program reference analysis is omitted.
 
-The baseline product suite passed 233 tests on 2026-10-11. The starter gate currently reports a pre-existing CRLF formatting failure in `docs/PROGRESS.md`. Existing author/configuration/planning edits belong to the user and are preserved. New migrations will be validated locally before any separately authorized deployment. Passing mocks or PostgreSQL-WASM checks does not establish hosted concurrency, real GitHub webhook delivery, Tempo settlement or private AI quality.
+The authenticated native SDK and stdio MCP expose pinned source, maps, questions and exact dependency discovery. Browser and caller-owned signing requires explicit immutable purchase terms and actual Moderato chain verification. Unknown settlement stays reserved; resume reconciles the existing record without another charge. Selected paid context includes signed source and graph provenance, independently of its accuracy.
+
+Owner publishing remains explicit: review selected paths/rights/price, download the signed immutable export, install it in an independent operator database, verify HTTPS endpoint control, then activate. Private metadata cannot be discovered through anonymous control requests. Revocation blocks new access and in-flight delivery reuse.
+
+Voyage and DeepSeek remain the exclusive optional application AI providers. Deterministic indexing makes no AI calls. Private questions use extractive evidence; private AI operating-budget/tracing acceptance remains open.
+
+## Actual results
+
+| Check | Result and scope |
+|---|---|
+| Product suite | 350/350 passed, 28 files, 39.42 seconds; actual implementation with labelled external transports |
+| Browser | 21/21 passed in Edge; 19 fixture/transport/anonymous controls and two real development sign-in controls with simulated commerce/wallet responses |
+| Starter | 105/105 passed |
+| Source/build | Full TypeScript, ESLint/provider policy/hygiene, production Next build and worker/provider bundles passed |
+| Evaluation | Three authored cases and two abstention guards; no general quality claim |
+| Real GitHub import | 199 authorized files in 94.6 seconds, nine checkpoints, no retries; exact source, 160-node page, five citations and same-commit reuse passed in isolated local SQL |
+| Production smoke | Eight pages HTTP 200; authenticated APIs deny anonymous calls with 401/no-store; fixture APIs 503 and /demo 404 even when fixture enablement is set |
+| Read-only integrations | Clerk, Supabase, verified PostgreSQL TLS, GitHub App and DeepSeek model metadata passed |
+| Independent work | All six actual custom roles completed; security and verifier findings/regressions recorded; backend model metadata unavailable |
+
+The real import uses fresh Clerk-linked GitHub authorization and actual immutable source reads. New migration writes and source remain in an in-memory database; hosted reads only inspect existing membership/repository metadata. It does not establish changed-schema hosted browser acceptance or multi-backend concurrency.
+
+## Benchmarks
+
+| Generated files | Parser before | Parser after |
+|---|---:|---:|
+| 17 | 193 ms | 109 ms |
+| 145 | 1,478 ms | 271 ms |
+| 1,001 | Rejected by old bounds | 722 ms |
+| 4,001 | Rejected by old bounds | 2,398 ms |
+
+The actual SQL/checkpoint pipeline with simulated GitHub imported 4,001 files in 8.57 seconds. A one-file update took 8.10 seconds, downloaded one blob and reused 4,000; simulated HTTP requests fell from 5,288 to 1,288. Parsing still rebuilds the complete bounded graph. These sparse generated inputs do not establish dense large-repository or real-network throughput.
+
+RSS is measured at return, not peak. The real importer parent used 563,662,848 bytes including PGlite; child peak memory is unmeasured. Indexing provider calls and cost were zero. Hosting/compute/storage costs remain unmeasured.
+
+## Verified workflow boundaries and deployment requirements
+
+Current checks verify source-backed general maps, exact source/citations, durable crash/retry/cancel/reuse controls, owner-selected proofs, version/tenant/revocation denial, authenticated SDK/MCP, immutable budget/payment state and recovery through the production implementation. Fixture receipts are not real settlement.
+
+New central migrations 202610110001/002 and independent provider delivery migration 202610110003 are ready for reviewed deployment but have not been applied externally. A provider database also needs replay/ledger 005/006 and standard Supabase roles. Deploy the Node worker and configure central issuer keys/origin plus independent database/CA, HTTPS origin, issuer public key, MPP secret, publication identity, testnet recipient and price.
+
+Actual external activation, second-account discovery, distinct operator recipients, wallet signing, Moderato settlement/recovery, remote GitHub delivery, organization/Storage and private AI acceptance remain unverified. A local PostgreSQL concurrency refresh was unavailable because Docker's daemon did not start; single-backend SQL results are explicitly bounded. The release gate must continue to fail.
+
+Evidence: [validation](evidence/overhaul-validation.json), [real import](evidence/overhaul-real-import.json), [benchmarks](evidence/import-pipeline-benchmark.json), [security](evidence/overhaul-security.json), [independent verifier](evidence/overhaul-verifier-commerce.json). Full configuration and remaining acceptance are in [BLOCKERS.md](BLOCKERS.md), [PROVIDER-PUBLISHING.md](PROVIDER-PUBLISHING.md) and [TEMPO.md](TEMPO.md).

@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "product": "Chronos Atlas",
   "stage": "implementation",
-  "currentPhase": "remaining-integration-acceptance",
-  "nextAction": "Complete external publication/endpoint control, provider entitlement/finality/delivery, remaining identity/storage and private AI/SDK/MCP adapters; validate approved external flows without treating storage tests as settlement.",
+  "currentPhase": "production-overhaul-local-verification",
+  "nextAction": "Review and approve hosted migrations and independent HTTPS provider deployment; configure issuer keys and provider-only database/roles, then verify updated hosted import/RLS/concurrency and an explicitly authorized real Moderato purchase/delivery/recovery. Remote GitHub webhook, organization/Storage and private AI operating-budget acceptance remain open.",
   "milestones": [
     {
       "id": "P0",
@@ -29,7 +29,8 @@
         "apps/provider/src/fixture-server.ts",
         "docs/PROVIDER-PUBLISHING.md",
         "docs/evidence/publication-draft.json",
-        "docs/evidence/publication-capacity.json"
+        "docs/evidence/publication-capacity.json",
+        "docs/evidence/overhaul-validation.json"
       ]
     },
     {
@@ -40,7 +41,8 @@
         "tests/tempo",
         "supabase/migrations/202610030001_atlas.sql",
         "docs/evidence/provider-replay.json",
-        "docs/evidence/provider-ledger.json"
+        "docs/evidence/provider-ledger.json",
+        "docs/evidence/overhaul-validation.json"
       ]
     },
     {
@@ -49,7 +51,8 @@
       "status": "partial",
       "acceptanceEvidence": [
         "tests/integration/federation.test.ts",
-        "tests/integration/answer-boundary.test.ts"
+        "tests/integration/answer-boundary.test.ts",
+        "docs/evidence/overhaul-validation.json"
       ]
     },
     {
@@ -58,7 +61,8 @@
       "status": "partial",
       "acceptanceEvidence": [
         "docs/evidence/browser-verification.json",
-        "tests/integration/mcp-stdio.test.ts"
+        "tests/integration/mcp-stdio.test.ts",
+        "docs/evidence/overhaul-validation.json"
       ]
     },
     {
@@ -67,13 +71,14 @@
       "status": "partial",
       "acceptanceEvidence": [
         "docs/evidence/retrieval-evaluation.json",
-        "docs/SECURITY.md"
+        "docs/SECURITY.md",
+        "docs/evidence/overhaul-validation.json"
       ]
     }
   ],
   "liveIntegrationsVerified": false,
   "lastUpdatedBy": "lead",
-  "updatedAt": "2026-10-07",
+  "updatedAt": "2026-10-11T15:25:50Z",
   "applicationAi": {
     "embeddingProvider": "Voyage AI",
     "generationProvider": "DeepSeek",
@@ -104,6 +109,41 @@
     "providerReplayStorage": true,
     "providerSaleStorage": true,
     "externalPublication": false,
-    "tempoSettlement": false
+    "tempoSettlement": false,
+    "historicalEvidenceDate": "2026-10-07",
+    "newOverhaulMigrationsApplied": false,
+    "newOverhaulHostedConcurrencyVerified": false
+  },
+  "developmentAgentConfiguration": {
+    "model": "gpt-6.1-sol",
+    "reasoningEffort": "max",
+    "fallbackAllowed": false,
+    "updatedAt": "2026-10-11",
+    "observedModel": null,
+    "observedEffort": null,
+    "requiresSessionReload": true,
+    "actualCustomRolesExecuted": [
+      "atlas_architect",
+      "atlas_researcher",
+      "atlas_engineer",
+      "atlas_frontend",
+      "atlas_security",
+      "atlas_verifier"
+    ],
+    "executionAttestation": "Actual six role tasks completed; backend model/effort not exposed by available runtime metadata."
+  },
+  "productionOverhaul": {
+    "implemented": true,
+    "productionReady": false,
+    "mode": "tempo-testnet",
+    "network": "eip155:42431",
+    "fixturesInNormalProduct": false,
+    "localVerificationEvidence": "docs/evidence/overhaul-validation.json",
+    "securityEvidence": "docs/evidence/overhaul-security.json",
+    "independentVerifierEvidence": "docs/evidence/overhaul-verifier-commerce.json",
+    "importBenchmarkEvidence": "docs/evidence/import-pipeline-benchmark.json",
+    "externalDeploymentPerformed": false,
+    "paymentBroadcasts": 0,
+    "privateSourceSentToAi": false
   }
 }

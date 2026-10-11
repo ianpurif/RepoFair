@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-07T09:26:21.914Z",
-  "finishedAt": "2026-10-07T09:26:56.763Z",
+  "startedAt": "2026-10-11T15:12:36.815Z",
+  "finishedAt": "2026-10-11T15:13:36.614Z",
   "exitStatus": "passed",
   "command": "Playwright test invocation with evidence reporter",
   "url": "http://localhost:3000",
@@ -12,8 +12,8 @@
     "http://127.0.0.1:4311",
     "http://127.0.0.1:4312"
   ],
-  "total": 14,
-  "passed": 14,
+  "total": 21,
+  "passed": 21,
   "failed": 0,
   "skipped": 0,
   "observations": [
@@ -21,7 +21,7 @@
       "title": "AI disclosure is bound to the edited question and consumed; generated citations open real source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 2617,
+      "durationMs": 3453,
       "errors": [],
       "console": null
     },
@@ -29,7 +29,7 @@
       "title": "AI failure stays visible and never triggers local extraction as a fallback",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1465,
+      "durationMs": 2406,
       "errors": [],
       "console": null
     },
@@ -37,7 +37,7 @@
       "title": "parsed graph selection and list relationships open actual immutable source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1944,
+      "durationMs": 2171,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -51,7 +51,7 @@
       "title": "local question citations match original files and exact selected lines",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1863,
+      "durationMs": 2243,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -65,7 +65,7 @@
       "title": "unanswerable runtime guarantees and unsupported versions abstain without citations",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1995,
+      "durationMs": 2476,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -79,7 +79,7 @@
       "title": "search shortcut, empty state, and keyboard resizing remain usable",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 2015,
+      "durationMs": 2203,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -93,7 +93,7 @@
       "title": "provider approval explicitly discloses a separate bounded outbound question",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 2291,
+      "durationMs": 2601,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -104,10 +104,10 @@
       }
     },
     {
-      "title": "two real providers extend graph with distinct exact-version provenance and clickable source",
+      "title": "two explicit fixture HTTP providers extend graph with distinct exact-version provenance and clickable source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 2191,
+      "durationMs": 2489,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -121,7 +121,7 @@
       "title": "buyer version change clears stale provider context, approval, question and source",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 6685,
+      "durationMs": 6820,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -135,7 +135,7 @@
       "title": "mobile panels, keyboard evidence navigation and reduced motion fit the viewport",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1416,
+      "durationMs": 1852,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -149,7 +149,7 @@
       "title": "publishing remains gated and configured Clerk sign-in offers real authentication",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 2413,
+      "durationMs": 3167,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -163,14 +163,16 @@
       }
     },
     {
-      "title": "activity records actual index/source/retrieval/provider operations and can be cleared",
+      "title": "normal purchase history hides fixture operations and requires an authenticated account",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 2757,
+      "durationMs": 2668,
       "errors": [],
       "console": {
         "pageErrors": [],
-        "consoleErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+        ],
         "consoleWarnings": [
           "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
         ]
@@ -180,7 +182,7 @@
       "title": "invalid snapshot, private path and cross-origin HTTP operations fail closed",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1382,
+      "durationMs": 1592,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -191,10 +193,10 @@
       }
     },
     {
-      "title": "injected indexing transport failure shows retry and records failed then actual recovered operation",
+      "title": "injected fixture indexing transport failure shows retry and actual recovered graph",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1329,
+      "durationMs": 1641,
       "errors": [],
       "console": {
         "pageErrors": [],
@@ -205,10 +207,70 @@
           "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
         ]
       }
+    },
+    {
+      "title": "real anonymous product workspace requires authentication and does not load fixture source",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 1108,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "catalog transport mock shows honest loading, empty, failure and recovery states",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 1262,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "catalog transport mock rejects mainnet terms before displaying purchase controls",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 1462,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "catalog transport mock shows exact service terms and no signing at narrow width",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 1212,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "explicit fixture graph keyboard opens source and keeps dragged positions during expansion",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 1773,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "browser wallet on mainnet cannot connect, approve or sign a purchase",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 6343,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "purchase history recovery posts only to the recorded resume endpoint",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 5622,
+      "errors": [],
+      "console": null
     }
   ],
   "limitations": [
-    "Public fixture browser checks do not establish Clerk identity, hosted RLS, real database concurrency, or Tempo settlement.",
-    "The indexing recovery case deliberately aborts one browser request; the successful retry uses the actual server."
-  ]
+    "Nineteen fixture/transport/anonymous checks plus two real development sign-in controls do not establish hosted RLS, multi-backend concurrency, independent provider publication or Tempo settlement.",
+    "The two real sign-in controls use simulated catalog, purchase-history and wallet transport; no wallet signature or transaction was submitted.",
+    "The indexing recovery case deliberately aborts one browser request; the successful retry uses the actual fixture server."
+  ],
+  "developmentIdentityControlsEnabled": true,
+  "identityScope": "Two opt-in controls used fresh sessions for the existing authorized development Clerk account, verified the actual account route, and revoked only their own sessions/tickets. Commerce and wallet responses remained explicit fixtures.",
+  "evidenceScopeClarifiedAt": "2026-10-11T15:25:50Z"
 }

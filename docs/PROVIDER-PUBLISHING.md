@@ -1,52 +1,56 @@
-# Provider publishing specification
+# Owner publication and independent providers
 
-Private administrative drafts and the local fixture service are implemented.
-External publication remains unavailable pending endpoint control, explicit
-approval and the independent provider delivery/payment integration.
+Updated 2026-10-11. Signed export, control proof, catalog discovery, fresh entitlement, Moderato charging and durable delivery are implemented. Hosted publication and real paid delivery remain unverified.
 
-## Private administrative drafts
+## Explicit owner workflow
 
-The signed-in `/app/publish` page uses `/api/publications` and the durable
-`atlas.publication_drafts` table. Creation, reads, saves and revocation require
-workspace owner/admin status plus fresh GitHub personal ownership or repository
-administration. Repository read permission is insufficient. Every mutation
-rechecks membership and repository revisions after acquiring locks.
+1. At **/app/publish**, select a completed immutable snapshot. Fresh workspace owner/admin and GitHub administrative authority are required; read permission alone is insufficient.
+2. Select exact source paths, review bytes/lines/digests, declare rights, choose private/authenticated/public metadata policy, and configure an HTTPS endpoint and exact PathUSD price/recipient. Saving remains a private draft mutation.
+3. Explicitly approve and download the signed export. It contains only selected original files and supported graph members, exact commit/release identity, source/graph proofs and immutable terms digest. It is not uploaded automatically.
+4. An independent operator installs that reviewed file in **its own database**, starts its configured HTTPS provider, and receives only the Atlas issuer **public** key.
+5. Activate the selected revision. Atlas sends a short-lived signed control proof bound to the origin, publication, digest, revision and nonce. An anonymous nonce cannot reveal private metadata or prove control.
+6. Accessible publications appear in **Providers** with exact package/version/commit and testnet terms. Dependency discovery requests the exact resolved version; missing versions are never replaced with latest.
 
-Drafts start private with no exposed files, endpoint or payment terms. The
-preview contains exact selected paths, line/byte counts and source digests bound
-to an immutable commit. Package export mappings must match explicit package.json
-entries; a module's exported symbol is not proof of a package subpath export.
-Updates require the expected revision. Every exposure/terms change changes the
-revision digest. A newer imported snapshot requires a new draft. Fifty retained
-drafts per workspace bound the history; revoked records remain readable.
+Administration, declared rights, accuracy, endpoint control and settlement are separate claims. A rights checkbox is not independent licensing verification. No accurate/trustworthy badge is invented.
 
-Administration, declared rights, accuracy, endpoint proof, publication and
-payment are separate fields. Database constraints prevent a draft from becoming
-a publication or enabling payment. Saving proposed public access is still a
-private draft mutation and does not disclose source to an external provider.
+Draft history is capped at 50 records per workspace. Source/terms changes update the digest/revision and revoke activation. A changed installed release uses a new publication identity; old source cannot be replaced behind an existing paid binding.
 
-## Local implementation
+## Independent runtime setup
 
-`bun run provider:a` and `bun run provider:b` launch separately configured
-fixture processes with explicit `--publish`. The reviewed exposure is the
-authored retry-kit or event-log catalog snapshot; no arbitrary repository or
-private paths can be selected. Without `--publish`, manifest/context access is
-unavailable. This is a fixture publishing flag, not verified repository ownership.
-Stopping/restarting without the flag revokes new requests. No result cache is
-shared across buyers; previously delivered content cannot be recalled.
+Central Atlas applies its foundational migrations plus **202610110001** and **202610110002**. New migrations were validated locally, not applied to hosted databases.
 
-Each request validates package, exact version, body bounds and provider state
-before indexing. Each response has provider identity, source snapshot and
-fixture/no-payment fields. Provider origin/redirect handling uses a fixed
-loopback allowlist in this mode. Production endpoint registration, publication
-approval and independent paid delivery still require implementation and tests.
+A separate provider database applies only:
 
-Verify repository administrative authority and endpoint control separately. Show authorized exposure before publication. Store declared rights/licensing and accuracy status separately; don't award an all-purpose trusted badge.
+- `202610070005_provider_replay.sql`
+- `202610070006_provider_ledger.sql`
+- `202610110003_provider_delivery.sql`
 
-The manifest maps each supported package version to an immutable repository snapshot and explicit exports. Metadata has its own access policy; do not leak private file paths through discovery.
+No central Atlas tables, Clerk secrets/session credentials, buyer budget connection or central database fallback are required.
 
-Independent provider process: distinct identity, endpoint, configuration, authorized index access, price and recipient. The starter health services deliberately do not accept payments. Implement context.retrieve with bounded inputs/results and document its supported version schema.
+The SQL expects the standard Supabase roles `anon`, `authenticated` and `service_role` to exist. Use a separate Supabase project or provision equivalent PostgreSQL roles and server-only privileges before applying the migrations. A bare PostgreSQL database without those roles is not an installation target yet.
 
-Before payment: validate caller entitlement, operation, version and availability. Paid request binds exact terms. Return source passages with source ranges, limited subgraph, provenance and limitations. Validate provider output as untrusted JSON at the buyer.
+Configure the provider fields in [.env.example](../.env.example): database/CA, publication UUID, HTTPS origin, trusted issuer origin/public-key file, MPP secret file, fixed recipient/price/realm, and Moderato RPC/chain. Keep secrets and private source exports access-controlled.
 
-Unpublishing revokes new service access and server-side reuse. It cannot erase bytes already legitimately delivered. Document result caching/reuse rights before selling it. Decline unsupported versions rather than charging for a latest-version substitute.
+```powershell
+bun run provider:check
+bun run provider:install -- "C:\secure\owner-approved-export.json"
+bun run provider:testnet
+```
+
+The listener defaults to **127.0.0.1:4311** behind an operator-controlled HTTPS proxy. Startup fails closed when installed source, configured price/recipient/origin, issuer key or actual RPC chain differs. Installation is idempotent; immutable paid source cannot be replaced.
+
+## Authorization and delivery
+
+Atlas issues a 120-second signed grant scoped to principal/session, workspace membership revision, provider audience, publication digest, exact release, request digest and idempotency key. The provider freshly introspects it through Atlas, including the current Clerk session, owner authority and private buyer/source access. It never receives a Clerk bearer token.
+
+Network requests use bounded public HTTPS, DNS/IP checks, pinned addresses, timeouts and redirect rejection. Private metadata requires the signed activation proof; anonymous health returns generic readiness only.
+
+The provider owns immutable submission/delivery records, replay state and receipt reconciliation. Delivered passages and graph members retain signed provenance. A paid result can still be insufficient or wrong. [TEMPO.md](TEMPO.md) describes single submission and unknown recovery.
+
+Revocation blocks new access/reuse even while identity or delivery HTTP requests are in flight. Previously delivered bytes cannot be recalled. Publication cannot broaden the selected exposure.
+
+## Verification boundary
+
+Independent tests run the real parser, Ed25519 proofs, SQL/RLS/triggers, offline MPP challenges and provider runtime against simulated transports. Provider-only schema installation, immutable terms, revoked membership/session, wrong versions, forged relationships and recovery without another charge are checked. This is not hosted authority, multi-backend contention or live settlement evidence.
+
+See [BLOCKERS.md](BLOCKERS.md), [verifier evidence](evidence/overhaul-verifier-commerce.json) and [security evidence](evidence/overhaul-security.json). Fixture providers are development-only and do not charge or represent real recipients.

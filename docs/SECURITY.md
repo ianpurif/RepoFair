@@ -68,3 +68,17 @@ null/type fields and mutation of immutable terms. The reviewer performed no
 tests or live requests; separate hosted evidence covers storage contention only.
 Real entitlement/finality verification and durable paid delivery remain unwired.
 No scoped review is a full-product release security certification.
+
+## Production overhaul independent review — 2026-10-11
+
+Actual atlas_security and atlas_verifier tasks reviewed and executed the changed boundaries. [Security evidence](evidence/overhaul-security.json) records ten reproduced findings and fixes; [verifier evidence](evidence/overhaul-verifier-commerce.json) records adversarial source/proof/registry/buyer/provider tests and retained-history capacity checks.
+
+Complete canonical source, node and edge signatures reject invented graph relationships. Signed origin-bound control proofs protect private provider metadata. Fresh owner/buyer/session/revision fences reject revocation during external calls. Old purchases retain immutable source/terms. DNS/IP/pinned HTTPS and body/timeout limits bound provider egress. Ledger settlement reuses the active transaction, eliminating a reproduced single-connection deadlock. Authenticated readers no longer request mutation-only row locks.
+
+The buyer atomically reserves integer allowance, claims credential dispatch once and preserves unknown settlement. Providers own replay/quote/delivery state independently, verify exact canonical Moderato transfers and authoritative settlement, and reconcile delivery without a second submission. Models/MCP cannot approve allowance, new purchases or signing.
+
+Native Edge separately reproduced an unbound global fetch receiver in the SDK. The lead bound fetch correctly; the full browser suite passed 21/21 and the independent security follow-up passed 12/12 SDK tests. Its evidence distinguishes the lead's Edge execution from the reviewer's source/local tests.
+
+Workspace retention is enforced by SQL locks/triggers at 100 snapshots/1,000 jobs; existing completed/pending imports remain reusable. Ten independent capacity tests verify rollback, isolation and preserved source. These serialized PostgreSQL-WASM checks do not prove multi-backend contention.
+
+No new critical/high defect remains demonstrated in the reviewed local scope. New hosted schema/concurrency, external operator authority, wallet behavior, settlement, organizations/Storage and private AI operating budgets remain release gates. A scoped review is not a security certification. No private source appears in reports or model requests.

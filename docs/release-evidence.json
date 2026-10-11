@@ -5,73 +5,75 @@
       "id": "product_unit_tests",
       "status": "passed",
       "command": "bun run test:product",
-      "recordedAt": "2026-10-07T08:59:31.580Z",
+      "recordedAt": "2026-10-11T15:28:34Z",
       "evidencePaths": [
-        "docs/evidence/live-audit-checkpoint.json"
+        "docs/evidence/overhaul-validation.json"
       ],
-      "scope": "Local application checks; separate hosted reports establish bounded live acceptance, not full product readiness"
+      "scope": "Current local implementation and bounded tests; live integration scope is documented separately."
     },
     {
       "id": "typecheck",
       "status": "passed",
       "command": "bun run typecheck",
-      "recordedAt": "2026-10-07T08:59:31.580Z",
+      "recordedAt": "2026-10-11T15:28:34Z",
       "evidencePaths": [
-        "docs/evidence/live-audit-checkpoint.json"
+        "docs/evidence/overhaul-validation.json"
       ],
-      "scope": "Local application checks; separate hosted reports establish bounded live acceptance, not full product readiness"
+      "scope": "Current local implementation and bounded tests; live integration scope is documented separately."
     },
     {
       "id": "lint",
       "status": "passed",
       "command": "bun run lint",
-      "recordedAt": "2026-10-07T08:59:31.580Z",
+      "recordedAt": "2026-10-11T15:28:34Z",
       "evidencePaths": [
-        "docs/evidence/live-audit-checkpoint.json"
+        "docs/evidence/overhaul-validation.json"
       ],
-      "scope": "Local application checks; separate hosted reports establish bounded live acceptance, not full product readiness"
+      "scope": "Current local implementation and bounded tests; live integration scope is documented separately."
     },
     {
       "id": "production_build",
       "status": "passed",
       "command": "bun run build",
-      "recordedAt": "2026-10-07T08:59:31.580Z",
+      "recordedAt": "2026-10-11T15:28:34Z",
       "evidencePaths": [
-        "docs/evidence/live-audit-checkpoint.json"
+        "docs/evidence/overhaul-validation.json"
       ],
-      "scope": "Local application checks; separate hosted reports establish bounded live acceptance, not full product readiness"
+      "scope": "Current local implementation and bounded tests; live integration scope is documented separately."
     },
     {
       "id": "database_tenant_isolation",
-      "status": "passed",
+      "status": "partial",
       "command": "bun scripts/verify-hosted-database.ts",
       "recordedAt": "2026-10-07T08:25:29.803Z",
       "evidencePaths": [
         "docs/evidence/hosted-database.json",
-        "docs/evidence/clerk-session.json"
+        "docs/evidence/clerk-session.json",
+        "docs/evidence/overhaul-verifier-commerce.json"
       ],
-      "scope": "Hosted PostgreSQL separate-backend isolation, server repository grants, revocation and concurrent reservations; separate real Clerk JWT acceptance. Storage and organizations remain open."
+      "scope": "Historical 2026-10-07 hosted RLS/concurrency remains valid for its scope; new migrations/transactions are validated locally but not on hosted multi-backend PostgreSQL."
     },
     {
       "id": "browser_e2e",
       "status": "passed",
       "command": "bun run test:browser --reporter=list,./tests/browser/evidence-reporter.ts",
-      "recordedAt": "2026-10-07T08:59:31.580Z",
+      "recordedAt": "2026-10-11T15:28:34Z",
       "evidencePaths": [
-        "docs/evidence/browser-verification.json",
-        "docs/evidence/private-repository-ui.json"
+        "docs/evidence/overhaul-validation.json",
+        "docs/evidence/browser-verification.json"
       ],
-      "scope": "Public fixtures and real authorized private source/graph/extractive questions; no paid acceptance"
+      "scope": "Current local implementation and bounded tests; live integration scope is documented separately."
     },
     {
       "id": "provider_independence",
-      "status": "passed",
+      "status": "partial",
       "command": "bun run test:product",
-      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "recordedAt": "2026-10-11T15:28:34Z",
       "evidencePaths": [
-        "docs/evidence/local-execution.json"
+        "docs/evidence/overhaul-validation.json",
+        "docs/evidence/overhaul-verifier-commerce.json"
       ],
-      "scope": "Public authored fixtures only; not live payment or hosted authorization"
+      "scope": "Real independent runtime/SQL/signed exports and exact-version traversal exercised with fixture identity/RPC/HTTP; distinct real operators and paid context not verified."
     },
     {
       "id": "tempo_testnet_payment",
@@ -89,25 +91,26 @@
     },
     {
       "id": "versioned_federation",
-      "status": "passed",
+      "status": "partial",
       "command": "bun run test:product",
-      "recordedAt": "2026-10-03T15:15:56.670068+00:00",
+      "recordedAt": "2026-10-11T15:28:34Z",
       "evidencePaths": [
-        "docs/evidence/local-execution.json"
+        "docs/evidence/overhaul-validation.json",
+        "docs/evidence/overhaul-verifier-commerce.json"
       ],
-      "scope": "Public authored fixtures only; not live payment or hosted authorization"
+      "scope": "Real independent runtime/SQL/signed exports and exact-version traversal exercised with fixture identity/RPC/HTTP; distinct real operators and paid context not verified."
     },
     {
       "id": "independent_security_review",
       "status": "partial",
-      "command": "Actual atlas_security review and independent hosted webhook verification",
-      "recordedAt": "2026-10-07T08:25:29.803Z",
+      "command": "Actual atlas_security and atlas_verifier tasks",
+      "recordedAt": "2026-10-11T15:28:34Z",
       "evidencePaths": [
-        "docs/SECURITY.md",
-        "docs/evidence/webhook-verification.json"
+        "docs/evidence/overhaul-security.json",
+        "docs/evidence/overhaul-verifier-commerce.json"
       ],
-      "scope": "Repository, webhook and saved-payment-term findings addressed; full publication/payment integration still unavailable for complete review."
+      "scope": "Actual independent bounded source/security and adversarial fixture execution; findings fixed. Deployed service, multi-backend concurrency and real wallet settlement remain unverified."
     }
   ],
-  "note": "Passing fixture checks do not satisfy missing live milestones. Release must remain blocked."
+  "note": "Current local checks pass. Historical hosted evidence is dated and does not certify new schema or settlement. Release must remain blocked until missing external milestones are accepted."
 }

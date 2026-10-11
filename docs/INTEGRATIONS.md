@@ -98,3 +98,24 @@ of buyer budgets, requires a fresh entitlement callback and independently checks
 settlement through a required authoritative callback before saving it. These
 callbacks are not yet wired to a live paid service. No source was published and
 no payment or settlement receipt was created by the hosted storage audits.
+
+## Current overhaul integration review — 2026-10-11
+
+The previous sections are dated historical evidence. Current execution and scope are recorded in [overhaul-validation.json](evidence/overhaul-validation.json).
+
+| Integration | Current implementation | Acceptance boundary |
+|---|---|---|
+| GitHub REST 2026-03-10 | Native App/user checks, bounded recursive/fallback tree discovery, verified blobs, expiring-token renewal and rate-limit backoff | Actual 199-file authorized GitHub import completed through the new service into isolated local SQL; updated hosted schema, large network imports and remote events remain open |
+| PostgreSQL | Durable checkpoint/lease/retention migrations and immutable publication/buyer/provider ledgers | Actual SQL/RLS/triggers pass locally; new hosted multi-backend races not verified |
+| ts-morph 28.0.0 | In-memory syntax extraction, bounded references and AST/graph output | No imported configuration/plugins/dependency execution; large inputs explicitly omit expensive references |
+| @lezer/python 1.1.19 | Native packaged syntax tree and bounded declarations/relative imports | Python runtime execution, absolute environment resolution and cross-language call graphs unsupported |
+| React Flow 12.12.0 | 160-node progressive pages, grouping/filtering and exact source navigation | Real browser rendering checked; dense graph throughput beyond bounds unmeasured |
+| mppx 0.13.1 / viem 2.57.2 | Explicit single-token Moderato charge, canonical credential inspection, authoritative finality/receipt verification and durable recovery | Installed exact-version signatures and offline challenges tested; real signing/settlement absent |
+| Authenticated SDK / MCP 1.32.0 | Native scoped HTTP and stdio read/discovery/recovery tools; caller-owned signing stays explicit | Real loopback/stdio tests; deployment/session/token rotation and hardware signers remain open |
+| Voyage / DeepSeek | Exclusive fixed native HTTP providers; extractive private source is default | Metadata probe current; no new inference/private source egress; private AI cost/tracing acceptance open |
+
+Official primary references were researched by the actual researcher and checked again where accessible. GitHub documents recursive tree bounds and non-recursive subtree fallback in [Git trees](https://docs.github.com/en/rest/git/trees?apiVersion=2026-03-10). Lezer documents compact syntax trees and bounded cursor traversal in [its guide](https://lezer.codemirror.net/docs/guide/). These inform source extraction rather than runtime semantic claims.
+
+The [official Tempo repository](https://github.com/tempoxyz/tempo) identifies Moderato chain 42431 and its RPC. The [official MPP specification](https://paymentauth.org/draft-tempo-charge-00.pdf) requires receipt event verification against challenge parameters for hash credentials. Current [mppx main documentation](https://github.com/wevm/mppx) has evolved factory/currency defaults; this project deliberately validates installed 0.13.1 APIs and explicitly fixes the testnet asset/chain. Do not copy newer main APIs or default currencies into a pinned integration without compatibility tests. Some documentation URLs were unavailable to the web reader; local pinned source and offline/runtime tests are independently recorded.
+
+Today's metadata probe found 74 accessible GitHub repositories, Contents/Metadata read permissions, no event subscriptions and webhook configuration 404. It did not verify a user OAuth session. The separate real-import verifier freshly checked Clerk-linked GitHub user authorization and actual source reads. Hosted metadata/TLS reads succeeded, Supabase Storage had zero buckets, and configured DeepSeek model metadata was available. No hosted schema, private source AI egress or real purchase was performed.
