@@ -1,6 +1,6 @@
 import 'server-only';
 import { auth } from '@clerk/nextjs/server';
-import { createAtlasDatabase } from '@atlas/worker/database';
+import { workspaceDatabase } from './database';
 import { createPublicationService, PublicationServiceError } from '@atlas/worker/publications';
 import { readBounded } from '../app/api/fixture-boundary';
 import { privateHeaders, repositoryFailure } from './repositories';
@@ -9,7 +9,7 @@ let service: Promise<ReturnType<typeof createPublicationService>> | undefined;
 export async function publicationContext() {
   const { userId, sessionId } = await auth();
   if (!userId || !sessionId) throw new Error('AUTHENTICATION_REQUIRED');
-  service ??= createAtlasDatabase(process.env).then(database => createPublicationService(database, process.env)).catch(error => { service = undefined; throw error; });
+  service ??= workspaceDatabase().then(database => createPublicationService(database, process.env)).catch(error => { service = undefined; throw error; });
   return { principalId: userId, service: await service };
 }
 export function publicationFailure(error: unknown) {

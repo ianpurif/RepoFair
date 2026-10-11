@@ -3,9 +3,12 @@ import { indexFixture } from '@atlas/worker/fixtures';
 import { answerLocal, lookupSource } from '@atlas/core/local';
 
 /** This public demonstration boundary cannot select private repositories. */
+export function fixturesEnabled(env: Readonly<Record<string,string | undefined>> = process.env): boolean {
+  return env.ATLAS_FIXTURES_ENABLED === 'true' && env.NODE_ENV !== 'production';
+}
 export async function fixtureRequest(request: Request, operation: 'index' | 'question' | 'source'): Promise<Response> {
   try {
-    if ((process.env.ATLAS_MODE ?? 'fixture') !== 'fixture') return Response.json({ error: 'Fixture APIs are disabled outside fixture mode' }, { status: 503 });
+    if (!fixturesEnabled() || (process.env.ATLAS_MODE ?? 'fixture') !== 'fixture') return Response.json({ error: 'Fixture APIs require explicit development/test enablement' }, { status: 503 });
     const url = new URL(request.url);
     let input: Record<string, unknown> = {};
     if (operation === 'question') {

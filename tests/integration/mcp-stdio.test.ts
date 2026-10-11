@@ -16,7 +16,7 @@ function textResult(value: Awaited<ReturnType<Client['callTool']>>): unknown {
 it('actual stdio subprocess negotiates MCP, lists tools, and binds versioned citations to real source', async () => {
   const client = new Client({ name: 'atlas-independent-stdio-verifier', version: '1.0.0' });
   const transport = new StdioClientTransport({ command: 'bun', args: ['packages/sdk/src/mcp.ts'], cwd: resolve('.'),
-    env: { ...getDefaultEnvironment(), ATLAS_MODE: 'fixture' }, stderr: 'pipe' });
+    env: { ...getDefaultEnvironment(), ATLAS_MODE: 'fixture', ATLAS_FIXTURES_ENABLED:'true' }, stderr: 'pipe' });
   const stderr: string[] = []; transport.stderr?.on('data', chunk => stderr.push(String(chunk)));
   try {
     await client.connect(transport);
@@ -44,7 +44,7 @@ it('actual stdio subprocess negotiates MCP, lists tools, and binds versioned cit
 it('stdio rejects private selectors, source escape, unsupported version and unbounded input without leakage', async () => {
   const client = new Client({ name: 'atlas-independent-stdio-boundary-verifier', version: '1.0.0' });
   const transport = new StdioClientTransport({ command: 'bun', args: ['packages/sdk/src/mcp.ts'], cwd: resolve('.'),
-    env: { ...getDefaultEnvironment(), ATLAS_MODE: 'fixture' }, stderr: 'pipe' });
+    env: { ...getDefaultEnvironment(), ATLAS_MODE: 'fixture', ATLAS_FIXTURES_ENABLED:'true' }, stderr: 'pipe' });
   try {
     await client.connect(transport);
     for (const arguments_ of [{ fixtureId: '../../private' }, { fixtureId: 'retry-kit@9.0.0' }]) {

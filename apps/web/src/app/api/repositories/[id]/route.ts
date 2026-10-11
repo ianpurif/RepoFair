@@ -2,7 +2,7 @@ import { repositoryContext, repositoryFailure, privateHeaders } from '../../../.
 export const runtime = 'nodejs';
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   try { const { principalId, service } = await repositoryContext(); const { id } = await context.params;
-    const index = await service.getIndex(principalId, id);
+    const index = await service.getIndex(principalId, id, new URL(_request.url).searchParams.get('snapshotId') ?? undefined);
     return Response.json({ index }, { headers: privateHeaders });
   } catch (error) { return repositoryFailure(error); }
 }

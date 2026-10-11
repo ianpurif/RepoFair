@@ -8,7 +8,7 @@ import { answerLocal } from '@atlas/core/local';
 /** Independently configured, public fixture-only service. Never issues receipts. */
 export function createFixtureProvider(providerId: FixtureProviderId, published = false) {
   const config = FIXTURE_PROVIDERS.find(p => p.providerId === providerId);
-  if (!config || (process.env.ATLAS_MODE ?? 'fixture') !== 'fixture') throw new Error('Only allowlisted fixture providers are enabled');
+  if (!config || process.env.NODE_ENV==='production'||(process.env.NODE_ENV!=='test'&&process.env.ATLAS_FIXTURES_ENABLED!=='true')||(process.env.ATLAS_MODE ?? 'fixture') !== 'fixture') throw new Error('Only explicitly enabled development fixture providers are available');
   return createServer(async (request, response) => {
     const send = (status: number, body: unknown) => { response.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Atlas-Mode': 'fixture' }); response.end(JSON.stringify(body)); };
     const host = request.headers.host ?? '';

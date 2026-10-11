@@ -26,14 +26,20 @@
     "dev": "node scripts/web.mjs dev",
     "build": "node scripts/web.mjs build",
     "start": "node scripts/web.mjs start",
-    "provider:a": "bun apps/provider/src/fixture-server.ts --identity fixture-retry --publish",
-    "provider:b": "bun apps/provider/src/fixture-server.ts --identity fixture-events --publish",
+    "provider:a": "node scripts/fixtures.mjs provider-a",
+    "provider:b": "node scripts/fixtures.mjs provider-b",
     "worker:check": "node scripts/worker.mjs --build",
     "verify": "node scripts/verify-starter.mjs && node scripts/typecheck.mjs && node scripts/web.mjs build",
     "verify:release": "node scripts/release-gate.mjs",
     "verify:ai": "node scripts/check-ai-providers.mjs",
     "worker": "node scripts/worker.mjs",
-    "verify:integrations": "bun scripts/verify-integrations.ts"
+    "verify:integrations": "bun scripts/verify-integrations.ts",
+    "provider:testnet": "node scripts/provider.mjs",
+    "provider:install": "node scripts/provider.mjs --install",
+    "provider:check": "node scripts/provider.mjs --build",
+    "fixture:provider-a": "node scripts/fixtures.mjs provider-a",
+    "fixture:provider-b": "node scripts/fixtures.mjs provider-b",
+    "fixture:mcp": "node scripts/fixtures.mjs mcp"
   },
   "devDependencies": {
     "typescript": "5.9.3",

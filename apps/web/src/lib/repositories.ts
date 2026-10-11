@@ -1,6 +1,6 @@
 import 'server-only';
 import { auth } from '@clerk/nextjs/server';
-import { createAtlasDatabase } from '@atlas/worker/database';
+import { workspaceDatabase } from './database';
 import { createRepositoryService, RepositoryServiceError } from '@atlas/worker/repositories';
 import { readBounded } from '../app/api/fixture-boundary';
 let service: Promise<ReturnType<typeof createRepositoryService>> | undefined;
@@ -8,7 +8,7 @@ export const privateHeaders = { 'Cache-Control': 'no-store', Vary: 'Cookie, Auth
 export async function repositoryContext() {
   const { userId, sessionId } = await auth();
   if (!userId || !sessionId) throw new Error('AUTHENTICATION_REQUIRED');
-  service ??= createAtlasDatabase(process.env).then(db => createRepositoryService(db, process.env)).catch(error => { service = undefined; throw error; });
+  service ??= workspaceDatabase().then(db => createRepositoryService(db, process.env)).catch(error => { service = undefined; throw error; });
   return { principalId: userId, service: await service };
 }
 export function repositoryFailure(error: unknown): Response {
