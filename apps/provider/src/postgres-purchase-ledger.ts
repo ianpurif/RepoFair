@@ -19,7 +19,7 @@ export type ProviderLedgerOptions = Readonly<{
   /** Independently verify identity, exact-version entitlement and current permission
    * revision on every call. Return the freshly verified binding, never echo untrusted
    * arguments as authorization. No buyer budget or credentials are needed here. */
-  reauthorize(check: Readonly<{ operation: ProviderLedgerOperation; providerId: string; authorization: AuthorizedRetrieval; requestDigest: string }>): Promise<AuthorizedRetrieval>;
+  reauthorize(check: Readonly<{ operation: ProviderLedgerOperation; providerId: string; authorization: AuthorizedRetrieval; requestDigest: string }>,tx?:AtlasTransaction): Promise<AuthorizedRetrieval>;
   /** MUST reconcile authoritative network finality, transfer token/recipient/amount,
    * request attribution and this principal/provider's immutable exact-version terms.
    * An SDK success or a receipt header alone is not authoritative verification. */
@@ -109,10 +109,10 @@ export function createPostgresPurchaseLedger(database: AtlasDatabase, supplied: 
     && typeof supplied.reauthorize === 'function' && typeof supplied.verifySettlement === 'function' && typeof supplied.now === 'function', 'configuration', 'Provider ledger requires trusted authorization and settlement verification');
   const options = Object.freeze({ ...supplied });
   function now(): number { const value = options.now(); requireValue(Number.isSafeInteger(value) && value > 0, 'configuration', 'Provider ledger clock is invalid'); return value; }
-  async function fresh(operation: ProviderLedgerOperation, auth: AuthorizedRetrieval, digest: string): Promise<void> {
+  async function fresh(operation: ProviderLedgerOperation, auth: AuthorizedRetrieval, digest: string,tx?:AtlasTransaction): Promise<void> {
     requireValue(typeof digest === 'string' && /^sha-256=[A-Za-z0-9+/]{43}=$/.test(digest), 'invalid', 'Invalid request body digest');
     let verified: AuthorizedRetrieval;
-    try { verified = authorization(await options.reauthorize(Object.freeze({ operation, providerId: options.providerId, authorization: auth, requestDigest: digest }))); }
+    try { verified = authorization(await options.reauthorize(Object.freeze({ operation, providerId: options.providerId, authorization: auth, requestDigest: digest }),tx)); }
     catch { return fail('denied', 'Current provider authorization is unavailable'); }
     requireValue(authorizationDigest(verified) === authorizationDigest(auth), 'denied', 'Current authorization differs from this purchase binding');
   }
@@ -167,7 +167,7 @@ export function createPostgresPurchaseLedger(database: AtlasDatabase, supplied: 
       try { validateTestnetTerms(proposed, now()); } catch { return fail('expired', 'Quote has expired'); }
       requireValue(proposed.expiresAtMs - now() <= 300_000, 'invalid', 'Quote lifetime exceeds the supported testnet bound');
       return transaction(async tx => {
-        await lock(tx, auth); await fresh('quote', auth, proposed.requestDigest);
+        await lock(tx, auth); await fresh('quote', auth, proposed.requestDigest,tx);
         const row = await read(tx, auth, true);
         if (row) {
           const saved = bound(row, auth, proposed.requestDigest);
@@ -189,7 +189,7 @@ export function createPostgresPurchaseLedger(database: AtlasDatabase, supplied: 
       const auth = authorization(rawAuth); await fresh('lookup', auth, digest);
       return transaction(async tx => {
         const row = await read(tx, auth); if (!row) return null;
-        const terms = bound(row, auth, digest); await fresh('lookup', auth, digest);
+        const terms = bound(row, auth, digest); await fresh('lookup', auth, digest,tx);
         // Quote-only state must not be mistaken for a processing claim by the
         // adapter; otherwise its first credential could never be accepted.
         return row.state === 'quoted' ? null : Object.freeze({ ...claimResult(row, auth), terms });
@@ -198,7 +198,7 @@ export function createPostgresPurchaseLedger(database: AtlasDatabase, supplied: 
     claim: async (rawAuth, rawTerms) => {
       const auth = authorization(rawAuth); const terms = parseTerms(rawTerms, auth, options.providerId); await fresh('claim', auth, terms.requestDigest);
       return transaction(async tx => {
-        await lock(tx, auth); const row = await matchingRow(tx, auth, terms); await fresh('claim', auth, terms.requestDigest);
+        await lock(tx, auth); const row = await matchingRow(tx, auth, terms); await fresh('claim', auth, terms.requestDigest,tx);
         if (row.state !== 'quoted') return claimResult(row, auth);
         if (terms.expiresAtMs <= now()) {
           await tx.query("UPDATE atlas_provider.sales SET state='rejected',updated_at=now() WHERE provider_id=$1 AND principal_id=$2 AND idempotency_key=$3 AND state='quoted'", key(auth));
@@ -228,7 +228,7 @@ export function createPostgresPurchaseLedger(database: AtlasDatabase, supplied: 
         requireValue(['pending', 'unknown', 'settled'].includes(row.state), 'not-claimed', 'This quote has no processing claim'); });
       requireValue(await verify(auth, terms, receipt), 'verification', 'Authoritative settlement verification failed; reconcile without another charge');
       await transaction(async tx => {
-        await lock(tx, auth); const row = await matchingRow(tx, auth, terms); await fresh('saveSettlement', auth, terms.requestDigest);
+        await lock(tx, auth); const row = await matchingRow(tx, auth, terms); await fresh('saveSettlement', auth, terms.requestDigest,tx);
         if (row.state === 'settled') {
           const stored = parseReceipt(row.receipt as Receipt.Receipt, auth);
           requireValue(receiptIdentity(stored) === receiptIdentity(receipt), 'mismatch', 'Sale already has a different immutable receipt'); return;
@@ -243,7 +243,7 @@ export function createPostgresPurchaseLedger(database: AtlasDatabase, supplied: 
     markUnknown: async (rawAuth, rawTerms) => {
       const auth = authorization(rawAuth); const terms = parseTerms(rawTerms, auth, options.providerId); await fresh('markUnknown', auth, terms.requestDigest);
       await transaction(async tx => {
-        await lock(tx, auth); const row = await matchingRow(tx, auth, terms); await fresh('markUnknown', auth, terms.requestDigest);
+        await lock(tx, auth); const row = await matchingRow(tx, auth, terms); await fresh('markUnknown', auth, terms.requestDigest,tx);
         // A lost settlement COMMIT response may have stored settlement already;
         // never downgrade it. Pending uncertainty remains durable indefinitely.
         if (row.state === 'unknown' || row.state === 'settled') return;

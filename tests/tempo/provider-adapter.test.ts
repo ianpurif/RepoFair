@@ -13,11 +13,14 @@ function configured() {
   const dependencies: TempoProviderDependencies = { now: () => now,
     authorize: vi.fn(async (_request, input) => ({ input, principalId: 'test-principal', permissionRevision: 'test-revision' })),
     quote: vi.fn(async (_authorization, terms) => terms), claim: vi.fn(async () => ({ state })),
+    bindSubmission: vi.fn(),
     lookup: vi.fn(async () => null),
     verifySettlement: vi.fn(async () => false), saveSettlement: vi.fn(), deliver: vi.fn(),
     markUnknown: vi.fn(async () => { state = 'unknown'; }), replayStore: Store.memory(),
-    // Test-only descriptor: no RPC methods, signer or network. Durable stores are not established by these unit tests.
-    getClient: vi.fn(() => ({ chain: { id: 42431 } }) as never),
+    // Explicit RPC transport simulation; no signer/network or concurrency evidence.
+    getClient: vi.fn(() => ({ chain: { id: 42431 }, request: async ({method}:{method:string}) => {
+      if(method==='eth_chainId')return '0xa5bf';throw new Error('Unexpected unit-test RPC method');
+    } }) as never),
   };
   const body = JSON.stringify({ packageName: '@test/lib', version: '1.0.0', question: 'How does run work?', idempotencyKey: 'test_purchase_12345678' });
   const request = (paid = false) => new Request(`${config.origin}/context/retrieve`, { method: 'POST', body,
@@ -59,16 +62,18 @@ describe('unwired Tempo testnet adapter', () => {
     expect(dependencies.claim).not.toHaveBeenCalled();
   });
   it('stops pending/unknown state without SDK resubmission or delivery', async () => {
-    const { config, dependencies, request, setState } = configured(); setState('unknown');
+    const { config, dependencies, request, body, now } = configured();
+    dependencies.lookup = vi.fn(async () => ({state:'unknown',terms:{providerId:config.providerId,operation:'context.retrieve',requestDigest:BodyDigest.compute(body),packageName:'@test/lib',version:'1.0.0',network:'eip155:42431',token:config.token,recipient:config.recipient,atomicAmount:config.atomicPrice,expiresAtMs:now+60_000}}));
     const response = await createTempoTestnetAdapter(config, dependencies).handle(request(true));
     expect(response.status).toBe(409); expect((await response.json()).payment).toBe('unknown');
     expect(dependencies.getClient).not.toHaveBeenCalled(); expect(dependencies.deliver).not.toHaveBeenCalled();
   });
-  it('persists uncertainty on an unaccepted credential and stops a second attempt', async () => {
+  it('rejects malformed credentials before claiming processing or broadcasting', async () => {
     const { config, dependencies, request } = configured(); const adapter = createTempoTestnetAdapter(config, dependencies);
-    const first = await adapter.handle(request(true)); expect(first.status).toBe(503); expect((await first.json()).payment).toBe('unknown');
-    expect(dependencies.markUnknown).toHaveBeenCalledTimes(1); expect(dependencies.saveSettlement).not.toHaveBeenCalled();
-    expect((await adapter.handle(request(true))).status).toBe(409); expect(dependencies.markUnknown).toHaveBeenCalledTimes(1);
+    const first = await adapter.handle(request(true)); expect(first.status).toBe(400); expect((await first.json()).payment).toBe('not-attempted');
+    expect(dependencies.markUnknown).not.toHaveBeenCalled(); expect(dependencies.saveSettlement).not.toHaveBeenCalled();
+    expect((await adapter.handle(request(true))).status).toBe(400); expect(dependencies.claim).not.toHaveBeenCalled();
+    expect(dependencies.bindSubmission).not.toHaveBeenCalled();
     expect(dependencies.deliver).not.toHaveBeenCalled();
   });
   it('rejects a saved purchase belonging to another provider before delivery', async () => {

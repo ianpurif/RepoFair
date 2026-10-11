@@ -66,4 +66,3 @@ begin
 end $$;
 revoke all on function atlas.protect_purchase_policy() from public,anon,authenticated;
 create trigger protect_purchase_policy before update on atlas.purchases for each row execute function atlas.protect_purchase_policy();
-
