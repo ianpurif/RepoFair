@@ -1,6 +1,23 @@
 {
   "schemaVersion": 1,
-  "active": [],
+  "active": [
+    {
+      "task": "/root/overhaul_architecture",
+      "role": "atlas_architect",
+      "status": "running",
+      "allowedWritePaths": [],
+      "milestone": "production-overhaul",
+      "recordedAt": "2026-10-11T13:16:08.207Z"
+    },
+    {
+      "task": "/root/overhaul_research",
+      "role": "atlas_researcher",
+      "status": "running",
+      "allowedWritePaths": [],
+      "milestone": "production-overhaul",
+      "recordedAt": "2026-10-11T13:16:08.207Z"
+    }
+  ],
   "completed": [
     {
       "task": "/root/p0_architecture",
