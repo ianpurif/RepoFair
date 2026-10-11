@@ -31,6 +31,19 @@ The SQL expects the standard Supabase roles `anon`, `authenticated` and `service
 
 Configure the provider fields in [.env.example](../.env.example): database/CA, publication UUID, HTTPS origin, trusted issuer origin/public-key file, MPP secret file, fixed recipient/price/realm, and Moderato RPC/chain. Keep secrets and private source exports access-controlled.
 
+The provider UUID is the downloaded signed export's `artifact.id`, which is the saved draft identity. Its endpoint must be the exact provider origin followed by `/context/retrieve`; configured recipient and integer price must match the export. Origins have no trailing slash or path.
+
+On a separate provider host, configure only provider variables. The convenience launcher loads the checkout's `.env.local`; sharing an Atlas checkout's central secrets with that launcher does not demonstrate independent operation. For a local test with a provider-only env file, compile the trusted bundles and run them directly through Node instead:
+
+```powershell
+bun run provider:check
+bun build apps/provider/src/install.ts --target=node --packages=external --outfile=apps/provider/.atlas/install.mjs
+node --env-file="C:\secure\provider.env" apps/provider/.atlas/install.mjs "C:\secure\owner-approved-export.json"
+node --env-file="C:\secure\provider.env" apps/provider/.atlas/provider.mjs
+```
+
+Use a fresh shell without inherited Atlas secrets. Keep issuer private keys, central database credentials, Clerk/GitHub secrets and buyer signing keys out of the provider environment. The provider receives only the issuer public key and needs only the recipient address, never that recipient's wallet private key.
+
 ```powershell
 bun run provider:check
 bun run provider:install -- "C:\secure\owner-approved-export.json"

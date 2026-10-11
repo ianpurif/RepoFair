@@ -78,7 +78,7 @@
   ],
   "liveIntegrationsVerified": false,
   "lastUpdatedBy": "lead",
-  "updatedAt": "2026-10-11T15:25:50Z",
+  "updatedAt": "2026-10-11T16:12:29Z",
   "applicationAi": {
     "embeddingProvider": "Voyage AI",
     "generationProvider": "DeepSeek",
@@ -145,5 +145,16 @@
     "externalDeploymentPerformed": false,
     "paymentBroadcasts": 0,
     "privateSourceSentToAi": false
+  },
+  "publishingSetup": {
+    "configured": false,
+    "infrastructureProvisioned": false,
+    "callerExample": "packages/sdk/examples/moderato.ts",
+    "evidence": "docs/evidence/publishing-setup.json",
+    "browserWalletCompatibilityVerified": false,
+    "browserWalletCompatibilityStatus": "unverified",
+    "actualRpcChain": 42431,
+    "paymentBroadcasts": 0,
+    "hostedWrites": 0
   }
 }

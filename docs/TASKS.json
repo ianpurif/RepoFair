@@ -306,6 +306,33 @@
       "requestedEffort": "max",
       "observedModel": null,
       "observedEffort": null
+    },
+    {
+      "task": "/root/publishing_setup_research",
+      "role": "atlas_researcher",
+      "allowedWritePaths": [],
+      "status": "completed",
+      "milestone": "publishing-setup-clarification",
+      "completionRecordedAt": "2026-10-11T16:12:29Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/publishing_setup_cli",
+      "role": "atlas_engineer",
+      "allowedWritePaths": [
+        "packages/sdk/examples/moderato.ts",
+        "tests/integration/moderato-cli.test.ts"
+      ],
+      "status": "completed",
+      "milestone": "publishing-setup-clarification",
+      "completionRecordedAt": "2026-10-11T16:12:29Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
     }
   ],
   "note": "Actual delegated task handles; completed execution recorded after work. Requested model/effort configuration is not backend execution attestation. No nested delegation or agent commits."

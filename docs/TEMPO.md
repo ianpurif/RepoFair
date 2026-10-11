@@ -35,6 +35,12 @@ Atlas needs the reviewed central migrations, HTTPS issuer origin and Ed25519 sig
 
 The browser uses an injected EIP-1193 wallet supporting Tempo pull signing. Hardware/extension behavior remains unverified; unsupported signing fails explicitly. Headless callers supply their own signer through the authenticated SDK.
 
+Adding Moderato to an ordinary EVM wallet does not establish this compatibility. With the pinned libraries, Atlas's browser pull mode requests `eth_signTransaction` with Tempo transaction fields. No real extension has passed that path. The first acceptance attempt can instead use the caller-owned local-account signer in `packages/sdk/examples/moderato.ts`; its key remains outside application configuration.
+
+The example defaults to `--check`: actual RPC chain, authenticated account/catalog and existing allowance, with no reservation, key read or signing. `--purchase` separately requires the exact `--approve-atomic-amount`, an outside-checkout `--key-file` and stable `--idempotency-key`. It cannot increase allowance. `--resume <purchase UUID>` accepts no signer and never supplies another credential. Token files are reread per request; stdout omits private source and raw errors. An explicit outside-checkout output file is created exclusively. These CLI guards are checked with simulated transports, not live purchases.
+
+The official Moderato RPC is `https://rpc.moderato.tempo.xyz`; its explorer is `https://explore.testnet.tempo.xyz`. The official test faucet accepts `POST https://tempo.xyz/developers/api/faucet` with an address-only JSON body. Test allocations can change; funding and fee sufficiency remain separate from workspace allowance. The default Tempo Wallet/CLI documentation uses mainnet and does not establish a configured Atlas Moderato browser signer.
+
 Current evidence executes genuine SQL, official offline challenges, signed source/graph proofs, SDK/MCP transports, canonical-transfer validation and interrupted-delivery recovery against **explicit simulated identity/RPC/provider transports**. PGlite's serialized backend does not prove networked PostgreSQL concurrency.
 
 Release still requires hosted migrations/TLS, real endpoint control, two independent operators/recipients, authorized testnet funding/signing, settlement, and delivery recovered without another charge. No approval to spend real money or deploy externally has been inferred.
