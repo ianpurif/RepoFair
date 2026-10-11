@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-11T15:23:57.186Z",
+  "status": "passed",
+  "scope": "Real Clerk-linked GitHub user and App authorization; actual GitHub immutable source reads; production repository service and isolated parser with new migration SQL in an in-memory PostgreSQL-WASM database. Hosted database reads only existing membership/repository metadata. No hosted writes, AI calls, publication, payment, or private source in this report.",
+  "identityBoundary": "Existing authorized durable-job principal, freshly reverified by Clerk/GitHub. This script is not a new sign-in or hosted RLS/concurrency acceptance.",
+  "sourcePersistedByVerifier": false,
+  "credentialsOrRepositoryIdentifiersPersisted": false,
+  "apiRequestCount": "not instrumented",
+  "aiCalls": 0,
+  "providerIndexingCostUsd": 0,
+  "hostedMigrationsApplied": false,
+  "hostedWrites": false,
+  "cleanup": "local database closed; no hosted writes or verifier-owned source files",
+  "authorization": {
+    "clerkLinkedGitHubVerified": true,
+    "repositoryReadVerified": true
+  },
+  "result": {
+    "durationMs": 94647,
+    "slices": 9,
+    "phases": {
+      "downloading": 7,
+      "parsing": 1,
+      "complete": 1
+    },
+    "localSqlQueries": 264,
+    "files": 199,
+    "nodes": 1886,
+    "edges": 7400,
+    "evidencePassages": 4415,
+    "downloaded": 199,
+    "reused": 0,
+    "parsed": 199,
+    "failures": 0,
+    "immutableCommitMatchedExistingAuthorizedImport": true,
+    "sourceRangeVerified": true,
+    "boundedGraphNodesReturned": 160,
+    "extractiveCitationCount": 5,
+    "sameCommitRepeatReusedCompleteSnapshot": true,
+    "parentRssAtReturnBytes": 563662848,
+    "memoryScope": "Parent RSS at return, including PostgreSQL-WASM; not peak RSS or parser child RSS."
+  },
+  "incrementalNewCommit": "Not attempted against another real commit; generated changed-commit checkpoint/blob-reuse tests remain separate.",
+  "finishedAt": "2026-10-11T15:25:37.774Z"
+}
