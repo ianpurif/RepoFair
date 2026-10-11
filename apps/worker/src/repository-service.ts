@@ -19,6 +19,12 @@ export class RepositoryServiceError extends Error {
   constructor(public readonly code: string, message: string, public readonly status = 503) { super(message); this.name = 'RepositoryServiceError'; }
 }
 function fail(code: string, message: string, status = 503): never { throw new RepositoryServiceError(code, message, status); }
+/** Match SQL capacity triggers; caller already owns the repository lock. */
+export async function assertImportHistoryCapacity(tx:AtlasTransaction,workspaceId:string,snapshot:boolean):Promise<void> {
+  await tx.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[`atlas-import-capacity:${workspaceId}`]);
+  const counts=(await tx.query<{snapshots:number;jobs:number}>('SELECT (SELECT count(*)::int FROM atlas.snapshots WHERE workspace_id=$1) AS snapshots,(SELECT count(*)::int FROM atlas.jobs WHERE workspace_id=$1) AS jobs',[workspaceId])).rows[0];
+  if(!counts||counts.jobs>=1000||snapshot&&counts.snapshots>=100)fail('import-history-limit','Workspace history is limited to 100 snapshots and 1000 import jobs. Ask an administrator to review retention before importing another version.',422);
+}
 function uuid(value: string): string {
   if (typeof value !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value)) return fail('invalid-id', 'Invalid repository or workspace identifier', 400);
   return value.toLowerCase();
@@ -218,12 +224,13 @@ export function createRepositoryService(database: AtlasDatabase, env: Readonly<R
       const current = await membership(tx, principalId, workspaceId, true, true); ensureRevision(current.revision, initial.revision);
       let snapshot = (await tx.query<{ id: string; status: string; tree_sha: string | null }>('SELECT id,status,tree_sha FROM atlas.snapshots WHERE repository_id=$1 AND workspace_id=$2 AND revision=$3 AND index_version=$4', [row.id, workspaceId, commit.sha, IMPORT_INDEX_VERSION])).rows[0];
       if (snapshot?.tree_sha && snapshot.tree_sha !== commit.treeSha) return fail('source-integrity', 'Immutable repository tree changed', 422);
-      if (!snapshot) snapshot = (await tx.query<{ id: string; status: string; tree_sha: string | null }>(`INSERT INTO atlas.snapshots(id,workspace_id,repository_id,revision,status,requested_ref,tree_sha,index_version,base_snapshot_id)
-        VALUES($1,$2,$3,$4,'queued',$5,$6,$7,(SELECT id FROM atlas.snapshots WHERE repository_id=$3 AND workspace_id=$2 AND status='complete' ORDER BY indexed_at DESC NULLS LAST,created_at DESC LIMIT 1)) RETURNING id,status,tree_sha`, [randomUUID(), workspaceId, row.id, commit.sha, requestedRef, commit.treeSha, IMPORT_INDEX_VERSION])).rows[0];
+      if (!snapshot) {await assertImportHistoryCapacity(tx,workspaceId,true);snapshot = (await tx.query<{ id: string; status: string; tree_sha: string | null }>(`INSERT INTO atlas.snapshots(id,workspace_id,repository_id,revision,status,requested_ref,tree_sha,index_version,base_snapshot_id)
+        VALUES($1,$2,$3,$4,'queued',$5,$6,$7,(SELECT id FROM atlas.snapshots WHERE repository_id=$3 AND workspace_id=$2 AND status='complete' ORDER BY indexed_at DESC NULLS LAST,created_at DESC LIMIT 1)) RETURNING id,status,tree_sha`, [randomUUID(), workspaceId, row.id, commit.sha, requestedRef, commit.treeSha, IMPORT_INDEX_VERSION])).rows[0];}
       if (!snapshot) return fail('database-failed', 'Snapshot could not be queued');
       if (snapshot.status === 'complete') return { repositoryId: row.id, snapshotId: snapshot.id, jobId: null, status: 'complete', commitSha: commit.sha };
       const existing = (await tx.query<{ id: string; status: 'queued' | 'running' }>("SELECT id,status FROM atlas.jobs WHERE snapshot_id=$1 AND workspace_id=$2 AND status IN ('queued','running') ORDER BY created_at DESC LIMIT 1 FOR UPDATE", [snapshot.id, workspaceId])).rows[0];
       if (existing) return { repositoryId: row.id, snapshotId: snapshot.id, jobId: existing.id, status: existing.status, commitSha: commit.sha };
+      await assertImportHistoryCapacity(tx,workspaceId,false);
       const previous = (await tx.query<{ phase: ImportPhase }>('SELECT phase FROM atlas.jobs WHERE snapshot_id=$1 AND workspace_id=$2 ORDER BY created_at DESC LIMIT 1 FOR UPDATE', [snapshot.id, workspaceId])).rows[0];
       const phase = previous?.phase && previous.phase !== 'complete' ? previous.phase : 'discovering';
       const job = (await tx.query<{ id: string }>(`INSERT INTO atlas.jobs(workspace_id,snapshot_id,principal_id,permission_revision,repository_permission_revision,status,phase)

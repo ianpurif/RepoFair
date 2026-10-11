@@ -1,6 +1,7 @@
 import { verifyGitHubWebhook, GitHubError } from './github.ts';
 import type { AtlasDatabase } from './database.ts';
 import { IMPORT_INDEX_VERSION } from '../../../packages/contracts/src/import.ts';
+import { assertImportHistoryCapacity } from './repository-service.ts';
 export async function processGitHubWebhook(database: AtlasDatabase, body: Uint8Array, headers: Headers, secret: string | undefined) {
   const delivery = verifyGitHubWebhook(body, headers, secret);
   const payload = delivery.payload;
@@ -53,6 +54,9 @@ export async function processGitHubWebhook(database: AtlasDatabase, body: Uint8A
       for (const row of repositories.rows) {
         const origin = await tx.query<{principal_id:string;revision:string}>("select j.principal_id,m.revision::text from atlas.jobs j join atlas.snapshots s on s.id=j.snapshot_id join atlas.memberships m on m.workspace_id=j.workspace_id and m.principal_id=j.principal_id where s.repository_id=$1 and s.requested_ref=$2 and m.role in ('owner','admin') order by j.created_at desc limit 1",[row.id,ref]);
         if (!origin.rows[0]) continue;
+        const duplicate=await tx.query('SELECT id FROM atlas.snapshots WHERE repository_id=$1 AND revision=$2 AND index_version=$3',[row.id,payload.after,IMPORT_INDEX_VERSION]);
+        if(duplicate.rows.length)continue;
+        await assertImportHistoryCapacity(tx,row.workspace_id,true);
         const snapshot = await tx.query<{id:string}>(`insert into atlas.snapshots(workspace_id,repository_id,revision,status,requested_ref,index_version,base_snapshot_id)
           values ($1,$2,$3,'queued',$4,$5,(select id from atlas.snapshots where repository_id=$2 and workspace_id=$1 and status='complete' order by indexed_at desc nulls last,created_at desc limit 1))
           on conflict(repository_id,revision,index_version) do nothing returning id`,[row.workspace_id,row.id,payload.after,ref,IMPORT_INDEX_VERSION]);

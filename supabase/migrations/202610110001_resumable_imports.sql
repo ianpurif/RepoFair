@@ -70,3 +70,20 @@ grant all on atlas.import_manifests,atlas.import_files to service_role;
 drop policy job_read on atlas.jobs;
 create policy job_read on atlas.jobs for select to authenticated using(atlas.has_snapshot_access(snapshot_id));
 -- No partial source can be read through normal source RLS or external APIs.
+-- Retained history is bounded as well as individual imports. No old evidence is silently deleted.
+create function atlas.bound_import_history() returns trigger language plpgsql set search_path=pg_catalog,atlas as $$
+declare used bigint;
+begin
+  perform pg_advisory_xact_lock(hashtextextended('atlas-import-capacity:'||new.workspace_id::text,0));
+  if tg_table_name='snapshots' then
+    select count(*) into used from atlas.snapshots where workspace_id=new.workspace_id;
+    if used>=100 then raise exception 'Workspace retained snapshot capacity reached'; end if;
+  else
+    select count(*) into used from atlas.jobs where workspace_id=new.workspace_id;
+    if used>=1000 then raise exception 'Workspace retained import job capacity reached'; end if;
+  end if;
+  return new;
+end $$;
+revoke all on function atlas.bound_import_history() from public,anon,authenticated;
+create trigger bounded_snapshot_history before insert on atlas.snapshots for each row execute function atlas.bound_import_history();
+create trigger bounded_job_history before insert on atlas.jobs for each row execute function atlas.bound_import_history();
