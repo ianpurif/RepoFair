@@ -1,0 +1,234 @@
+{
+  "timestamp": "2026-10-11T13:58:45.225Z",
+  "mode": "synthetic-local-benchmark",
+  "scope": "Simulated GitHub HTTP and identity; actual native GitHub client with hash-verified blobs, real PostgreSQL-WASM migration SQL/checkpoints, and isolated trusted Node parser. No external network, hosted authentication, hosted concurrency, or payments.",
+  "memoryMetric": "RSS/heap of the Node benchmark parent at pipeline return, including PGlite. Not sampled peak RSS; does not measure the transient parser child. Parser child uses a 768 MiB V8 heap bound and 60 second deadline.",
+  "costScope": "Measured zero AI calls and provider indexing cost. Local compute, database, storage and hosting costs are not included.",
+  "results": [
+    {
+      "size": 17,
+      "initial": {
+        "files": 17,
+        "sourceBytes": 1011,
+        "status": "complete",
+        "durationMs": 907,
+        "slices": 3,
+        "phaseResults": {
+          "downloading": 1,
+          "parsing": 1,
+          "complete": 1
+        },
+        "sqlQueries": 92,
+        "simulatedGitHubRequests": {
+          "total": 54,
+          "blobs": 17,
+          "trees": 1,
+          "commits": 2,
+          "tokens": 7,
+          "authorization": 27
+        },
+        "downloaded": 17,
+        "reused": 0,
+        "parsed": 17,
+        "failures": 0,
+        "storageAtReturn": {
+          "sourceFiles": 17,
+          "sourceContentBytes": "1011",
+          "graphBytes": "53955",
+          "stagedFiles": 0,
+          "stagedBytes": "0"
+        },
+        "parentRssAtReturnBytes": 396070912,
+        "parentHeapAtReturnBytes": 27580560,
+        "aiCalls": 0,
+        "indexingProviderCostUsd": 0
+      },
+      "oneFileChange": {
+        "files": 17,
+        "sourceBytes": 1015,
+        "status": "complete",
+        "durationMs": 735,
+        "slices": 3,
+        "phaseResults": {
+          "downloading": 1,
+          "parsing": 1,
+          "complete": 1
+        },
+        "sqlQueries": 92,
+        "simulatedGitHubRequests": {
+          "total": 38,
+          "blobs": 1,
+          "trees": 1,
+          "commits": 2,
+          "tokens": 7,
+          "authorization": 27
+        },
+        "downloaded": 1,
+        "reused": 16,
+        "parsed": 17,
+        "failures": 0,
+        "storageAtReturn": {
+          "sourceFiles": 17,
+          "sourceContentBytes": "1015",
+          "graphBytes": "53963",
+          "stagedFiles": 0,
+          "stagedBytes": "0"
+        },
+        "parentRssAtReturnBytes": 397070336,
+        "parentHeapAtReturnBytes": 24962224,
+        "aiCalls": 0,
+        "indexingProviderCostUsd": 0
+      }
+    },
+    {
+      "size": 145,
+      "initial": {
+        "files": 145,
+        "sourceBytes": 8907,
+        "status": "complete",
+        "durationMs": 990,
+        "slices": 7,
+        "phaseResults": {
+          "downloading": 5,
+          "parsing": 1,
+          "complete": 1
+        },
+        "sqlQueries": 184,
+        "simulatedGitHubRequests": {
+          "total": 222,
+          "blobs": 145,
+          "trees": 1,
+          "commits": 2,
+          "tokens": 15,
+          "authorization": 59
+        },
+        "downloaded": 145,
+        "reused": 0,
+        "parsed": 145,
+        "failures": 0,
+        "storageAtReturn": {
+          "sourceFiles": 145,
+          "sourceContentBytes": "8907",
+          "graphBytes": "466787",
+          "stagedFiles": 0,
+          "stagedBytes": "0"
+        },
+        "parentRssAtReturnBytes": 400908288,
+        "parentHeapAtReturnBytes": 26335840,
+        "aiCalls": 0,
+        "indexingProviderCostUsd": 0
+      },
+      "oneFileChange": {
+        "files": 145,
+        "sourceBytes": 8911,
+        "status": "complete",
+        "durationMs": 975,
+        "slices": 7,
+        "phaseResults": {
+          "downloading": 5,
+          "parsing": 1,
+          "complete": 1
+        },
+        "sqlQueries": 184,
+        "simulatedGitHubRequests": {
+          "total": 78,
+          "blobs": 1,
+          "trees": 1,
+          "commits": 2,
+          "tokens": 15,
+          "authorization": 59
+        },
+        "downloaded": 1,
+        "reused": 144,
+        "parsed": 145,
+        "failures": 0,
+        "storageAtReturn": {
+          "sourceFiles": 145,
+          "sourceContentBytes": "8911",
+          "graphBytes": "466795",
+          "stagedFiles": 0,
+          "stagedBytes": "0"
+        },
+        "parentRssAtReturnBytes": 402251776,
+        "parentHeapAtReturnBytes": 39614584,
+        "aiCalls": 0,
+        "indexingProviderCostUsd": 0
+      }
+    },
+    {
+      "size": 4001,
+      "initial": {
+        "files": 4001,
+        "sourceBytes": 257835,
+        "status": "complete",
+        "durationMs": 8571,
+        "slices": 128,
+        "phaseResults": {
+          "downloading": 126,
+          "parsing": 1,
+          "complete": 1
+        },
+        "sqlQueries": 2967,
+        "simulatedGitHubRequests": {
+          "total": 5288,
+          "blobs": 4001,
+          "trees": 1,
+          "commits": 2,
+          "tokens": 257,
+          "authorization": 1027
+        },
+        "downloaded": 4001,
+        "reused": 0,
+        "parsed": 4001,
+        "failures": 0,
+        "storageAtReturn": {
+          "sourceFiles": 4001,
+          "sourceContentBytes": "257835",
+          "graphBytes": "13103435",
+          "stagedFiles": 0,
+          "stagedBytes": "0"
+        },
+        "parentRssAtReturnBytes": 559575040,
+        "parentHeapAtReturnBytes": 57081024,
+        "aiCalls": 0,
+        "indexingProviderCostUsd": 0
+      },
+      "oneFileChange": {
+        "files": 4001,
+        "sourceBytes": 257839,
+        "status": "complete",
+        "durationMs": 8102,
+        "slices": 128,
+        "phaseResults": {
+          "downloading": 126,
+          "parsing": 1,
+          "complete": 1
+        },
+        "sqlQueries": 2967,
+        "simulatedGitHubRequests": {
+          "total": 1288,
+          "blobs": 1,
+          "trees": 1,
+          "commits": 2,
+          "tokens": 257,
+          "authorization": 1027
+        },
+        "downloaded": 1,
+        "reused": 4000,
+        "parsed": 4001,
+        "failures": 0,
+        "storageAtReturn": {
+          "sourceFiles": 4001,
+          "sourceContentBytes": "257839",
+          "graphBytes": "13103443",
+          "stagedFiles": 0,
+          "stagedBytes": "0"
+        },
+        "parentRssAtReturnBytes": 560009216,
+        "parentHeapAtReturnBytes": 43927400,
+        "aiCalls": 0,
+        "indexingProviderCostUsd": 0
+      }
+    }
+  ]
+}
