@@ -20,7 +20,13 @@ alter table atlas.jobs add column bytes_processed bigint not null default 0 chec
 update atlas.jobs j set repository_permission_revision=r.permission_revision
   from atlas.snapshots s join atlas.repositories r on r.id=s.repository_id and r.workspace_id=s.workspace_id
   where s.id=j.snapshot_id and s.workspace_id=j.workspace_id;
-update atlas.jobs set phase='complete',finished_at=created_at where status='complete';
+-- Historic finish times were not recorded. Preserve that uncertainty instead of backdating them.
+update atlas.jobs set phase='complete' where status='complete';
+with counts as (select workspace_id,snapshot_id,count(*)::integer as files,
+  coalesce(sum(octet_length(content)),0)::bigint as bytes from atlas.source_files group by workspace_id,snapshot_id)
+update atlas.jobs j set files_discovered=c.files,files_eligible=c.files,files_downloaded=c.files,files_parsed=c.files,
+  bytes_total=c.bytes,bytes_processed=c.bytes from counts c
+  where j.workspace_id=c.workspace_id and j.snapshot_id=c.snapshot_id and j.status='complete';
 -- Preserve duplicate records as cancelled audit history; never delete source or jobs.
 with ranked as (select id,row_number() over(partition by snapshot_id order by created_at,id) as ordinal
   from atlas.jobs where status in ('queued','running'))
@@ -35,12 +41,12 @@ alter table atlas.snapshots add column index_version text not null default 'atla
 alter table atlas.snapshots add column base_snapshot_id uuid;
 alter table atlas.snapshots add column indexed_at timestamptz;
 alter table atlas.snapshots add constraint snapshot_base_scope foreign key(base_snapshot_id,workspace_id) references atlas.snapshots(id,workspace_id);
-update atlas.snapshots set indexed_at=created_at where status='complete';
 alter table atlas.snapshots drop constraint snapshots_status_check;
 alter table atlas.snapshots add constraint snapshots_status_check check(status in ('queued','running','complete','failed','cancelled'));
 alter table atlas.snapshots drop constraint snapshots_repository_id_revision_key;
 alter table atlas.snapshots add unique(repository_id,revision,index_version);
 alter table atlas.source_files add column blob_sha text check(blob_sha ~ '^[a-f0-9]{40}$');
+create index source_blob_reuse on atlas.source_files(workspace_id,blob_sha,snapshot_id) where blob_sha is not null;
 
 create table atlas.import_manifests (
   snapshot_id uuid primary key,workspace_id uuid not null,tree_sha text not null check(tree_sha ~ '^[a-f0-9]{40}$'),

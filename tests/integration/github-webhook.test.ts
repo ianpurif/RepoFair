@@ -13,6 +13,7 @@ const workspace = randomUUID(); const repository = randomUUID(); const snapshot 
 const installationId = 9_001_000_001; const githubRepositoryId = 9_001_000_002;
 const installationBody = { id: installationId, app_id: 9_001_000_003, account: { id: 9_001_000_004, login: 'synthetic-owner' }, permissions: { contents: 'read', metadata: 'read' } };
 const initialCommit = '1'.repeat(40); const pushedCommit = '2'.repeat(40);
+const pendingCommits = ['8'.repeat(40),'9'.repeat(40)];
 async function transaction<T>(actor: string | null, work: (tx: AtlasTransaction) => Promise<T>): Promise<T> {
   await sql.exec('BEGIN');
   try {
@@ -56,7 +57,7 @@ beforeAll(async () => {
   await sql.exec(`CREATE ROLE authenticated; CREATE ROLE anon; CREATE ROLE service_role BYPASSRLS;
     CREATE SCHEMA auth; CREATE FUNCTION auth.jwt() RETURNS jsonb LANGUAGE sql STABLE AS $$ SELECT coalesce(nullif(current_setting('request.jwt.claims',true),''),'{}')::jsonb $$;
     GRANT USAGE ON SCHEMA auth TO authenticated; GRANT EXECUTE ON FUNCTION auth.jwt() TO authenticated;`);
-  for (const migration of ['202610030001_atlas', '202610070001_personal_workspaces', '202610070002_github_jobs', '202610070003_server_repository_grants']) {
+  for (const migration of ['202610030001_atlas', '202610070001_personal_workspaces', '202610070002_github_jobs', '202610070003_server_repository_grants','202610110001_resumable_imports']) {
     await sql.exec(await readFile(`supabase/migrations/${migration}.sql`, 'utf8'));
   }
 });
@@ -71,7 +72,11 @@ beforeEach(async () => {
     await tx.query("insert into atlas.snapshots(id,workspace_id,repository_id,revision,status,requested_ref) values ($1,$2,$3,$4,'complete','main')", [snapshot, workspace, repository, initialCommit]);
     await tx.query("insert into atlas.source_files(workspace_id,snapshot_id,path,content) values ($1,$2,'synthetic.ts','export const synthetic = true;')", [workspace, snapshot]);
     await tx.query('insert into atlas.graphs(workspace_id,snapshot_id,graph) values ($1,$2,$3::jsonb)', [workspace, snapshot, JSON.stringify({ synthetic: true })]);
-    for (const status of ['queued', 'running', 'complete']) await tx.query("insert into atlas.jobs(workspace_id,snapshot_id,principal_id,permission_revision,status,lease_until) values ($1,$2,$3,1,$4,now()+interval '1 hour')", [workspace, snapshot, principal, status]);
+    for (const [position,status] of ['queued','running','complete'].entries()) {
+      const target = status === 'complete' ? snapshot : randomUUID();
+      if (target !== snapshot) await tx.query("insert into atlas.snapshots(id,workspace_id,repository_id,revision,status,requested_ref) values($1,$2,$3,$4,$5,'main')",[target,workspace,repository,pendingCommits[position],status]);
+      await tx.query("insert into atlas.jobs(workspace_id,snapshot_id,principal_id,permission_revision,repository_permission_revision,status,lease_until,claim_token) values($1,$2,$3,1,1,$4,now()+interval '1 hour',$5)",[workspace,target,principal,status,status === 'running' ? randomUUID() : null]);
+    }
   });
 });
 afterAll(async () => { await sql.close(); });
@@ -79,7 +84,7 @@ describe('GitHub webhook actual handler and migration policies', () => {
   it('rejects a forged HMAC before any delivery or repository mutation', async () => {
     const item = delivery('push', push()); item.headers.set('x-hub-signature-256', 'sha256=' + '0'.repeat(64));
     await expect(process(item)).rejects.toMatchObject({ code: 'unauthorized' });
-    const saved = await state(); expect(saved.deliveries).toHaveLength(0); expect(saved.snapshots).toHaveLength(1); expect(saved.repository?.revision).toBe(1);
+    const saved = await state(); expect(saved.deliveries).toHaveLength(0); expect(saved.snapshots).toHaveLength(3); expect(saved.repository?.revision).toBe(1);
   });
   it('rejects a changed raw body even when its JSON remains valid', async () => {
     const item = delivery('push', push()); item.body = new TextEncoder().encode(JSON.stringify(push('3'.repeat(40))));
@@ -90,7 +95,7 @@ describe('GitHub webhook actual handler and migration policies', () => {
     const item = delivery('push', push());
     await expect(process(item)).resolves.toEqual({ status: 'processed', revoked: 0, queued: 1 });
     await expect(process(item)).resolves.toEqual({ status: 'duplicate' });
-    const saved = await state(); expect(saved.deliveries).toHaveLength(1); expect(saved.snapshots).toEqual([{ revision: initialCommit, requested_ref: 'main' }, { revision: pushedCommit, requested_ref: 'main' }]); expect(saved.jobs).toHaveLength(4);
+    const saved = await state(); expect(saved.deliveries).toHaveLength(1); expect(saved.snapshots).toEqual([initialCommit,pushedCommit,...pendingCommits].map(revision=>({revision,requested_ref:'main'}))); expect(saved.jobs).toHaveLength(4);
   });
   it('does not queue the same commit again under a new delivery UUID', async () => {
     await process(delivery('push', push()));
@@ -100,7 +105,7 @@ describe('GitHub webhook actual handler and migration policies', () => {
   it('rejects a correctly signed changed body reusing an existing delivery UUID', async () => {
     const item = delivery('push', push()); await process(item);
     await expect(process(delivery('push', push('3'.repeat(40)), item.id))).rejects.toMatchObject({ code: 'invalid' });
-    const saved = await state(); expect(saved.snapshots).toHaveLength(2); expect(saved.deliveries).toHaveLength(1);
+    const saved = await state(); expect(saved.snapshots).toHaveLength(4); expect(saved.deliveries).toHaveLength(1);
   });
   it('rejects unsigned event-header reinterpretation of a signed repository deletion', async () => {
     const item = delivery('repository', { action: 'deleted', installation: { id: installationId }, repository: { id: githubRepositoryId } });
@@ -115,7 +120,7 @@ describe('GitHub webhook actual handler and migration policies', () => {
   });
   it('requires the server repository grant and tenant membership before source or graph reads', async () => {
     expect(await visible(principal, false)).toEqual({ repositories: 0, snapshots: 0, source_files: 0, graphs: 0, jobs: 0 });
-    expect(await visible()).toEqual({ repositories: 1, snapshots: 1, source_files: 1, graphs: 1, jobs: 3 });
+    expect(await visible()).toEqual({ repositories: 1, snapshots: 3, source_files: 1, graphs: 1, jobs: 3 });
     expect(await visible('user_syntheticOtherTenant')).toEqual({ repositories: 0, snapshots: 0, source_files: 0, graphs: 0, jobs: 0 });
   });
   it.each([
@@ -145,11 +150,11 @@ describe('GitHub webhook actual handler and migration policies', () => {
   it('ignores a signed deleted-branch push and refuses a non-immutable commit', async () => {
     await expect(process(delivery('push', { ...push(), deleted: true }))).resolves.toEqual({ status: 'processed', revoked: 0, queued: 0 });
     await expect(process(delivery('push', push('main')))).rejects.toMatchObject({ code: 'invalid' });
-    expect((await state()).snapshots).toHaveLength(1);
+    expect((await state()).snapshots).toHaveLength(3);
   });
   it('does not create an automatic import job for a principal who lost owner/admin authority', async () => {
     await transaction(null, tx => tx.query("update atlas.memberships set role='reader',revision=revision+1 where workspace_id=$1 and principal_id=$2", [workspace, principal]));
     await expect(process(delivery('push', push()))).resolves.toEqual({ status: 'processed', revoked: 0, queued: 0 });
-    expect((await state()).snapshots).toHaveLength(1);
+    expect((await state()).snapshots).toHaveLength(3);
   });
 });
