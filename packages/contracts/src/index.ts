@@ -19,7 +19,7 @@ export type GraphNode = Readonly<{
 }>;
 export type GraphEdge = Readonly<{
   id: string; from: string; to: string;
-  relation: 'imports' | 'exports' | 'references' | 'resolved-call' | 'package-binding';
+  relation: 'imports' | 'exports' | 'references' | 'resolved-call' | 'package-binding' | 'declares';
   provenance: 'parsed-source' | 'provider-reported'; evidenceId: string;
 }>;
 export type ReleaseMapping = Readonly<{
@@ -50,3 +50,4 @@ export type PurchaseTerms = Readonly<{
   packageName: string; version: string; network: string; token: string;
   recipient: string; atomicAmount: string; expiresAtMs: number;
 }>;
+export * from './import.ts';
