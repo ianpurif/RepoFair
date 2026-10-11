@@ -22,7 +22,12 @@ export default class BrowserEvidenceReporter implements Reporter {
       total: this.observations.length, passed: this.observations.filter(item => item.status === 'passed').length,
       failed: this.observations.filter(item => item.status === 'failed' || item.status === 'timedOut').length,
       skipped: this.observations.filter(item => item.status === 'skipped').length, observations: this.observations,
-      limitations: ['Public fixture browser checks do not establish Clerk identity, hosted RLS, real database concurrency, or Tempo settlement.',
+      developmentIdentityControlsEnabled: process.env.ATLAS_BROWSER_TEST_SESSION === 'true',
+      identityScope: process.env.ATLAS_BROWSER_TEST_SESSION === 'true'
+        ? 'Opt-in controls create and clean fresh sessions for the existing authorized development Clerk account; commerce and wallet transports remain fixtures.'
+        : 'No opt-in development identity controls enabled.',
+      limitations: ['Fixture/transport browser cases do not establish hosted RLS, real database concurrency, provider publication or Tempo settlement.',
+        'Opt-in real development sign-in checks do not turn simulated catalog, purchase-history or wallet responses into real commerce evidence.',
         'The indexing recovery case deliberately aborts one browser request; the successful retry uses the actual server.'],
     }, null, 2) + '\n');
   }

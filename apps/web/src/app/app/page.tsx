@@ -1,2 +1,2 @@
-import { Workspace } from '../../components/workspace';
-export default function ApplicationPage() { return <Workspace initialFixture="jobboard-app@1.0.0" />; }
+import { RepositoryBrowser } from '../../components/repository-browser';
+export default function ApplicationPage() { return <RepositoryBrowser />; }

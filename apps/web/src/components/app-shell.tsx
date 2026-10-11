@@ -26,8 +26,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   })}</nav><div className="rail-bottom"><ThemeToggle /><AuthStatus /></div></aside><div className="app-content">{children}</div></div>;
 }
 export function PageHeader({ title, subtitle }: { title: string; subtitle: string }) {
-  return <header className="page-header"><div><span className="eyebrow">Chronos Atlas</span><h1>{title}</h1><p>{subtitle}</p></div><Link className="button secondary" href="/app">Open workspace <ArrowUpRight size={15} /></Link></header>;
+  return <header className="page-header"><div><h1>{title}</h1><p>{subtitle}</p></div><Link className="button secondary" href="/app">Open workspace <ArrowUpRight size={15} /></Link></header>;
 }
 export function Unavailable({ title, detail }: { title: string; detail: string }) {
-  return <div className="unavailable-state"><span className="status-tag unavailable">Unavailable</span><h2>{title}</h2><p>{detail}</p><Link className="button secondary" href="/app">Explore the local fixtures <ArrowUpRight size={15} /></Link></div>;
+  return <div className="unavailable-state"><span className="status-tag unavailable">Unavailable</span><h2>{title}</h2><p>{detail}</p><Link className="button secondary" href="/app/repositories">Open repositories <ArrowUpRight size={15} /></Link></div>;
 }

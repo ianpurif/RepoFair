@@ -1,3 +1,9 @@
 import { AppShell } from '../../components/app-shell';
 import { Workspace } from '../../components/workspace';
-export default function DemoPage() { return <AppShell><Workspace initialFixture="jobboard-app@1.0.0" demo /></AppShell>; }
+import { notFound } from 'next/navigation';
+import { fixturesEnabled } from '../api/fixture-boundary';
+export const dynamic = 'force-dynamic';
+export default function DemoPage() {
+  if (!fixturesEnabled()) notFound();
+  return <AppShell><Workspace initialFixture="jobboard-app@1.0.0" demo /></AppShell>;
+}

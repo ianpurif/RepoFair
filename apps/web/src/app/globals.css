@@ -48,3 +48,75 @@ code,kbd,pre { font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono
 .ai-disclosure { margin: 8px 0; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; }
 .ai-disclosure p { margin: 0 0 8px; }
 .ai-choice input, .ai-disclosure input { flex: none; }
+
+.repository-title { min-width:0; max-width:60%; gap:10px; }
+.repository-title strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; }
+.repository-title code { font-size:11px; color:var(--muted); }
+.import-progress { flex-shrink:0; padding:10px 20px; border-bottom:1px solid var(--line); background:var(--surface-alt); font-size:12px; max-height:28dvh; overflow:auto; }
+.import-progress-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.import-progress-heading .job-status { flex-wrap:wrap; font-size:12px; }
+.import-progress-heading strong { font-weight:550; text-transform:capitalize; }
+.import-progress-heading .job-status>span { color:var(--muted); }
+.import-actions { display:flex; align-items:center; gap:16px; flex-shrink:0; }
+.import-counters { display:flex; flex-wrap:wrap; gap:4px 16px; color:var(--muted); margin-top:8px; font-size:11px; }
+.import-progress p { margin-top:7px; font-size:11px; color:var(--muted); }
+.import-progress progress { width:100%; height:5px; margin-top:8px; accent-color:var(--accent); }
+.import-progress details { margin-top:6px; color:var(--muted); font-size:11px; }
+.import-progress details code { overflow-wrap:anywhere; display:block; margin-top:5px; }
+.import-progress.complete details { display:inline-block; margin-right:12px; }
+.folder-up { margin:0 10px 14px; overflow-wrap:anywhere; text-align:left; }
+.folder-choice { width:100%; padding:9px 10px; border:0; background:transparent; }
+.folder-choice:hover { background:var(--surface-alt); }
+.folder-choice small { margin-left:auto; font-size:11px; color:var(--muted); }
+.load-more { padding:20px 10px; }
+.load-more p { font-size:12px; color:var(--muted); margin-top:10px; }
+.source-range-controls { display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:12px 17px; }
+.graph-limit { position:absolute; z-index:5; left:14px; top:10px; max-width:80%; padding:8px 10px; background:var(--surface); border:1px solid var(--line); border-radius:5px; color:var(--muted); font-size:11px; }
+.provider-rights { margin-bottom:20px; color:var(--muted); font-size:12px; }
+.provider-rights p { margin-top:10px; overflow-wrap:anywhere; }
+.provider-purchase-state { display:grid; gap:14px; border-top:1px solid var(--line); padding-top:18px; font-size:12px; color:var(--muted); }
+.provider-cards article .provider-card-title h2 { overflow-wrap:anywhere; }
+.provider-cards article dl { font-size:12px; }
+.provider-cards article dl code { font-size:11px; }
+.purchase-states { display:flex; flex-wrap:wrap; gap:8px 24px; margin:12px 0; font-size:12px; }
+.purchase-states>div { display:flex; gap:8px; }
+.purchase-states dt,.purchase-terms dt { color:var(--muted); }
+.purchase-states dd,.purchase-terms dd { margin:0; }
+.purchase-allowance { padding:18px; border:1px solid var(--line); background:var(--surface); border-radius:5px; margin-bottom:20px; }
+.purchase-allowance h2 { font-size:13px; font-weight:550; }
+.purchase-allowance .quiet-label { margin:0; }
+.provider-allowance .field-label { margin-bottom:12px; }
+.allowance-form { display:grid; gap:12px; margin-top:16px; }
+.allowance-form input { display:block; width:100%; min-height:40px; padding:8px 12px; margin-top:8px; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:5px; }
+.allowance-form p { line-height:1.8; }
+.allowance-form .button { justify-self:start; }
+.purchase-terms { display:grid; gap:10px; font-size:12px; }
+.purchase-terms>div { display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; }
+.purchase-terms code { overflow-wrap:anywhere; }
+.activity-body details { font-size:12px; margin:12px 0; }
+.field-label { display:block; margin-bottom:24px; font-size:12px; }
+.field-label select { display:block; min-height:40px; width:100%; margin-top:8px; padding:8px 12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:5px; }
+.publication-paths { max-height:300px; overflow:auto; min-width:0; border:1px solid var(--line); border-radius:5px; }
+.publication-paths label { display:flex; gap:10px; padding:10px 12px; align-items:flex-start; overflow-wrap:anywhere; font-size:12px; }
+.publication-paths input { flex-shrink:0; margin-top:3px; }
+.publication-paths label>span { min-width:0; }
+.publication-paths small { display:block; color:var(--muted); }
+.publication-paths>p { padding:12px; }
+.publication-exposure-approval { display:flex; gap:12px; align-items:flex-start; font-size:12px; line-height:1.8; }
+.publication-exposure-approval input { flex-shrink:0; margin-top:5px; }
+@media(max-width:600px) {
+  .repository-title { max-width:70%; gap:6px; }
+  .repository-title strong { font-size:12px; }
+  .repository-title code { font-size:10px; }
+  .import-progress { padding:9px 12px; max-height:24dvh; }
+  .import-progress-heading { align-items:flex-start; gap:8px; }
+  .import-progress-heading .job-status { font-size:11px; }
+  .import-actions { gap:10px; }
+  .import-actions .button { font-size:11px; padding:5px 8px; }
+  .import-counters { font-size:10px; gap:3px 12px; }
+  .import-progress p,.import-progress details { font-size:11px; }
+  .source-range-controls { padding:12px; }
+  .provider-cards article dl>div { display:block; }
+  .provider-cards article dl dd { text-align:left; margin-top:4px; }
+  .publication-editor .settings-card { padding:18px; }
+}
