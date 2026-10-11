@@ -51,3 +51,4 @@ export type PurchaseTerms = Readonly<{
   recipient: string; atomicAmount: string; expiresAtMs: number;
 }>;
 export * from './import.ts';
+export * from './commerce.ts';

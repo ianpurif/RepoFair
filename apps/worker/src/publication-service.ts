@@ -148,16 +148,18 @@ export function createPublicationService(database: AtlasDatabase, env: Readonly<
       && membership.revision === row.member_revision, 'authorization-changed', 'Administrative permissions changed; request access again', 403);
   }
   async function source(principalId: string, row: Candidate): Promise<RepositoryIndex> { return repositories.getIndex(principalId, row.id); }
-  async function getDraft(principalId: string, draftId: string): Promise<PublicationDraft> {
+  async function getAuthorizedDraft(principalId: string, draftId: string) {
     const selected = await candidate(principalId, null, draftId, true); const proof = await authority(principalId, selected);
-    return database.withPrincipalTransaction(principalId, async tx => {
+    return database.withAdminTransaction(async tx => {
+      await lockGrant(tx,principalId,selected);
       await tx.query("SELECT set_config('atlas.authorized_repository_ids',$1,true)", [JSON.stringify([selected.id])]);
       const row = (await tx.query<DraftRow>(`SELECT d.* FROM atlas.publication_drafts d JOIN atlas.repositories r ON r.id=d.repository_id AND r.workspace_id=d.workspace_id
         JOIN atlas.memberships m ON m.workspace_id=d.workspace_id WHERE d.id=$1 AND d.workspace_id=$2 AND m.principal_id=$3
         AND m.role IN ('owner','admin') AND m.revision=$4 AND r.permission_revision=$5`, [draftId, selected.workspace_id, principalId, selected.member_revision, selected.permission_revision])).rows[0];
-      assert(row, 'authorization-changed', 'Private draft is no longer available to this administration scope', 403); return response(row, proof);
+      assert(row, 'authorization-changed', 'Private draft is no longer available to this administration scope', 403); return {draft:response(row,proof),grant:selected};
     });
   }
+  async function getDraft(principalId:string,draftId:string):Promise<PublicationDraft> {return (await getAuthorizedDraft(principalId,draftId)).draft;}
   async function listDrafts(principalId: string, workspaceId: string): Promise<readonly PublicationDraft[]> {
     const initial = await member(principalId, workspaceId);
     const candidates = await database.withAdminTransaction(async tx => (await tx.query<Candidate>(`SELECT DISTINCT r.id,r.workspace_id,r.permission_revision::text,m.revision::text AS member_revision,
@@ -227,5 +229,5 @@ export function createPublicationService(database: AtlasDatabase, env: Readonly<
       assert(row, 'draft-unavailable', 'Private draft could not be revoked', 503); return response(row, proof);
     });
   }
-  return { listDrafts, createDraft, getDraft, updateDraft, revokeDraft };
+  return { listDrafts, createDraft, getDraft, updateDraft, revokeDraft, getAuthorizedDraft, lockGrant };
 }
