@@ -2,7 +2,7 @@ import type { LocalIndex, SourceEvidence, SourceIndex } from '../../../contracts
 import { checkSourcePassage, isSafeRelativePath, sameScope } from '../evidence.ts';
 import { nodeId, validateGraph } from '../graph.ts';
 import { isExactVersion } from '../versions.ts';
-import { assertLocal, LOCAL_LIMITS, record, sourceLines } from './limits.ts';
+import { assertLocal, LOCAL_LIMITS, sourceLimits, record, sourceLines } from './limits.ts';
 
 export function evidenceId(index: Pick<SourceIndex, 'snapshot'>, path: string, start: number, end: number): string {
   return JSON.stringify([index.snapshot.repositoryId, index.snapshot.snapshotId, index.snapshot.revision, path, start, end]);
@@ -21,30 +21,34 @@ export function validateSourceIndex(value: unknown): asserts value is SourceInde
   assertLocal(record(value) && value.schemaVersion === 1 && (value.mode === 'fixture' || value.mode === 'git'), 'Unsupported source index');
   assertLocal(validScope(value.scope) && record(value.snapshot), 'Invalid index identity');
   const snapshot = value.snapshot;
+  const limits = sourceLimits(value.mode);
   assertLocal(string(snapshot.repositoryId) && string(snapshot.snapshotId) && snapshot.kind === value.mode
     && typeof snapshot.revision === 'string' && (value.mode === 'fixture' ? /^sha256:[a-f0-9]{64}$/ : /^[a-f0-9]{40}$/).test(snapshot.revision), `Invalid immutable ${value.mode} snapshot`);
-  assertLocal(string(value.packageName) && typeof value.version === 'string' && isExactVersion(value.version), 'Invalid package identity');
+  assertLocal((string(value.packageName) || value.mode === 'git' && value.packageName === null)
+    && (typeof value.version === 'string' && isExactVersion(value.version) || value.mode === 'git' && value.version === null), 'Invalid package identity');
   for (const field of ['files', 'nodes', 'edges', 'evidence', 'dependencies', 'unresolved', 'limitations']) {
     assertLocal(Array.isArray(value[field]), `Invalid ${field}`);
   }
   const index = value as unknown as SourceIndex;
-  assertLocal(index.files.length > 0 && index.files.length <= LOCAL_LIMITS.files && index.nodes.length <= LOCAL_LIMITS.nodes
-    && index.edges.length <= LOCAL_LIMITS.edges && index.evidence.length <= LOCAL_LIMITS.evidence
-    && index.dependencies.length <= LOCAL_LIMITS.edges, 'Index exceeds limits');
-  const files = new Map<string, string>(); let characters = 0;
+  assertLocal(index.files.length > 0 && index.files.length <= limits.files && index.nodes.length <= limits.nodes
+    && index.edges.length <= limits.edges && index.evidence.length <= limits.evidence
+    && index.dependencies.length <= limits.edges, 'Index exceeds limits');
+  const files = new Map<string, string>(); const lines = new Map<string, string[]>(); let characters = 0;
   for (const file of index.files) {
     assertLocal(record(file) && string(file.path) && isSafeRelativePath(file.path) && !files.has(file.path)
-      && typeof file.text === 'string' && file.text.length <= LOCAL_LIMITS.fileCharacters, 'Invalid source file');
-    assertLocal(file.lineCount === sourceLines(file.text).length && file.lineCount <= LOCAL_LIMITS.linesPerFile, 'Invalid source line count');
+      && typeof file.text === 'string' && file.text.length <= limits.fileCharacters, 'Invalid source file');
+    const source = sourceLines(file.text);
+    assertLocal(file.lineCount === source.length && file.lineCount <= limits.linesPerFile, 'Invalid source line count');
+    lines.set(file.path, source);
     characters += file.text.length; files.set(file.path, file.text);
   }
-  assertLocal(characters <= LOCAL_LIMITS.totalCharacters, 'Index source exceeds limits');
+  assertLocal(characters <= limits.totalCharacters, 'Index source exceeds limits');
   if (index.mode === 'git') {
-    const text = files.get('package.json'); assertLocal(text !== undefined, 'Git index requires a root package.json manifest');
-    let manifest: unknown;
-    try { manifest = JSON.parse(text); } catch { throw new Error('Invalid Git package.json manifest'); }
-    assertLocal(record(manifest) && typeof manifest.version === 'string' && isExactVersion(manifest.version)
-      && manifest.name === index.packageName && manifest.version === index.version, 'Git package identity differs from its source manifest');
+    const text = files.get('package.json'); let manifest: unknown = null;
+    if (text !== undefined) try { manifest = JSON.parse(text); } catch { throw new Error('Invalid Git package.json manifest'); }
+    const name = record(manifest) && typeof manifest.name === 'string' && manifest.name.trim() ? manifest.name : null;
+    const version = record(manifest) && typeof manifest.version === 'string' && isExactVersion(manifest.version) ? manifest.version : null;
+    assertLocal(name === index.packageName && version === index.version, 'Git package identity differs from its source manifest');
   }
   for (const node of index.nodes) {
     assertLocal(record(node) && string(node.id, 10_000) && string(node.localId) && string(node.label)
@@ -54,7 +58,7 @@ export function validateSourceIndex(value: unknown): asserts value is SourceInde
     if (node.kind === 'symbol') {
       const match = /^(.*?)#[^#]+@(\d+):(\d+)$/.exec(node.localId);
       assertLocal(match && files.has(match[1]!) && Number(match[2]) >= 1
-        && Number(match[2]) <= sourceLines(files.get(match[1]!)!).length, 'Symbol node is outside snapshot');
+        && Number(match[2]) <= lines.get(match[1]!)!.length, 'Symbol node is outside snapshot');
     }
   }
   validateGraph(index.nodes, index.edges);
@@ -70,16 +74,22 @@ export function validateSourceIndex(value: unknown): asserts value is SourceInde
       && passage.id === evidenceId(index, passage.source.path, passage.source.startLine, passage.source.endLine)
       && !evidence.has(passage.id), 'Invalid evidence identity or limit');
     const text = files.get(passage.source.path); assertLocal(text !== undefined, 'Evidence source is absent');
-    checkSourcePassage(passage, index.scope, text); evidence.set(passage.id, passage);
+    assertLocal(Number.isSafeInteger(passage.source.startLine) && Number.isSafeInteger(passage.source.endLine)
+      && passage.source.startLine >= 1 && passage.source.endLine >= passage.source.startLine
+      && passage.source.endLine <= lines.get(passage.source.path)!.length
+      && passage.original === lines.get(passage.source.path)!.slice(passage.source.startLine - 1, passage.source.endLine).join('\n'), 'Original source does not match its lines');
+    evidence.set(passage.id, passage);
   }
   const methods = { imports: 'ts-morph-import', exports: 'ts-morph-export', references: 'ts-morph-reference',
-    'resolved-call': 'ts-morph-call', 'package-binding': 'ts-morph-import' };
+    'resolved-call': 'ts-morph-call', 'package-binding': 'ts-morph-import', declares: 'python-ast-declaration' };
   for (const edge of index.edges) {
     assertLocal(record(edge) && edge.provenance === 'parsed-source' && evidence.has(edge.evidenceId)
       && Object.hasOwn(methods, edge.relation) && typeof edge.extractionMethod === 'string'
       && (methods[edge.relation] === edge.extractionMethod
-        || (edge.relation === 'exports' && edge.extractionMethod === 'explicit-release-export')), 'Invalid edge extraction or source');
+        || (edge.relation === 'exports' && edge.extractionMethod === 'explicit-release-export')
+        || (edge.relation === 'imports' && edge.extractionMethod === 'python-ast-import')), 'Invalid edge extraction or source');
   }
+  const nodeIds = new Set(index.nodes.map(node => node.id));
   for (const binding of index.dependencies) {
     assertLocal(record(binding) && string(binding.packageName) && files.has(binding.sourcePath)
       && binding.packageName !== '__proto__'
@@ -87,10 +97,10 @@ export function validateSourceIndex(value: unknown): asserts value is SourceInde
       && binding.importedNames.every(name => string(name)), 'Invalid dependency binding');
     assertLocal(binding.status === 'exact' ? typeof binding.version === 'string' && isExactVersion(binding.version) && binding.reason === null
       : binding.status === 'unresolved' && binding.version === null && string(binding.reason), 'Invalid exact dependency version');
-    assertLocal(index.nodes.some(node => node.kind === 'package' && node.id === nodeId(index.snapshot.repositoryId,
+    assertLocal(nodeIds.has(nodeId(index.snapshot.repositoryId,
       index.snapshot.snapshotId, `package:${binding.packageName}@${binding.version ?? 'unresolved'}`)), 'Missing dependency package node');
   }
-  assertLocal(index.unresolved.length <= LOCAL_LIMITS.edges && index.limitations.length <= 100
+  assertLocal(index.unresolved.length <= limits.edges && index.limitations.length <= 100
     && [...index.unresolved, ...index.limitations].every(item => string(item, 4_000)), 'Invalid index limitations');
 }
 

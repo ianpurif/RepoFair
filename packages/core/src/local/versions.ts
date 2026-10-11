@@ -11,7 +11,7 @@ export function packageSpecifier(specifier: string): { packageName: string; subp
   return { packageName: parts.slice(0, count).join('/'), subpath: parts.length === count ? '.' : `./${parts.slice(count).join('/')}` };
 }
 export function bindDependency(packageName: string, importedNames: readonly string[], sourcePath: string,
-  manifest: unknown, lockfile: unknown, links: readonly TrustedFixtureLink[]): DependencyBinding {
+  manifest: unknown, lockfile: unknown, links: readonly TrustedFixtureLink[], manifestDirectory = ''): DependencyBinding {
   const unresolved = (reason: string): DependencyBinding => ({ packageName, version: null, importedNames, sourcePath, status: 'unresolved', reason });
   if (!record(manifest)) return unresolved('Missing valid package.json');
   const dependencies = [manifest.dependencies, manifest.devDependencies, manifest.peerDependencies, manifest.optionalDependencies]
@@ -20,11 +20,17 @@ export function bindDependency(packageName: string, importedNames: readonly stri
   if (!declared.length) return unresolved('Package import is not declared in package.json');
   if (new Set(declared).size > 1) return unresolved('Conflicting package dependency declarations');
   if (!record(lockfile) || lockfile.lockfileVersion !== 3 || !record(lockfile.packages)) return unresolved('Supported package-lock v3 resolution is missing');
-  const root = lockfile.packages[''];
+  const root = lockfile.packages[manifestDirectory];
   if (!record(root) || root.version !== manifest.version || (root.name !== undefined && root.name !== manifest.name)) return unresolved('Lockfile root identity differs from package.json');
   const rootDeclarations = [root.dependencies, root.devDependencies, root.peerDependencies, root.optionalDependencies].filter(record);
   if (!rootDeclarations.some(map => map[packageName] === declared[0])) return unresolved('Lockfile dependency declaration is stale');
-  const entry = lockfile.packages[`node_modules/${packageName}`];
+  const parents = manifestDirectory ? manifestDirectory.split('/') : [];
+  let entry: unknown;
+  for (let depth = parents.length; depth >= 0; depth--) {
+    const prefix = parents.slice(0, depth).join('/');
+    const candidate = lockfile.packages[`${prefix ? `${prefix}/` : ''}node_modules/${packageName}`];
+    if (candidate !== undefined) { entry = candidate; break; }
+  }
   if (!record(entry)) return unresolved('No top-level lockfile package resolution');
   let version: unknown = entry.version;
   if (entry.link === true) {
