@@ -3,6 +3,8 @@ import { ArrowRight } from 'lucide-react';
 import { AtlasLogo } from '../../components/app-shell';
 import { ThemeToggle } from '../../components/theme-provider';
 import { AuthPanel, AuthStatus } from '../../components/auth-status';
+import { privatePageMetadata } from '../../lib/site-metadata';
+export const metadata = privatePageMetadata('Create an account');
 
 export default function SignUpPage() {
   const fixtures = process.env.ATLAS_FIXTURES_ENABLED === 'true' && process.env.NODE_ENV !== 'production';

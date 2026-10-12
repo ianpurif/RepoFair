@@ -1,13 +1,10 @@
-import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
 import './globals.css';
 import { ThemeProvider } from '../components/theme-provider';
 import { AuthAvailabilityProvider, type AuthAvailability } from '../components/auth-status';
-export const metadata: Metadata = {
-  title: 'Chronos Atlas · Codebase workspace',
-  description: 'General codebase intelligence and independently operated knowledge providers.',
-};
+import { rootMetadata } from '../lib/site-metadata';
+export const metadata = rootMetadata();
 export default function RootLayout({ children }: { children: ReactNode }) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.trim();
   const secretKey = process.env.CLERK_SECRET_KEY?.trim();
