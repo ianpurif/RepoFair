@@ -5,75 +5,80 @@
       "id": "product_unit_tests",
       "status": "passed",
       "command": "bun run test:product",
-      "recordedAt": "2026-10-11T15:28:34Z",
+      "recordedAt": "2026-10-12T14:39:00.393Z",
       "evidencePaths": [
-        "docs/evidence/overhaul-validation.json"
+        "docs/evidence/publishing-execution.json"
       ],
-      "scope": "Current local implementation and bounded tests; live integration scope is documented separately."
+      "scope": "Current passing local checks; no paid source publication, service purchase or settlement."
     },
     {
       "id": "typecheck",
       "status": "passed",
       "command": "bun run typecheck",
-      "recordedAt": "2026-10-11T15:28:34Z",
+      "recordedAt": "2026-10-12T14:39:00.393Z",
       "evidencePaths": [
-        "docs/evidence/overhaul-validation.json"
+        "docs/evidence/publishing-execution.json"
       ],
-      "scope": "Current local implementation and bounded tests; live integration scope is documented separately."
+      "scope": "Current passing local checks; no paid source publication, service purchase or settlement."
     },
     {
       "id": "lint",
       "status": "passed",
       "command": "bun run lint",
-      "recordedAt": "2026-10-11T15:28:34Z",
+      "recordedAt": "2026-10-12T14:39:00.393Z",
       "evidencePaths": [
-        "docs/evidence/overhaul-validation.json"
+        "docs/evidence/publishing-execution.json"
       ],
-      "scope": "Current local implementation and bounded tests; live integration scope is documented separately."
+      "scope": "Current passing local checks; no paid source publication, service purchase or settlement."
     },
     {
       "id": "production_build",
       "status": "passed",
       "command": "bun run build",
-      "recordedAt": "2026-10-11T15:28:34Z",
+      "recordedAt": "2026-10-12T14:39:00.393Z",
       "evidencePaths": [
-        "docs/evidence/overhaul-validation.json"
+        "docs/evidence/publishing-execution.json"
       ],
-      "scope": "Current local implementation and bounded tests; live integration scope is documented separately."
+      "scope": "Current passing local checks; no paid source publication, service purchase or settlement."
     },
     {
       "id": "database_tenant_isolation",
       "status": "partial",
       "command": "bun scripts/verify-hosted-database.ts",
-      "recordedAt": "2026-10-07T08:25:29.803Z",
+      "recordedAt": "2026-10-12T14:10:06.784Z",
       "evidencePaths": [
         "docs/evidence/hosted-database.json",
         "docs/evidence/clerk-session.json",
-        "docs/evidence/overhaul-verifier-commerce.json"
+        "docs/evidence/overhaul-verifier-commerce.json",
+        "docs/evidence/publishing-infrastructure.json"
       ],
-      "scope": "Historical 2026-10-07 hosted RLS/concurrency remains valid for its scope; new migrations/transactions are validated locally but not on hosted multi-backend PostgreSQL."
+      "scope": "Historical hosted tenant/RLS evidence plus current exact schema, restricted separate-provider login and real provider replay/sale contention. New hosted buyer capacity/signing/spending races remain unverified."
     },
     {
       "id": "browser_e2e",
       "status": "passed",
-      "command": "bun run test:browser --reporter=list,./tests/browser/evidence-reporter.ts",
-      "recordedAt": "2026-10-11T15:28:34Z",
+      "command": "bun scripts/verify-private-repository-ui.ts --allow-test-session --wait-ready --origin CONFIGURED_APP_ORIGIN",
+      "recordedAt": "2026-10-12T14:34:15.268Z",
       "evidencePaths": [
         "docs/evidence/overhaul-validation.json",
-        "docs/evidence/browser-verification.json"
+        "docs/evidence/browser-verification.json",
+        "docs/evidence/private-repository-ui.json",
+        "docs/evidence/publishing-execution.json"
       ],
-      "scope": "Current local implementation and bounded tests; live integration scope is documented separately."
+      "scope": "Fresh development Clerk identity, existing actual private hosted import, current production source/graph/extractive citations/accessibility and negative origins verified over configured temporary HTTPS. Historical fixture21-check flow is retained; new hosted import and paid-product acceptance remain open."
     },
     {
       "id": "provider_independence",
       "status": "partial",
       "command": "bun run test:product",
-      "recordedAt": "2026-10-11T15:28:34Z",
+      "recordedAt": "2026-10-12T14:10:06.784Z",
       "evidencePaths": [
         "docs/evidence/overhaul-validation.json",
-        "docs/evidence/overhaul-verifier-commerce.json"
+        "docs/evidence/overhaul-verifier-commerce.json",
+        "docs/evidence/publishing-infrastructure.json",
+        "docs/evidence/publishing-execution.json"
       ],
-      "scope": "Real independent runtime/SQL/signed exports and exact-version traversal exercised with fixture identity/RPC/HTTP; distinct real operators and paid context not verified."
+      "scope": "Actual separate provider database/login on the same Supabase cluster, sanitized runtime and inactive HTTPS service. Distinct independent operators, approved source activation and paid delivery remain unverified."
     },
     {
       "id": "tempo_testnet_payment",
@@ -104,13 +109,15 @@
       "id": "independent_security_review",
       "status": "partial",
       "command": "Actual atlas_security and atlas_verifier tasks",
-      "recordedAt": "2026-10-11T15:28:34Z",
+      "recordedAt": "2026-10-12T14:39:00.393Z",
       "evidencePaths": [
         "docs/evidence/overhaul-security.json",
-        "docs/evidence/overhaul-verifier-commerce.json"
+        "docs/evidence/overhaul-verifier-commerce.json",
+        "docs/evidence/publishing-infrastructure.json",
+        "docs/evidence/publishing-execution.json"
       ],
-      "scope": "Actual independent bounded source/security and adversarial fixture execution; findings fixed. Deployed service, multi-backend concurrency and real wallet settlement remain unverified."
+      "scope": "Actual bounded provisioning/credential/ACL review and native provider concurrency verification. No complete deployment, live paid entitlement, signer or settlement certification."
     }
   ],
-  "note": "Current local checks pass. Historical hosted evidence is dated and does not certify new schema or settlement. Release must remain blocked until missing external milestones are accepted."
+  "note": "Current local checks and actual publishing infrastructure pass within their recorded scopes. Source publication/payments remain inactive; release stays blocked until missing paid and broader acceptance gates pass."
 }

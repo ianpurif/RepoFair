@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-12T14:51:13.681Z",
+  "status": "infrastructure-prepared-publication-and-payments-inactive",
+  "scope": "Actual hosted provider provisioning, protected local signing configuration, one testnet faucet funding request, two approved temporary HTTPS tunnels and inactive provider readiness. No approved source export or service purchase.",
+  "authorization": {
+    "directActionRequested": true,
+    "temporaryHttpsTunnelsExplicitlyApproved": true,
+    "approvedConstraint": "Source publication and payments remain inactive",
+    "realMoneySpendingAuthorized": false
+  },
+  "centralDatabase": {
+    "current001002SignaturesAlreadyPresent": true,
+    "tablesVerified": 15,
+    "columnsVerified": 149,
+    "nonNotNullConstraintsVerified": 94,
+    "functionsVerified": 8,
+    "triggersVerified": 4,
+    "centralMigrationsAppliedByThisExecution": 0,
+    "historicalMigrationJournalBackfilled": false,
+    "newHostedBuyerCapacitySigningSpendingConcurrencyVerified": false,
+    "existingTenantRowsMutatedBySetupOrVerification": false
+  },
+  "providerDatabase": {
+    "newSeparateDatabaseCreated": true,
+    "newDedicatedLoginCreated": true,
+    "sameSupabaseProjectAndCluster": true,
+    "independentOperatorOwnershipVerified": false,
+    "superuser": false,
+    "createDatabase": false,
+    "createRole": false,
+    "replication": false,
+    "bypassRls": false,
+    "inheritedRolePrivileges": false,
+    "centralServiceRoleMembership": false,
+    "authenticatedRoleMembership": false,
+    "providerRoleSetGrantedOnlyToExistingTrustedAdministrator": true,
+    "centralAdminRoleGrantedToProvider": false,
+    "nativeClientCertificateAndHostnameVerified": true,
+    "poolerInternalHopTlsInferred": false,
+    "providerCredentialsDeniedCentralAtlasRead": true,
+    "migrationsAppliedAtomically": [
+      "202610070005_provider_replay.sql",
+      "202610070006_provider_ledger.sql",
+      "202610110003_provider_delivery.sql"
+    ],
+    "providerMigrationDigestJournalVerified": true,
+    "idempotentSetupRerunPassed": true,
+    "infrastructureChecksPassed": 11,
+    "contentionUsesDistinctNativeBackends": true,
+    "replayClaimAttempts": 8,
+    "replayClaimWinners": 1,
+    "saleClaimAttempts": 8,
+    "saleClaimWinners": 1,
+    "unknownSaleCannotReopenOrChangeTerms": true,
+    "syntheticAuthorization": true,
+    "auditRowsRemainingAfterCleanup": 0,
+    "evidence": "docs/evidence/publishing-infrastructure.json"
+  },
+  "signingConfiguration": {
+    "ed25519KeyPairCreatedAndVerified": true,
+    "mppSecretCreated": true,
+    "distinctBuyerRecipientTestnetAccountsCreated": 2,
+    "privateFilesOutsideCheckoutAndOneDrive": true,
+    "windowsAclVerifiedRestricted": true,
+    "providerReceivesIssuerPublicKeyOnly": true,
+    "providerReceivesRecipientAddressWithoutRecipientPrivateKey": true,
+    "callerOwnsBuyerSigningKey": true,
+    "secretsPrintedOrCommitted": false,
+    "publicationIdInvented": false,
+    "localEnvBackupsStoredPrivately": true
+  },
+  "testFunding": {
+    "officialAddressOnlyFaucetRequests": 1,
+    "faucetHttpStatus": 200,
+    "automaticSecondRequestPreventedByPrivateMarker": true,
+    "verifiedAt": "2026-10-12T14:10:06.784Z",
+    "rpc": "https://rpc.moderato.tempo.xyz",
+    "chainId": 42431,
+    "pathUsdDecimals": 6,
+    "buyerBalanceBeforeAtomicUnits": "0",
+    "buyerBalanceAfterAtomicUnits": "1000000000000",
+    "preparedServicePriceAtomicUnits": "10000",
+    "faucetTransactionHashOrReceiptClaimed": false,
+    "servicePaymentSigningPerformed": false,
+    "servicePaymentBroadcasts": 0,
+    "servicePurchases": 0,
+    "browserWalletCompatibilityVerified": false
+  },
+  "temporaryHttps": {
+    "atlasOrigin": "https://known-les-characters-narrow.trycloudflare.com",
+    "providerOrigin": "https://dennis-headline-bytes-pct.trycloudflare.com",
+    "cloudflaredVersion": "2026.9.3",
+    "cloudflaredChecksumMatchesOfficialRelease": true,
+    "servicesStartedAsToolManagedSessions": true,
+    "permanentHostingConfigured": false,
+    "originsChangeWhenTunnelsRestart": true,
+    "automaticReviewBlockedEarlierCombinedDetachedLaunch": true,
+    "completedUsingApprovedDirectToolManagedLaunch": true,
+    "atlasProductionWebAndWorkerRunning": true,
+    "anonymousLandingAndSignin": 200,
+    "anonymousPrivateAccountCatalogPublications": 401,
+    "anonymousPrivateApisCacheControl": "no-store",
+    "normalProductFixtureApi": 503,
+    "providerHealthRetrieveResumeControl": 503,
+    "providerResponse": {
+      "mode": "tempo-testnet",
+      "ready": false,
+      "publication": "awaiting-owner-approval",
+      "payments": "inactive"
+    },
+    "providerPaymentChallengesAndReceiptsAbsent": true,
+    "checkedAt": "2026-10-12T14:04:35.798Z",
+    "providerCheckedAfterRestartAt": "2026-10-12T14:31:18.518Z"
+  },
+  "providerLauncher": {
+    "explicitProviderOnlyEnvironmentSupported": true,
+    "centralCredentialsAndUnsafeRuntimeSettingsRemoved": true,
+    "bundlingLoadsNoApplicationEnvironment": true,
+    "nativeRuntimePostgresDependencyDeclaredDirectly": "pg@8.23.1",
+    "preparationUsesDedicatedBuiltinOnlyEntry": true,
+    "preparationChildReceivesOnlyOsSettingsAndPort": true,
+    "preparationLoadsDatabaseKeysSourceRpcOrPaymentRuntime": false,
+    "nativeBundleBuiltAndSpawnedWithoutNodeModules": true,
+    "preparationCanActivateItself": false
+  },
+  "verification": {
+    "product": {
+      "command": "bun run test:product",
+      "exitCode": 0,
+      "passed": 429,
+      "filesPassed": 31,
+      "seconds": 40.59,
+      "performedAfterOriginRepair": true
+    },
+    "starter": {
+      "command": "node scripts/verify-starter.mjs",
+      "exitCode": 0,
+      "passed": 117
+    },
+    "fullTypecheck": {
+      "command": "bun run typecheck",
+      "exitCode": 0
+    },
+    "fullLintPolicyHygiene": {
+      "command": "bun run lint",
+      "exitCode": 0
+    },
+    "scopedSetupLauncherInfrastructureLint": {
+      "exitCode": 0
+    },
+    "doctor": {
+      "command": "node scripts/doctor.mjs",
+      "exitCode": 0
+    },
+    "productionBuild": {
+      "command": "bun run build",
+      "exitCode": 0,
+      "performedBeforeStartingProductionWeb": true,
+      "performedAfterOriginRepair": true
+    },
+    "frozenInstall": {
+      "command": "bun install --frozen-lockfile --ignore-scripts",
+      "exitCode": 0
+    },
+    "normalProviderBundle": {
+      "command": "node scripts/provider.mjs --build",
+      "exitCode": 0
+    },
+    "launcherNativeGuards": {
+      "command": "node --test tests/provider-launcher.test.mjs",
+      "exitCode": 0,
+      "passed": 12
+    },
+    "preparationHttpIntegration": {
+      "passed": 15,
+      "includedInProductSuite": true
+    },
+    "nativeHostedInfrastructure": {
+      "exitCode": 0,
+      "passed": 11,
+      "evidence": "docs/evidence/publishing-infrastructure.json"
+    },
+    "privateBrowser": {
+      "loopbackVerified": true,
+      "configuredHttps": "verified",
+      "publicCheckedAt": "2026-10-12T14:32:34.912Z",
+      "publicCompletedAt": "2026-10-12T14:34:15.268Z",
+      "actualFreshClerkSession": true,
+      "existingRealPrivateImport": true,
+      "indexFiles": 144,
+      "indexNodes": 1831,
+      "indexEdges": 7399,
+      "sourceEquality": true,
+      "loadedGraphUnionProvenanceVerified": true,
+      "automaticExpansionAndPreservedPositions": true,
+      "citationsVerified": 8,
+      "narrowViewport": 390,
+      "ownedSessionsCleaned": true,
+      "existingSessionsRevoked": 0,
+      "aiRequests": 0,
+      "evidence": "docs/evidence/private-repository-ui.json",
+      "agentFinalReturn": "Model stream disconnected after verified browser report/cleanup was saved",
+      "leadFinalStrictTypecheckExitCode": 0,
+      "leadFinalEslintExitCode": 0,
+      "savedResultValidatedByLead": true
+    },
+    "releaseGate": {
+      "command": "bun run verify:release",
+      "exitCode": 1,
+      "status": "correctly-blocked",
+      "missing": [
+        "P2/P3/P4/P5/P6 complete acceptance",
+        "updated buyer tenant/concurrency acceptance",
+        "independent operators/active publication",
+        "actual Tempo service purchase and payment recovery",
+        "complete federation/security acceptance"
+      ],
+      "checkedAt": "2026-10-12T14:51:13.681Z"
+    },
+    "requestOrigin": {
+      "focusedTestsPassed": 48,
+      "actualRoutesWithSyntheticAuthDatabaseCallbacks": true,
+      "independentlyReviewedBy": "/root/publishing_origin_security",
+      "concreteScopedFindings": 0,
+      "realHttpsIngress": "verified",
+      "reference": "https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#identifying-the-target-origin",
+      "publicLoopbackOriginDenials": [
+        {
+          "origin": "http://localhost:3000",
+          "httpStatus": 403,
+          "noStore": true,
+          "code": "denied"
+        },
+        {
+          "origin": "http://127.0.0.1:3000",
+          "httpStatus": 403,
+          "noStore": true,
+          "code": "denied"
+        },
+        {
+          "origin": "http://[::1]:3000",
+          "httpStatus": 403,
+          "noStore": true,
+          "code": "denied"
+        }
+      ],
+      "realAuthenticatedNegativeStatuses": {
+        "malformedQuestionJson": 400,
+        "oversizedQuestionBody": 413,
+        "emptyQuestion": 400,
+        "nonObjectQuestion": 400,
+        "wrongQuestionContentType": 400,
+        "malformedImportJson": 400
+      }
+    }
+  },
+  "boundaries": {
+    "sourceArtifactsExported": 0,
+    "sourceArtifactsInstalled": 0,
+    "publicationsActivated": 0,
+    "servicePurchases": 0,
+    "servicePaymentBroadcasts": 0,
+    "settlementVerified": false,
+    "paidDeliveryOrRecoveryVerified": false,
+    "privateSourceSentToAi": false,
+    "realMoneySpent": false,
+    "mainnetOperation": false,
+    "productionReady": false
+  },
+  "remaining": [
+    "Exact owner-reviewed snapshot/package/version/source selection and signed export approval",
+    "Immutable artifact installation, strict provider startup and signed endpoint control/activation",
+    "Explicit bounded testnet purchase authorization, actual signing/settlement/delivery and recovery without another charge",
+    "Independent operators/hosting and the remaining broader product acceptance gates"
+  ],
+  "references": [
+    "https://supabase.com/docs/guides/troubleshooting/supavisor-faq-YyP5tI",
+    "https://supabase.com/docs/guides/troubleshooting/tenant-or-user-not-found",
+    "https://github.com/cloudflare/cloudflared/releases/tag/2026.9.3",
+    "https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/",
+    "https://github.com/tempoxyz/docs/blob/main/src/pages/docs/quickstart/connection-details.mdx",
+    "https://github.com/tempoxyz/docs/blob/main/src/pages/docs/quickstart/faucet.mdx",
+    "https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#identifying-the-target-origin",
+    "https://developers.cloudflare.com/fundamentals/reference/http-headers/"
+  ],
+  "historicalAttempts": [
+    {
+      "scope": "Full product suite while Next production build was also running",
+      "status": "failed",
+      "exitCode": 1,
+      "testsPassed": 413,
+      "testsSkipped": 16,
+      "failure": "publication-service SQL setup beforeAll exceeded its existing10000ms hook timeout",
+      "followup": "Unchanged full suite rerun without simultaneous build passed429/31; no timeout or assertion was weakened."
+    },
+    {
+      "scope": "Initial configured public HTTPS browser run before origin repair",
+      "status": "failed",
+      "checkedAt": "2026-10-12T14:08:48.721Z",
+      "passed": "Fresh real Clerk session and catalog",
+      "failure": "Malformed authenticated POST failed its expected400 assertion",
+      "exactOldHttpStatus": null,
+      "followup": "Origin guard repaired and full authenticated HTTPS retest verified; original evidence preserved in private-repository-ui.json."
+    }
+  ]
+}

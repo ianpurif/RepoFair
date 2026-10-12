@@ -1,6 +1,6 @@
 # Owner publication and independent providers
 
-Updated 2026-10-11. Signed export, control proof, catalog discovery, fresh entitlement, Moderato charging and durable delivery are implemented. Hosted publication and real paid delivery remain unverified.
+Updated 2026-10-12. Signing configuration, a separate hosted provider database and temporary HTTPS origins are now prepared. Signed export, control proof, catalog discovery, fresh entitlement, Moderato charging and durable delivery are implemented. Source publication remains inactive; real paid delivery remains unverified.
 
 ## Explicit owner workflow
 
@@ -17,7 +17,7 @@ Draft history is capped at 50 records per workspace. Source/terms changes update
 
 ## Independent runtime setup
 
-Central Atlas applies its foundational migrations plus **202610110001** and **202610110002**. New migrations were validated locally, not applied to hosted databases.
+Central Atlas requires its foundational migrations plus **202610110001** and **202610110002**. The current hosted database already contains their exact tables, columns, constraints, functions and triggers, verified through native PostgreSQL on 2026-10-12. This setup did not replay those migrations or backfill their historical journal.
 
 A separate provider database applies only:
 
@@ -33,24 +33,29 @@ Configure the provider fields in [.env.example](../.env.example): database/CA, p
 
 The provider UUID is the downloaded signed export's `artifact.id`, which is the saved draft identity. Its endpoint must be the exact provider origin followed by `/context/retrieve`; configured recipient and integer price must match the export. Origins have no trailing slash or path.
 
-On a separate provider host, configure only provider variables. The convenience launcher loads the checkout's `.env.local`; sharing an Atlas checkout's central secrets with that launcher does not demonstrate independent operation. For a local test with a provider-only env file, compile the trusted bundles and run them directly through Node instead:
+On a separate provider host, configure only provider variables. The Node launcher now accepts an explicit provider-only environment file and drops inherited central credentials, proxy/TLS overrides and runtime preloads. Explicit files reject unsupported fields. Bundling reads no application environment file and does not inline credentials. The normal entry declares its external PostgreSQL driver directly.
 
 ```powershell
-bun run provider:check
-bun build apps/provider/src/install.ts --target=node --packages=external --outfile=apps/provider/.atlas/install.mjs
-node --env-file="C:\secure\provider.env" apps/provider/.atlas/install.mjs "C:\secure\owner-approved-export.json"
-node --env-file="C:\secure\provider.env" apps/provider/.atlas/provider.mjs
+node scripts/provider.mjs --build
+node scripts/provider.mjs --install "C:\secure\owner-approved-export.json" --env-file "C:\secure\provider.env"
+node scripts/provider.mjs --env-file "C:\secure\provider.env"
 ```
 
 Use a fresh shell without inherited Atlas secrets. Keep issuer private keys, central database credentials, Clerk/GitHub secrets and buyer signing keys out of the provider environment. The provider receives only the issuer public key and needs only the recipient address, never that recipient's wallet private key.
 
-```powershell
-bun run provider:check
-bun run provider:install -- "C:\secure\owner-approved-export.json"
-bun run provider:testnet
-```
-
 The listener defaults to **127.0.0.1:4311** behind an operator-controlled HTTPS proxy. Startup fails closed when installed source, configured price/recipient/origin, issuer key or actual RPC chain differs. Installation is idempotent; immutable paid source cannot be replaced.
+
+For readiness before a source export is approved, use `node scripts/provider.mjs --prepare --env-file "C:\secure\provider.env"`. This compiles a separate entry containing only Node builtins. Its child receives only operating-system settings and the port, loads no database/source/key/RPC/payment modules, and returns generic **503** on every route. It cannot activate itself or issue payment challenges.
+
+## Prepared environment — 2026-10-12
+
+Atlas is temporarily reachable at `https://known-les-characters-narrow.trycloudflare.com`; the inactive provider is at `https://dennis-headline-bytes-pct.trycloudflare.com`. Both user-approved Cloudflare Quick Tunnels change on restart and depend on this machine. These are not permanent production hosting.
+
+Provisioned a separate database, `atlas_provider_payments`, with dedicated login `atlas_provider_runtime` on the existing Supabase cluster. Applied only the three provider migrations above, with an atomic digest journal. The login has no superuser, database/role creation, replication, RLS bypass or central service-role membership. Native tests denied central Atlas table access and verified separate-backend replay/sale contention. This is database/credential separation within one project, not proof of a separate operator or independent infrastructure ownership.
+
+Ed25519 issuer keys, MPP secret, provider-only database/CA configuration and two testnet account keys are stored under `C:\Users\IAN\.atlas-secrets`, outside the checkout and OneDrive, with restricted Windows ACLs. The provider receives only the issuer public key and recipient address. Root `.env.local` and provider settings now bind the actual temporary origins. No publication UUID was invented; it will come from an explicitly approved signed artifact.
+
+The provider is currently running preparation only. Actual HTTPS health, retrieve, resume and control routes return inactive **503**, without payment headers. No source artifact was exported, installed or activated, and no purchase was made. See [execution evidence](evidence/publishing-execution.json) and [native database evidence](evidence/publishing-infrastructure.json).
 
 ## Authorization and delivery
 
@@ -64,6 +69,6 @@ Revocation blocks new access/reuse even while identity or delivery HTTP requests
 
 ## Verification boundary
 
-Independent tests run the real parser, Ed25519 proofs, SQL/RLS/triggers, offline MPP challenges and provider runtime against simulated transports. Provider-only schema installation, immutable terms, revoked membership/session, wrong versions, forged relationships and recovery without another charge are checked. This is not hosted authority, multi-backend contention or live settlement evidence.
+Independent product tests run the real parser, Ed25519 proofs, SQL/RLS/triggers, offline MPP challenges and provider runtime against simulated identity/payment transports. Provider-only schema installation, immutable terms, revoked membership/session, wrong versions, forged relationships and recovery without another charge are checked. A separate native hosted audit passed 11 infrastructure checks, including real multi-backend replay and sale contention with synthetic rows cleaned afterward. Neither scope establishes real paid entitlement, settlement or delivery.
 
 See [BLOCKERS.md](BLOCKERS.md), [verifier evidence](evidence/overhaul-verifier-commerce.json) and [security evidence](evidence/overhaul-security.json). Fixture providers are development-only and do not charge or represent real recipients.

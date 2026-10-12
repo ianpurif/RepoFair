@@ -1,6 +1,6 @@
 # Tempo Moderato commerce
 
-Updated 2026-10-11. Charge, receipt, authorization and recovery adapters are implemented and tested locally. **No real purchase, wallet signing, broadcast or settlement was performed in this overhaul.**
+Updated 2026-10-12. Charge, receipt, authorization and recovery adapters are implemented and tested locally. Two testnet accounts and buyer faucet funding are prepared. **No service purchase, wallet signing, payment broadcast or settlement was performed.**
 
 ## Fixed network and protocol
 
@@ -43,4 +43,6 @@ The official Moderato RPC is `https://rpc.moderato.tempo.xyz`; its explorer is `
 
 Current evidence executes genuine SQL, official offline challenges, signed source/graph proofs, SDK/MCP transports, canonical-transfer validation and interrupted-delivery recovery against **explicit simulated identity/RPC/provider transports**. PGlite's serialized backend does not prove networked PostgreSQL concurrency.
 
-Release still requires hosted migrations/TLS, real endpoint control, two independent operators/recipients, authorized testnet funding/signing, settlement, and delivery recovered without another charge. No approval to spend real money or deploy externally has been inferred.
+On 2026-10-12, generated separate buyer and recipient testnet account keys under the restricted outside-checkout secret folder. One address-only official faucet request returned HTTP 200; native Moderato RPC then showed buyer PathUSD balance **1,000,000,000,000 atomic units** (six decimals), previously zero. A private marker prevents an automatic second faucet request. No transaction hash or settlement receipt was claimed from the faucet response; test funding does not prove service-payment signing, fees or delivery. The provider's prepared test price is **10,000 atomic units** (0.01 test PathUSD).
+
+Hosted central migration signatures, separate provider migrations and verified native client TLS now pass. Eleven provider infrastructure checks include real multi-backend replay/sale contention, with synthetic audit rows cleaned. Temporary HTTPS exposure was explicitly approved; publication and payments remain inactive. Release still requires approved source export, installed immutable publication, real endpoint control, two independent operators/recipients, actual signing/settlement and delivery recovered without another charge. Browser extension/hardware compatibility remains unverified; no real-money spending was authorized or performed.

@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "product": "Chronos Atlas",
   "stage": "implementation",
-  "currentPhase": "production-overhaul-local-verification",
-  "nextAction": "Review and approve hosted migrations and independent HTTPS provider deployment; configure issuer keys and provider-only database/roles, then verify updated hosted import/RLS/concurrency and an explicitly authorized real Moderato purchase/delivery/recovery. Remote GitHub webhook, organization/Storage and private AI operating-budget acceptance remain open.",
+  "currentPhase": "publishing-infrastructure-prepared",
+  "nextAction": "Keep publication and payments inactive as approved. Review exact snapshot, package/version and source paths before a signed export; then explicitly approve provider installation/activation and a bounded Moderato purchase/delivery/recovery. Temporary HTTPS origins, same-cluster provider separation, remaining hosted import/buyer races and broader product gates retain their documented limits.",
   "milestones": [
     {
       "id": "P0",
@@ -30,7 +30,9 @@
         "docs/PROVIDER-PUBLISHING.md",
         "docs/evidence/publication-draft.json",
         "docs/evidence/publication-capacity.json",
-        "docs/evidence/overhaul-validation.json"
+        "docs/evidence/overhaul-validation.json",
+        "docs/evidence/publishing-execution.json",
+        "docs/evidence/publishing-infrastructure.json"
       ]
     },
     {
@@ -78,7 +80,7 @@
   ],
   "liveIntegrationsVerified": false,
   "lastUpdatedBy": "lead",
-  "updatedAt": "2026-10-11T16:12:29Z",
+  "updatedAt": "2026-10-12T14:51:13.681Z",
   "applicationAi": {
     "embeddingProvider": "Voyage AI",
     "generationProvider": "DeepSeek",
@@ -111,8 +113,16 @@
     "externalPublication": false,
     "tempoSettlement": false,
     "historicalEvidenceDate": "2026-10-07",
-    "newOverhaulMigrationsApplied": false,
-    "newOverhaulHostedConcurrencyVerified": false
+    "newOverhaulMigrationsApplied": true,
+    "newOverhaulMigrationsProvenance": "Already installed before this setup; exact native signatures verified; not replayed or historically journal-backfilled by this execution.",
+    "newOverhaulHostedConcurrencyVerified": false,
+    "providerReplaySaleConcurrencyVerified": true,
+    "providerInfrastructureEvidence": "docs/evidence/publishing-infrastructure.json",
+    "providerConcurrencyScope": "Real separate native PostgreSQL backends with synthetic audit authorization/records and verified cleanup; not buyer signing/spending or settlement.",
+    "privateBrowserCurrentLoopback": true,
+    "privateBrowserConfiguredHttps": true,
+    "privateBrowserEvidence": "docs/evidence/private-repository-ui.json",
+    "privateBrowserCurrentScope": "Fresh development Clerk sessions; existing real hosted private immutable import; current production UI on loopback and configured temporary HTTPS; no new hosted import, private AI or commerce acceptance."
   },
   "developmentAgentConfiguration": {
     "model": "gpt-6.1-sol",
@@ -144,17 +154,45 @@
     "importBenchmarkEvidence": "docs/evidence/import-pipeline-benchmark.json",
     "externalDeploymentPerformed": false,
     "paymentBroadcasts": 0,
-    "privateSourceSentToAi": false
+    "privateSourceSentToAi": false,
+    "temporaryHttpsExposed": true,
+    "permanentDeploymentPerformed": false,
+    "activeSourcePublication": false
   },
   "publishingSetup": {
     "configured": false,
-    "infrastructureProvisioned": false,
+    "configurationStatus": "infrastructure-only; publication identity awaits an approved signed artifact",
+    "infrastructureProvisioned": true,
     "callerExample": "packages/sdk/examples/moderato.ts",
-    "evidence": "docs/evidence/publishing-setup.json",
+    "evidence": "docs/evidence/publishing-execution.json",
+    "historicalCliEvidence": "docs/evidence/publishing-setup.json",
     "browserWalletCompatibilityVerified": false,
     "browserWalletCompatibilityStatus": "unverified",
     "actualRpcChain": 42431,
     "paymentBroadcasts": 0,
-    "hostedWrites": 0
+    "servicePurchases": 0,
+    "activePublication": false,
+    "sourceExports": 0,
+    "issuerKeyPairConfigured": true,
+    "mppSecretConfigured": true,
+    "providerDatabaseSeparate": true,
+    "providerLoginRestricted": true,
+    "providerDatabaseLocation": "Separate database on the existing Supabase project/cluster; not proof of an independent operator.",
+    "providerMigrationsApplied": [
+      "202610070005_provider_replay.sql",
+      "202610070006_provider_ledger.sql",
+      "202610110003_provider_delivery.sql"
+    ],
+    "centralMigrationsAppliedByThisExecution": 0,
+    "buyerTestnetFunded": true,
+    "buyerPathUsdAtomicUnitsObserved": "1000000000000",
+    "testFundingRequests": 1,
+    "privateKeyLocation": "Outside checkout and OneDrive; restricted Windows ACLs",
+    "atlasTemporaryOrigin": "https://known-les-characters-narrow.trycloudflare.com",
+    "providerTemporaryOrigin": "https://dennis-headline-bytes-pct.trycloudflare.com",
+    "providerService": "Preparation-only builtin bundle; all routes 503; no payment challenge or source/database/payment runtime",
+    "temporaryOriginsChangeOnRestart": true,
+    "requestOriginRepairImplemented": true,
+    "requestOriginSecurityReview": "Actual bounded atlas_security review and48 native synthetic-route cases; fresh authenticated public HTTPS rejected all three loopback Origins with403denied/no-store."
   }
 }
