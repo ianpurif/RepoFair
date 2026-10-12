@@ -30,7 +30,7 @@ if (mode === '--plan') {
     await client.query("SET LOCAL lock_timeout='5s'");
     await client.query("SET LOCAL statement_timeout='180s'");
     await client.query('SELECT pg_advisory_xact_lock($1,$2)', [1723531925, 42431]);
-    const existing = await client.query("SELECT to_regclass('supabase_migrations.atlas_central_setup') IS NOT NULL AS journal, EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='atlas') AS atlas_exists");
+    const existing = await client.query("SELECT to_regclass('supabase_migrations.atlas_central_setup') IS NOT NULL AS journal, EXISTS (SELECT 1 FROM pg_namespace WHERE nspname='atlas') AS atlas_exists");
     if (existing.rows[0]?.atlas_exists && !existing.rows[0]?.journal) throw new Error('Unjournaled Atlas schema exists; audit it before applying migrations.');
     await client.query('CREATE SCHEMA IF NOT EXISTS supabase_migrations');
     await client.query('CREATE TABLE IF NOT EXISTS supabase_migrations.atlas_central_setup(version text PRIMARY KEY,digest text NOT NULL CHECK(length(digest)=64),applied_at timestamptz NOT NULL DEFAULT now())');

@@ -11,7 +11,7 @@
     "frozenInstall": "pass; npx --yes bun@1.4.1 install --frozen-lockfile",
     "typecheck": "pass",
     "lintPolicyHygiene": "pass",
-    "nodeTests": "122/122 pass",
+    "nodeTests": "123/123 pass",
     "productTests": "496/496 pass across 33 files",
     "nextProductionBuild": "pass after final indexing gate; local development origin keeps metadataBase warning/noindex",
     "productionSeoBrowser": "4/4 pass against rebuilt local production server after final indexing gate",
@@ -21,8 +21,9 @@
     "doctor": "pass; prerequisites only",
     "gitDiffCheck": "pass",
     "releaseGate": "blocked as designed: P2-P6 and live security/payment/federation acceptance outstanding",
-    "starterVerification": "pass; 122/122 Node checks plus hygiene",
-    "indexingGate": "pass; explicit ATLAS_SEARCH_INDEXING_ENABLED=true required even for production; absent/false/preview stay noindex"
+    "starterVerification": "pass; 123/123 Node checks plus hygiene",
+    "indexingGate": "pass; explicit ATLAS_SEARCH_INDEXING_ENABLED=true required even for production; absent/false/preview stay noindex",
+    "providerMigrationPlan": "pass; exactly three provider SQL files, central SQL excluded; apply requires separate Supabase roles and remains unrun"
   },
   "review": {
     "engineer": "completed scoped database/commerce/provider secret implementation and focused tests",
