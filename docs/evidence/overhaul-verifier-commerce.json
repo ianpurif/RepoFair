@@ -1,0 +1,264 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-11T14:44:05Z",
+  "task": "/root/overhaul_verification",
+  "requestedModel": "gpt-6.1-sol",
+  "requestedReasoningEffort": "max",
+  "observedModel": null,
+  "observedReasoningEffort": null,
+  "mode": "isolated-local-verification",
+  "scope": {
+    "ownedPaths": [
+      "tests/integration/commerce-overhaul-artifacts.test.ts",
+      "tests/integration/commerce-overhaul-buyer.test.ts",
+      "tests/integration/commerce-overhaul-registry.test.ts",
+      "tests/integration/commerce-overhaul-http.test.ts",
+      "docs/evidence/overhaul-verifier-commerce.json"
+    ],
+    "productionFilesEdited": false,
+    "commitsMade": false,
+    "agentsSpawned": false,
+    "privateSourceExternalized": false,
+    "realWalletSigning": false,
+    "realTransactionBroadcasts": false,
+    "paidProviderCalls": false
+  },
+  "method": {
+    "executed": [
+      "Actual repository parser over synthetic source.",
+      "Actual Ed25519 source, graph, export, delegation and activation-control signing/verification.",
+      "Actual SQL migrations, triggers, RLS roles and AtlasDatabase transaction implementation through a pg-compatible PGlite fixture adapter.",
+      "Actual buyer service, publication registry, independent provider runtime and durable provider ledger.",
+      "Official pinned mppx offline challenge and credential serialization.",
+      "Actual Tempo envelope inspector and settlement validator against explicitly simulated RPC data.",
+      "Native provider URL/DNS/IP/response bounds with mocked DNS/TLS transport."
+    ],
+    "databaseConcurrencyBoundary": "One PostgreSQL-WASM backend; fixture transactions are serialized. The bounded-pool reentrancy guard checks that no nested connection is required, and does not establish multi-backend concurrency safety.",
+    "paymentBoundary": "Credential fixtures use fixed meaningless signature scalars and remain unbroadcast. Receipt and chain data are synthetic fixtures; no real Tempo purchase, settlement or wallet authorization is verified.",
+    "authenticationBoundary": "Clerk/GitHub authority and issuer introspection are explicit injected test transports; actual hosted identity is not verified."
+  },
+  "finalChecks": [
+    {
+      "command": "bunx vitest run tests/integration/commerce-overhaul-artifacts.test.ts tests/integration/commerce-overhaul-buyer.test.ts tests/integration/commerce-overhaul-registry.test.ts tests/integration/commerce-overhaul-http.test.ts",
+      "exitCode": 0,
+      "filesPassed": 4,
+      "testsPassed": 74,
+      "testsFailed": 0,
+      "testsSkipped": 0,
+      "durationSeconds": 10.88,
+      "casesByFile": {
+        "artifacts": 28,
+        "buyer": 24,
+        "registry": 13,
+        "http": 9
+      }
+    },
+    {
+      "command": "bunx eslint tests/integration/commerce-overhaul-artifacts.test.ts tests/integration/commerce-overhaul-buyer.test.ts tests/integration/commerce-overhaul-registry.test.ts tests/integration/commerce-overhaul-http.test.ts",
+      "exitCode": 0
+    },
+    {
+      "command": "bunx tsc --noEmit --module ESNext --moduleResolution Bundler --target ES2022 --lib ES2023,DOM --skipLibCheck --strict --noUncheckedIndexedAccess --exactOptionalPropertyTypes --allowImportingTsExtensions --types node tests/integration/commerce-overhaul-artifacts.test.ts tests/integration/commerce-overhaul-buyer.test.ts tests/integration/commerce-overhaul-registry.test.ts tests/integration/commerce-overhaul-http.test.ts",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check -- tests/integration/commerce-overhaul-artifacts.test.ts tests/integration/commerce-overhaul-buyer.test.ts tests/integration/commerce-overhaul-registry.test.ts tests/integration/commerce-overhaul-http.test.ts",
+      "exitCode": 0,
+      "limitation": "Files were untracked at this check; focused lint and strict TypeScript independently inspected their complete contents."
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "status": "fixed-and-independently-retested",
+      "title": "Genuine parser edges made publication artifacts unavailable.",
+      "location": "apps/worker/src/publication-artifact.ts",
+      "reproduction": "Construct a draft/index using parseRepositoryIndex with a real exported TypeScript function, then call buildPublicationArtifact. The original spread retained local extraction metadata rejected by strict published GraphEdge validation.",
+      "observedBeforeFix": "Invalid published edge shape; focused suite failed during setup with zero cases executed.",
+      "fixObserved": "Published edges explicitly project the shared GraphEdge contract before signing.",
+      "regression": "exports only the selected real files and graph, with genuine publisher signatures"
+    },
+    {
+      "severity": "high",
+      "status": "fixed-and-independently-retested",
+      "title": "Authenticated commerce reads attempted row locks without UPDATE privilege.",
+      "location": "apps/worker/src/commerce-service.ts",
+      "reproduction": "Use AtlasDatabase with the actual migrations and authenticated role to call createPurchase or history. member() originally executed FOR SHARE in a principal transaction.",
+      "observedBeforeFix": "AtlasDatabaseError code=permission; 22 of 24 buyer cases failed before usable quoting/history.",
+      "fixObserved": "Principal read transactions use nonlocking membership reads; trusted mutation transactions retain row locks without granting authenticated UPDATE.",
+      "regression": "atomically reserves approved integer units from a configured allowance with a genuine offline SDK quote"
+    },
+    {
+      "severity": "medium",
+      "status": "fixed-and-independently-retested",
+      "title": "Provider ledger reauthorization required a nested database connection.",
+      "location": "apps/provider/src/runtime.ts and apps/provider/src/postgres-purchase-ledger.ts",
+      "reproduction": "Run an authorized offline provider request through the genuine runtime/ledger while the fixture pool rejects acquisition of another connection from inside its existing transaction.",
+      "observedBeforeFix": "HTTP 503 instead of the expected unpaid HTTP 402; currentArtifact opened a second transaction during ledger lookup/quote reauthorization.",
+      "fixObserved": "Ledger fresh checks carry the existing AtlasTransaction; currentArtifact uses it instead of acquiring another pool connection.",
+      "regression": "issues an authorized offline quote without acquiring a second pool connection inside a ledger transaction",
+      "limitation": "This reproduces connection reentrancy, not multi-connection PostgreSQL contention."
+    }
+  ],
+  "verifiedBoundaries": [
+    "Only owner-approved files, exact snapshots/releases and complete signed evidence/graph members are returned; invented graph semantics, source-scope changes and missing proofs are denied.",
+    "Anonymous private provider metadata is denied; exact signed activation controls are accepted and altered audience, digest, revision, nonce, expiry and signing key are denied.",
+    "Provider migrations 005/006/003 apply independently without central Atlas tables; installed source, recorded submissions and deliveries are immutable under trusted updates.",
+    "Tenant purchase/budget visibility and unauthorized direct mutations are denied through actual RLS.",
+    "Integer allowances and immutable approvals reserve once; signing and canonical submission binding happen once; an in-flight forwarding replay is rejected.",
+    "Unknown outcomes retain their reservation and prevent cancellation, re-signing and new provider purchases; recovery forwards no second credential.",
+    "Simulated canonical Tempo transfers require the exact chain, sender, token, recipient, amount, transaction and challenge attribution.",
+    "Failed or revoked evidence delivery retains settled payment and resumes under the same purchase without another charge.",
+    "Seeded provider unknown-sale recovery uses chain reads, saves one delivery and reuses that delivery; revocation after the save blocks the source return.",
+    "Paused session checks reject deleted or revised/regranted memberships and publication revocation; administrative and private-source revision changes are fenced.",
+    "Public HTTPS/DNS/IP bounds deny mixed private answers, redirects, excessive bodies and unsupported statuses; HTTP 204/205 responses do not throw from stream callbacks."
+  ],
+  "notRun": [
+    "Browser/console checks and full application build, intentionally left to the lead's coordinated UI/build run.",
+    "Real Clerk/GitHub sign-in or external publisher control verification.",
+    "Hosted schema migration application and TLS/driver integration.",
+    "Multi-connection PostgreSQL contention and spending races.",
+    "Real wallet signing, testnet settlement, two-account paid delivery, or external provider deployment."
+  ],
+  "observedFileDigestsAfterFinalRun": [
+    {
+      "path": "tests/integration/commerce-overhaul-artifacts.test.ts",
+      "sha256": "54b299af42b1dbea4fd0982b167352f4ce8953fd04617fb9fc3537b2f741842e"
+    },
+    {
+      "path": "tests/integration/commerce-overhaul-buyer.test.ts",
+      "sha256": "1f89af73b1abf63555419b0601dfb6d3ae4bd6b9f72656da3d2ffb069923ec8f"
+    },
+    {
+      "path": "tests/integration/commerce-overhaul-registry.test.ts",
+      "sha256": "b6b711ed7a2f12364df21e38c657fcd14b036cc3da1c8c53f16a7881eb0e5f01"
+    },
+    {
+      "path": "tests/integration/commerce-overhaul-http.test.ts",
+      "sha256": "76ce274f39a605b45dcd3b9f5872a128fcdb95753755ce639b808a83b13b7e48"
+    },
+    {
+      "path": "apps/worker/src/publication-artifact.ts",
+      "sha256": "98096b4f118aa674e0f905e6d6f685071f36df4866911c0902ad503220437c19"
+    },
+    {
+      "path": "apps/worker/src/commerce-service.ts",
+      "sha256": "df3ad9fff1925e527603a31cd2af3fc6aee19d70ba9e156bfabf5580d9820da3"
+    },
+    {
+      "path": "apps/worker/src/publication-registry.ts",
+      "sha256": "a6cb772d091abe30a6aa1162f7e89f3f219bfe7829e6b13902e39ba6d0fac7c7"
+    },
+    {
+      "path": "apps/worker/src/provider-http.ts",
+      "sha256": "d258c1a6d27768ed9fdb7a86aac66399d82a4fed5e9d27f3b9ecc61d4c9abcc7"
+    },
+    {
+      "path": "apps/worker/src/tempo-verification.ts",
+      "sha256": "81f6e84806cb9a1e3f1a30397b18cbc1f9683af21d0dc95cf40d779dae1a44ce"
+    },
+    {
+      "path": "apps/provider/src/runtime.ts",
+      "sha256": "cc92e945e1738884ad925a74aeeca76e1bdfca01809ef24ebcd429513a88d9f3"
+    },
+    {
+      "path": "apps/provider/src/postgres-purchase-ledger.ts",
+      "sha256": "4bbae6f8726e7434220a969f54c0a91c2d8f62d00cbf066e80ae8e7ff417c64f"
+    }
+  ],
+  "historicalFailures": [
+    "The parser-edge shape blocker initially prevented suite setup; it was fixed by the lead.",
+    "One changed-artifact test fixture incorrectly retained an old scope digest; rebuilding the fixture from its changed draft corrected the fixture.",
+    "The authenticated row-lock blocker caused 22 buyer failures; it was fixed by the lead.",
+    "A quote test initially asserted no RPC reads; corrected to permit only eth_chainId while rejecting broadcast/other RPC methods.",
+    "The bounded-pool guard initially failed with HTTP503; it passed after existing-transaction reuse.",
+    "Strict test TypeScript initially identified fixture type errors; they were corrected and the complete strict check passed."
+  ],
+  "importHistoryCapacity": {
+    "checkedAt": "2026-10-11T14:56:47Z",
+    "testFile": "tests/integration/import-history-capacity.test.ts",
+    "scope": "Independent regression of retained import history through actual AtlasDatabase transactions, SQL triggers, authorization queries, parser evidence and repository service methods. No production or shared implementation edits.",
+    "method": {
+      "database": "Isolated PGlite PostgreSQL-WASM database; generated UUID workspaces and bounded generate_series fixtures of at most 100 snapshots / 1000 jobs each.",
+      "migrations": [
+        "supabase/migrations/202610030001_atlas.sql",
+        "supabase/migrations/202610070001_personal_workspaces.sql",
+        "supabase/migrations/202610070002_github_jobs.sql",
+        "supabase/migrations/202610070003_server_repository_grants.sql",
+        "supabase/migrations/202610110001_resumable_imports.sql"
+      ],
+      "source": "Two small generated package/TypeScript files, real parseRepositoryIndex output, actual source_files/graphs rows and immutable synthetic Git identity. Imported source is parsed, never executed.",
+      "injectedBoundary": "Server-owned GitHub principal adapter returns synthetic Clerk/GitHub authority and exact commit/tree proof. No network, live credentials, external source or paid calls.",
+      "concurrencyLimit": "The fixture serializes AtlasDatabase connections onto one PGlite backend. It executes advisory locks and SQL constraints but does not establish contention safety across separate PostgreSQL backends."
+    },
+    "finalChecks": [
+      {
+        "command": "bunx vitest run tests/integration/import-history-capacity.test.ts",
+        "exitCode": 0,
+        "startedAtLocal": "2026-10-11T22:56:05+08:00",
+        "durationSeconds": 6.40,
+        "testFilesPassed": 1,
+        "testsPassed": 10,
+        "testsFailed": 0,
+        "testsSkipped": 0
+      },
+      {
+        "command": "bunx eslint tests/integration/import-history-capacity.test.ts",
+        "exitCode": 0
+      },
+      {
+        "command": "bunx tsc --noEmit --module ESNext --moduleResolution Bundler --target ES2022 --lib ES2023,DOM --skipLibCheck --strict --noUncheckedIndexedAccess --exactOptionalPropertyTypes --allowImportingTsExtensions --types node tests/integration/import-history-capacity.test.ts",
+        "exitCode": 0
+      }
+    ],
+    "verifiedChecks": [
+      "Actual 001 SQL admits retained snapshot 100 and rejects 101 with P0001 / Workspace retained snapshot capacity reached, including failed and cancelled versions in the total; stored source remains unchanged.",
+      "Actual 001 SQL admits retained job 1000 and rejects 1001 with P0001 / Workspace retained import job capacity reached, including complete, failed and cancelled history in the total.",
+      "assertImportHistoryCapacity acquires pg_advisory_xact_lock for atlas-import-capacity:<workspace UUID>. At 100 snapshots / 999 jobs it permits another job for an existing snapshot and rejects a new snapshot. At 99 snapshots / 1000 jobs it rejects either kind of new import work.",
+      "Capacity rejection has RepositoryServiceError code import-history-limit, HTTP 422 and the exact actionable message asking an administrator to review retention before importing another version.",
+      "While the first workspace retains 100 snapshots / 1000 jobs, another workspace's actual queueImport accepts one snapshot and one job. Its member cannot read the first workspace's retained source index.",
+      "At both limits, two actual queueImport calls for the completed exact commit reuse its existing snapshot and return jobId null without acquiring a capacity lock or adding rows. getIndex preserves all parser nodes/evidence/files; getGraph search returns the retained symbol; getSource returns the original exact line range; the persisted source and graph are unchanged.",
+      "At both limits, actual queueImport reuses the same existing queued job and the same existing running job. Authenticated getJob remains readable, and the older completed source remains readable without deletion.",
+      "New-version queueImport is rejected at 100 snapshots / 999 jobs and at 99 snapshots / 1000 jobs. The transaction rolls back prior repository visibility/installation metadata writes, leaves no partial new snapshot and preserves all source."
+    ],
+    "findings": [],
+    "historicalFixtureFailures": [
+      {
+        "observation": "Independent first run: 9/10 tests passed, 1 failed, exit 1; duration 8.00 seconds; local start 2026-10-11T22:55:08+08:00.",
+        "cause": "The completed-import test incorrectly expected a symbol in the default getGraph root page. getIndex's full parser-node/evidence assertions passed; default getGraph intentionally projects files and packages.",
+        "correction": "Use getGraph with query retained and assert the exact symbol from the independently parsed index. Keep the full-index, exact source-line, persisted source/graph and unchanged row-count assertions. No production code changed."
+      },
+      {
+        "observation": "The lead reported a combined product run with 349/350 passing while this same pre-correction fixture was being finalized. This is lead-reported historical evidence; this verifier did not execute or independently observe that combined run.",
+        "cause": "The same default getGraph projection assertion described above. The finalized file was released to the lead after the independently observed 10/10 pass."
+      },
+      {
+        "observation": "Initial strict TypeScript check exited 1 with TS18046 on sourceRows' untyped query result.",
+        "correction": "Added the actual source_files row type to the fixture query; final strict TypeScript check exited 0."
+      }
+    ],
+    "notRun": [
+      "Separate PostgreSQL connection contention, advisory-lock scheduling and concurrent import capacity races.",
+      "Hosted migration application, native pg driver/TLS, real Clerk/GitHub authentication and remote repository import.",
+      "Browser/console checks or full application build/product suite for this follow-up; those remain coordinated by the lead."
+    ],
+    "observedFileDigestsAfterFinalRun": [
+      {
+        "path": "tests/integration/import-history-capacity.test.ts",
+        "sha256": "c09065349bf30efc227090d7fd051ddfd8a90646b1bd55d9ec9d612dc7c9a01b"
+      },
+      {
+        "path": "apps/worker/src/repository-service.ts",
+        "sha256": "99f6b924da41470a83f5b2fd4d0575488cd8e29d5721a206e48bee4a321a98c8"
+      },
+      {
+        "path": "apps/worker/src/database.ts",
+        "sha256": "25de95d09f98749ea53e6c307461e0d74b0c31cae25d0cf520f8d553c4fe5032"
+      },
+      {
+        "path": "supabase/migrations/202610110001_resumable_imports.sql",
+        "sha256": "9d4607c60ca821dc6244bae84a8cd1353119f74d7487fcdb339e03f6e2f84800"
+      }
+    ]
+  }
+}

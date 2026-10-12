@@ -8,7 +8,7 @@ export type DependencyBinding = Readonly<{
   sourcePath: string; status: 'exact' | 'unresolved'; reason: string | null;
 }>;
 export type ParsedEdge = GraphEdge & Readonly<{
-  extractionMethod: 'ts-morph-import' | 'ts-morph-export' | 'ts-morph-reference' | 'ts-morph-call' | 'explicit-release-export';
+  extractionMethod: 'ts-morph-import' | 'ts-morph-export' | 'ts-morph-reference' | 'ts-morph-call' | 'explicit-release-export' | 'python-ast-import' | 'python-ast-declaration';
 }>;
 export type LocalIndex = Readonly<{
   schemaVersion: 1; mode: 'fixture'; scope: Scope; snapshot: Snapshot;
@@ -18,7 +18,15 @@ export type LocalIndex = Readonly<{
   unresolved: readonly string[]; limitations: readonly string[];
 }>;
 /** Git source is separately authorized and always identified by an immutable commit. */
-export type RepositoryIndex = Omit<LocalIndex, 'mode'> & Readonly<{ mode: 'git' }>;
+export type RepositoryIndex = Omit<LocalIndex, 'mode' | 'packageName' | 'version'> & Readonly<{
+  mode: 'git'; packageName: string | null; version: string | null;
+}>;
+/** Bounded graph pages omit file contents; source is requested separately at the pinned snapshot. */
+export type RepositoryGraphPage = Omit<RepositoryIndex, 'files'> & Readonly<{
+  files: readonly Readonly<{ path: string; lineCount: number; bytes: number }>[];
+  folders: readonly Readonly<{ path: string; fileCount: number }>[];
+  page: Readonly<{ cursor: number; nextCursor: number | null; totalNodes: number; totalFiles: number; limit: number }>;
+}>;
 export type SourceIndex = LocalIndex | RepositoryIndex;
 export type Activity = Readonly<{
   id: string; operation: string; startedAt: string; durationMs: number;

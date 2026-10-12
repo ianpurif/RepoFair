@@ -1,14 +1,15 @@
 import 'server-only';
 import { auth } from '@clerk/nextjs/server';
-import { createAtlasDatabase } from '@atlas/worker/database';
+import { workspaceDatabase } from './database';
 import { createRepositoryService, RepositoryServiceError } from '@atlas/worker/repositories';
 import { readBounded } from '../app/api/fixture-boundary';
+import { isAllowedRequestOrigin } from './request-origin';
 let service: Promise<ReturnType<typeof createRepositoryService>> | undefined;
 export const privateHeaders = { 'Cache-Control': 'no-store', Vary: 'Cookie, Authorization' };
 export async function repositoryContext() {
   const { userId, sessionId } = await auth();
   if (!userId || !sessionId) throw new Error('AUTHENTICATION_REQUIRED');
-  service ??= createAtlasDatabase(process.env).then(db => createRepositoryService(db, process.env)).catch(error => { service = undefined; throw error; });
+  service ??= workspaceDatabase().then(db => createRepositoryService(db, process.env)).catch(error => { service = undefined; throw error; });
   return { principalId: userId, service: await service };
 }
 export function repositoryFailure(error: unknown): Response {
@@ -22,7 +23,7 @@ export function repositoryFailure(error: unknown): Response {
   return Response.json({ error: 'Repository operation unavailable. Check workspace access, your linked GitHub account, App installation, supported source limits, and worker status.', code }, { status, headers: privateHeaders });
 }
 export function requireSameOrigin(request: Request) {
-  if (request.headers.get('origin') !== new URL(request.url).origin) throw new RepositoryServiceError('denied','Cross-origin request denied',403);
+  if (!isAllowedRequestOrigin(request, process.env.APP_ORIGIN)) throw new RepositoryServiceError('denied','Cross-origin request denied',403);
 }
 export async function readRepositoryBody(request: Request): Promise<Record<string, unknown>> {
   if (!/^application\/json(?:\s*;|$)/i.test(request.headers.get('content-type') ?? '')) throw new RepositoryServiceError('invalid-body', 'Expected a JSON request object', 400);

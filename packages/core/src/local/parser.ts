@@ -1,10 +1,11 @@
 import { Project, Node, ScriptTarget, ModuleKind, ModuleResolutionKind, SyntaxKind } from 'ts-morph';
+import { parser as pythonParser } from '@lezer/python';
 import type { SourceFile as AstFile, Node as AstNode, Identifier } from 'ts-morph';
 import type { DependencyBinding, GraphNode, LocalIndex, ParsedEdge, RepositoryIndex, Scope, Snapshot, SourceEvidence, SourceIndex } from '../../../contracts/src/index.ts';
 import { isSafeRelativePath } from '../evidence.ts';
 import { nodeId } from '../graph.ts';
 import { isExactVersion } from '../versions.ts';
-import { assertLocal, LOCAL_LIMITS, record, sourceLines } from './limits.ts';
+import { assertLocal, LOCAL_LIMITS, sourceLimits, record, sourceLines } from './limits.ts';
 import { bindDependency, packageSpecifier } from './versions.ts';
 import type { TrustedFixtureLink } from './versions.ts';
 import { evidenceId, validateSourceIndex } from './validation.ts';
@@ -16,7 +17,7 @@ export type ParseLocalInput = Readonly<{
   observedAt: string;
 }>;
 /** Authorization and immutable Git download verification belong to the caller. */
-export type ParseRepositoryInput = Omit<ParseLocalInput, 'trustedLinks'>;
+export type ParseRepositoryInput = Omit<ParseLocalInput, 'trustedLinks' | 'packageName' | 'version'> & Readonly<{ packageName: string | null; version: string | null }>;
 type Declaration = { ast: AstNode; graph: GraphNode; name: string };
 type ReExport = { module: string | null; name: string; exported: string; ast: AstNode };
 type Target = { nodeId: string; callable: boolean };
@@ -58,30 +59,32 @@ export function parseRepositoryIndex(input: ParseRepositoryInput): RepositoryInd
 }
 function parseSourceIndex(input: ParseLocalInput, mode: 'fixture'): LocalIndex;
 function parseSourceIndex(input: ParseRepositoryInput, mode: 'git'): RepositoryIndex;
-function parseSourceIndex(input: ParseLocalInput, mode: 'fixture' | 'git'): SourceIndex {
+function parseSourceIndex(input: ParseLocalInput | ParseRepositoryInput, mode: 'fixture' | 'git'): SourceIndex {
   const started = Date.now();
+  const limits = sourceLimits(mode);
   const revisionPattern = mode === 'fixture' ? /^sha256:[a-f0-9]{64}$/ : /^[a-f0-9]{40}$/;
   assertLocal(input && input.snapshot?.kind === mode && typeof input.snapshot.revision === 'string'
     && revisionPattern.test(input.snapshot.revision), `Immutable ${mode === 'git' ? '40-character Git commit' : 'fixture snapshot'} required`);
-  assertLocal(typeof input.version === 'string' && isExactVersion(input.version)
+  assertLocal((mode === 'git' && input.version === null || typeof input.version === 'string' && isExactVersion(input.version))
     && typeof input.observedAt === 'string' && Number.isFinite(Date.parse(input.observedAt)), `Invalid ${mode} metadata: supported exact package version and observation time are required`);
-  assertLocal(Array.isArray(input.files) && input.files.length > 0 && input.files.length <= LOCAL_LIMITS.files, 'Invalid source count');
+  assertLocal(Array.isArray(input.files) && input.files.length > 0 && input.files.length <= limits.files, 'Invalid source count');
   const paths = new Set<string>(); let total = 0;
   const files = input.files.map(file => {
     assertLocal(typeof file.path === 'string' && isSafeRelativePath(file.path) && !paths.has(file.path)
-      && typeof file.text === 'string' && file.text.length <= LOCAL_LIMITS.fileCharacters, 'Invalid or oversized input file');
+      && typeof file.text === 'string' && file.text.length <= limits.fileCharacters, 'Invalid or oversized input file');
     paths.add(file.path); total += file.text.length;
-    const lineCount = sourceLines(file.text).length; assertLocal(lineCount <= LOCAL_LIMITS.linesPerFile, 'Source line limit exceeded');
+    const lineCount = sourceLines(file.text).length; assertLocal(lineCount <= limits.linesPerFile, 'Source line limit exceeded');
     return { path: file.path, text: file.text, lineCount };
   });
-  assertLocal(total <= LOCAL_LIMITS.totalCharacters, 'Source total limit exceeded');
+  assertLocal(total <= limits.totalCharacters, 'Source total limit exceeded');
   const manifest = json(files.find(file => file.path === 'package.json')?.text, 'package.json');
   if (mode === 'git') {
-    assertLocal(record(manifest), 'Git repository requires a root package.json manifest');
-    assertLocal(typeof manifest.version === 'string' && isExactVersion(manifest.version), 'Git package.json must declare a supported exact version');
-    assertLocal(typeof manifest.name === 'string' && manifest.name.trim().length > 0, 'Git package.json must declare its package name');
+    const name = record(manifest) && typeof manifest.name === 'string' && manifest.name.trim() ? manifest.name : null;
+    const version = record(manifest) && typeof manifest.version === 'string' && isExactVersion(manifest.version) ? manifest.version : null;
+    assertLocal(name === input.packageName && version === input.version, 'Package identity differs from snapshot');
+  } else {
+    assertLocal(record(manifest) && manifest.name === input.packageName && manifest.version === input.version, 'Package identity differs from snapshot');
   }
-  assertLocal(record(manifest) && manifest.name === input.packageName && manifest.version === input.version, 'Package identity differs from snapshot');
   const lock = json(files.find(file => file.path === 'package-lock.json')?.text, 'package-lock.json');
   const project = new Project({ useInMemoryFileSystem: true, skipAddingFilesFromTsConfig: true, skipFileDependencyResolution: true,
     compilerOptions: { target: ScriptTarget.ES2022, module: ModuleKind.ESNext, moduleResolution: ModuleResolutionKind.Bundler,
@@ -90,10 +93,13 @@ function parseSourceIndex(input: ParseLocalInput, mode: 'fixture' | 'git'): Sour
   const unresolved = new Set<string>();
   const nodes = new Map<string, GraphNode>(); const edges = new Map<string, ParsedEdge>(); const evidence = new Map<string, SourceEvidence>();
   const dependencies: DependencyBinding[] = [];
+  const fileByPath = new Map(files.map(file => [file.path, file]));
+  const linesByPath = new Map(files.map(file => [file.path, sourceLines(file.text)]));
+  const semanticReferences = files.filter(file => /\.(?:[cm]?ts|tsx|[cm]?js|jsx)$/.test(file.path)).length <= LOCAL_LIMITS.files;
   function budget(): void {
-    assertLocal(Date.now() - started <= LOCAL_LIMITS.parseMs, 'Parser time limit exceeded');
-    assertLocal(nodes.size <= LOCAL_LIMITS.nodes && edges.size <= LOCAL_LIMITS.edges && evidence.size <= LOCAL_LIMITS.evidence
-      && unresolved.size <= LOCAL_LIMITS.edges, 'Parser graph limit exceeded');
+    assertLocal(Date.now() - started <= limits.parseMs, 'Parser time limit exceeded');
+    assertLocal(nodes.size <= limits.nodes && edges.size <= limits.edges && evidence.size <= limits.evidence
+      && unresolved.size <= limits.edges, 'Parser graph limit exceeded');
   }
   function addNode(localId: string, kind: GraphNode['kind'], label: string): GraphNode {
     const id = nodeId(input.snapshot.repositoryId, input.snapshot.snapshotId, localId);
@@ -102,11 +108,11 @@ function parseSourceIndex(input: ParseLocalInput, mode: 'fixture' | 'git'): Sour
   }
   const fileNodes = new Map(files.map(file => [file.path, addNode(file.path, 'file', file.path)]));
   function passage(path: string, startLine: number, endLine: number): SourceEvidence {
-    const file = files.find(file => file.path === path)!;
+    const file = fileByPath.get(path)!;
     endLine = Math.min(endLine, startLine + LOCAL_LIMITS.passageLines - 1);
     const id = evidenceId(input, path, startLine, endLine);
     const item: SourceEvidence = { id, scope: input.scope, source: { ...input.snapshot, path, startLine, endLine },
-      original: sourceLines(file.text).slice(startLine - 1, endLine).join('\n'), providerId: null,
+      original: linesByPath.get(file.path)!.slice(startLine - 1, endLine).join('\n'), providerId: null,
       observedAt: input.observedAt, provenance: 'parsed-source' };
     evidence.set(id, item); budget(); return item;
   }
@@ -124,11 +130,45 @@ function parseSourceIndex(input: ParseLocalInput, mode: 'fixture' | 'git'): Sour
   for (const file of files) {
     if (/\.(?:[cm]?ts|tsx|[cm]?js|jsx)$/.test(file.path)) {
       const ast = project.createSourceFile(`/atlas/${file.path}`, file.text); astFiles.set(file.path, ast);
-      astCount += ast.getDescendants().length; assertLocal(astCount <= LOCAL_LIMITS.astNodes, 'AST size limit exceeded'); budget();
-      const diagnostics = ast.getPreEmitDiagnostics().filter(diagnostic => diagnostic.getCode() >= 1000 && diagnostic.getCode() < 2000);
-      if (diagnostics.length) unresolved.add(`${file.path}: source has syntax diagnostics; affected relationships may be incomplete`);
+      astCount += ast.getDescendants().length; assertLocal(astCount <= limits.astNodes, 'AST size limit exceeded'); budget();
     }
     for (let line = 1; line <= file.lineCount; line += LOCAL_LIMITS.passageLines) passage(file.path, line, Math.min(file.lineCount, line + LOCAL_LIMITS.passageLines - 1));
+  }
+  // Construct one compiler program after all files are present. Pre-emit diagnostics
+  // also run semantic checks and repeatedly rebuilt the program during ingestion.
+  if (astFiles.size) {
+    const program = project.getProgram().compilerObject;
+    for (const [path, ast] of astFiles) if (program.getSyntacticDiagnostics(ast.compilerNode).length)
+      unresolved.add(`${path}: source has syntax diagnostics; affected relationships may be incomplete`);
+  }
+  for (const file of files.filter(file => file.path.endsWith('.py'))) {
+    const tree = pythonParser.parse(file.text); let invalidSyntax = false;
+    tree.iterate({ enter(node) { if (node.type.isError) invalidSyntax = true; astCount++; } });
+    assertLocal(astCount <= limits.astNodes, 'AST size limit exceeded'); budget();
+    if (invalidSyntax) { unresolved.add(`${file.path}: Python syntax diagnostics; only file evidence retained`); continue; }
+    const lineAt = (offset: number) => file.text.slice(0, offset).split('\n').length;
+    tree.iterate({ enter(node) {
+      budget();
+      if (node.name === 'FunctionDefinition' || node.name === 'ClassDefinition') {
+        const nameNode = node.node.getChild('VariableName');
+        if (!nameNode) return;
+        const name = file.text.slice(nameNode.from, nameNode.to);
+        const start = lineAt(node.from);
+        const declaration = addNode(`${file.path}#${name}@${start}:${node.from}`, 'symbol', name);
+        edge(fileNodes.get(file.path)!.id, declaration.id, 'declares', 'python-ast-declaration', passage(file.path, start, lineAt(Math.max(node.from, node.to - 1))));
+      } else if (node.name === 'ImportStatement') {
+        const statement = file.text.slice(node.from, node.to);
+        const relative = /^from\s+(\.+)([A-Za-z_][\w.]*)?\s+import\b/.exec(statement);
+        if (!relative) { unresolved.add(`${file.path}:${lineAt(node.from)}: Python absolute import needs an independently verified environment/package mapping`); return; }
+        const parent = file.path.split('/').slice(0, -1);
+        for (let level = 1; level < relative[1]!.length; level++) parent.pop();
+        if (relative[1]!.length > file.path.split('/').length - 1) { unresolved.add(`${file.path}: Python relative import escapes package boundary`); return; }
+        const stem = [...parent, ...(relative[2]?.split('.') ?? [])].join('/');
+        const candidates = [`${stem}.py`, `${stem}/__init__.py`].filter(candidate => paths.has(candidate));
+        if (candidates.length === 1) edge(fileNodes.get(file.path)!.id, fileNodes.get(candidates[0]!)!.id, 'imports', 'python-ast-import', passage(file.path, lineAt(node.from), lineAt(Math.max(node.from, node.to - 1))));
+        else unresolved.add(`${file.path}:${lineAt(node.from)}: Python relative module is absent or ambiguous`);
+      }
+    } });
   }
   const declarations = new Map<string, Declaration>();
   const locals = new Map<string, Map<string, Declaration>>();
@@ -207,7 +247,15 @@ function parseSourceIndex(input: ParseLocalInput, mode: 'fixture' | 'git'): Sour
   function external(path: string, specifier: string, names: readonly string[], ast: AstNode): Target | null {
     const parsed = packageSpecifier(specifier);
     if (!parsed) { unresolved.add(`${path}:${ast.getStartLineNumber()}: unsupported module ${specifier}`); return null; }
-    const binding = bindDependency(parsed.packageName, names, path, manifest, lock, mode === 'fixture' ? input.trustedLinks ?? [] : []);
+    let packageManifest: unknown = manifest; let directory = '';
+    const parents = path.split('/').slice(0, -1);
+    for (let depth = parents.length; depth > 0; depth--) {
+      const candidate = parents.slice(0, depth).join('/');
+      const text = fileByPath.get(`${candidate}/package.json`)?.text;
+      if (text !== undefined) { directory = candidate; packageManifest = json(text, `${candidate}/package.json`); break; }
+    }
+    const binding = bindDependency(parsed.packageName, names, path, packageManifest, lock,
+      mode === 'fixture' && 'trustedLinks' in input ? input.trustedLinks ?? [] : [], directory);
     dependencies.push(binding);
     const graph = addNode(`package:${parsed.packageName}@${binding.version ?? 'unresolved'}`, 'package', `${parsed.packageName}@${binding.version ?? 'unresolved'}`);
     edge(fileNodes.get(path)!.id, graph.id, 'package-binding', 'ts-morph-import', source(ast));
@@ -274,7 +322,7 @@ function parseSourceIndex(input: ParseLocalInput, mode: 'fixture' | 'git'): Sour
     for (const parent of ast.getAncestors()) { const declaration = declarations.get(key(parent)); if (declaration) return declaration.graph.id; }
     return fileNodes.get(path)!.id;
   }
-  for (const [path, ast] of astFiles) {
+  for (const [path, ast] of semanticReferences ? astFiles : []) {
     for (const call of ast.getDescendantsOfKind(SyntaxKind.CallExpression)) {
       const expression = call.getExpression(); const target = expressionTarget(expression);
       if (target?.callable && !call.hasQuestionDotToken()) edge(owner(call, path), target.nodeId, 'resolved-call', 'ts-morph-call', source(call));
@@ -295,13 +343,13 @@ function parseSourceIndex(input: ParseLocalInput, mode: 'fixture' | 'git'): Sour
     }
   }
   // A simple explicit exports map is a release-to-source declaration, not a provider join.
-  if (record(manifest.exports)) for (const [name, target] of Object.entries(manifest.exports)) {
+  if (record(manifest) && record(manifest.exports) && input.packageName && input.version) for (const [name, target] of Object.entries(manifest.exports)) {
     if (typeof target === 'string' && target.startsWith('./') && paths.has(target.slice(2))) {
       const packageNode = addNode(`package:${input.packageName}@${input.version}`, 'package', `${input.packageName}@${input.version}`);
       edge(packageNode.id, fileNodes.get(target.slice(2))!.id, 'exports', 'explicit-release-export', passage('package.json', 1, files.find(file => file.path === 'package.json')!.lineCount));
     } else unresolved.add(`package.json: unsupported/absent export mapping ${name}`);
   }
-  const index: SourceIndex = { schemaVersion: 1, mode, scope: input.scope, snapshot: input.snapshot,
+  const index = { schemaVersion: 1, mode, scope: input.scope, snapshot: input.snapshot,
     packageName: input.packageName, version: input.version, files, nodes: [...nodes.values()], edges: [...edges.values()],
     evidence: [...evidence.values()], dependencies, unresolved: [...unresolved], limitations: [
       mode === 'fixture' ? 'Public authored fixture only; no production repository authorization is established.'
@@ -312,6 +360,9 @@ function parseSourceIndex(input: ParseLocalInput, mode: 'fixture' | 'git'): Sour
         : 'Only package-lock v3 top-level resolutions bind exact dependency versions. File/workspace links, other lockfile formats and missing resolutions remain unresolved.',
       'External source and export evidence requires a separate exact-version provider workflow.',
       'Parsing has bounded files, bytes, AST size and a checked deadline; the synchronous parser cannot interrupt a single AST operation.',
-    ] };
+      'Python syntax declarations and relative module imports are supported; Python calls, symbol references and installed package versions are not inferred.',
+      'Other ingested source languages retain file and line evidence only; unsupported relationships are not fabricated.',
+      ...(semanticReferences ? [] : ['Large repositories use syntax imports, exports and declarations. Semantic symbol references and resolved calls are omitted to bound compiler memory.']),
+    ] } as SourceIndex;
   validateSourceIndex(index); return index;
 }

@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-10-11T13:19:07.099Z",
+  "scope": "Generated TypeScript monorepo parser benchmark, separate Node process per size. No GitHub network calls, hosted concurrency, AI, or transactions.",
+  "memoryMetric": "RSS at parser return; includes runtime and parser library, not a sampled peak or a production memory guarantee.",
+  "results": [
+    {
+      "files": 17,
+      "bytes": 1686,
+      "status": "complete",
+      "durationMs": 193,
+      "rssAtReturnBytes": 101539840,
+      "nodes": 33,
+      "edges": 61,
+      "serializedBytes": 82472,
+      "providerCalls": 0,
+      "indexingProviderCostUsd": 0
+    },
+    {
+      "files": 145,
+      "bytes": 15767,
+      "status": "complete",
+      "durationMs": 1478,
+      "rssAtReturnBytes": 183992320,
+      "nodes": 289,
+      "edges": 573,
+      "serializedBytes": 755981,
+      "providerCalls": 0,
+      "indexingProviderCostUsd": 0
+    },
+    {
+      "files": 1001,
+      "status": "rejected",
+      "durationMs": 2,
+      "reason": "Invalid source count",
+      "rssAtReturnBytes": 83537920,
+      "providerCalls": 0
+    },
+    {
+      "files": 4001,
+      "status": "rejected",
+      "durationMs": 2,
+      "reason": "Invalid source count",
+      "rssAtReturnBytes": 87580672,
+      "providerCalls": 0
+    }
+  ]
+}

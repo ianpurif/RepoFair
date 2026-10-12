@@ -1,4 +1,5 @@
 import type { Capabilities, CapabilityState } from '../../contracts/src/index.ts';
+export * from './authenticated.ts';
 const states = new Set<CapabilityState>(['available', 'not-implemented', 'unverified', 'disabled']);
 function isCapabilities(value: unknown): value is Capabilities {
   if (typeof value !== 'object' || value === null) return false;

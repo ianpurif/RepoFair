@@ -62,7 +62,7 @@ it('HTTP boundary rejects remote/forged origin, missing launcher marker and miss
   expect(outbound).not.toHaveBeenCalled();
 });
 it('runs the whole approved HTTP answer flow through native Voyage and DeepSeek clients with mocked transport', async () => {
-  for (const [key, value] of Object.entries({ ATLAS_LOOPBACK_SERVER: 'true', ATLAS_MODE: 'fixture', ATLAS_AI_ENABLED: 'true', VOYAGE_API_KEY: 'test-voyage', DEEPSEEK_API_KEY: 'test-deepseek', VOYAGE_EMBEDDING_MODEL: 'voyage-code-3', VOYAGE_RERANK_MODEL: 'rerank-2.5', DEEPSEEK_MODEL: 'deepseek-flash', DEEPSEEK_THINKING: 'disabled' })) vi.stubEnv(key, value);
+  for (const [key, value] of Object.entries({ ATLAS_FIXTURES_ENABLED:'true', ATLAS_LOOPBACK_SERVER: 'true', ATLAS_MODE: 'fixture', ATLAS_AI_ENABLED: 'true', VOYAGE_API_KEY: 'test-voyage', DEEPSEEK_API_KEY: 'test-deepseek', VOYAGE_EMBEDDING_MODEL: 'voyage-code-3', VOYAGE_RERANK_MODEL: 'rerank-2.5', DEEPSEEK_MODEL: 'deepseek-flash', DEEPSEEK_THINKING: 'disabled' })) vi.stubEnv(key, value);
   const urls: string[] = [];
   vi.spyOn(globalThis, 'fetch').mockImplementation(async (url, init) => {
     urls.push(String(url)); const body = JSON.parse(init!.body as string);

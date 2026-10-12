@@ -18,6 +18,7 @@ export function sourceQuestionLimitation(index: SourceIndex, question: string): 
   }
   const releases = [{ packageName: index.packageName, version: index.version }, ...index.dependencies];
   for (const release of releases) {
+    if (!release.packageName) continue;
     const shortName = release.packageName.split('/').at(-1)!;
     const escaped = shortName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const mentioned = new RegExp(`${escaped}\\s*(?:@|version\\s*)?\\s*(\\d+\\.\\d+\\.\\d+(?:-[\\w.-]+)?)`, 'i').exec(question);
@@ -43,7 +44,7 @@ export function answerLocal(index: SourceIndex, rawQuestion: string): LocalAnswe
   const conflict = sourceQuestionLimitation(index, question); if (conflict) return abstain(conflict);
   const ranked = timed('lexical-source-search', value => `Searched ${index.evidence.length} passages; selected ${value.length} bounded candidates.`, () => {
     const candidates = index.evidence.map(item => ({ item, score: score(item, query) }))
-      .filter(candidate => candidate.score > 0 && /\.(?:[cm]?ts|tsx|[cm]?js|jsx)$/.test(candidate.item.source.path))
+      .filter(candidate => candidate.score > 0 && /\.(?:[cm]?ts|tsx|[cm]?js|jsx|py|go|rs|java|rb|php|c|h|cpp|hpp|cs|swift|kt|vue|svelte|sql)$/.test(candidate.item.source.path))
       .sort((a, b) => b.score - a.score || (a.item.source.endLine - a.item.source.startLine) - (b.item.source.endLine - b.item.source.startLine)
         || a.item.id.localeCompare(b.item.id));
     const result: SourceEvidence[] = [];
@@ -93,7 +94,7 @@ export function answerLocal(index: SourceIndex, rawQuestion: string): LocalAnswe
   for (const edge of index.edges) if (selectedEdges.has(edge.id) && !selectedEvidence.has(edge.evidenceId)
     && selectedEvidence.size < LOCAL_LIMITS.candidates) selectedEvidence.set(edge.evidenceId, index.evidence.find(item => item.id === edge.evidenceId)!);
   const citations: SourceEvidence[] = [];
-  let body = `Extractive source evidence for ${index.packageName}@${index.version} (${index.snapshot.revision}).\nStatic relationships show potential impact; they do not establish runtime outcomes.\n`;
+  let body = `Extractive source evidence for ${index.packageName && index.version ? `${index.packageName}@${index.version}` : 'this repository'} (${index.snapshot.revision}).\nStatic relationships show potential impact; they do not establish runtime outcomes.\n`;
   for (const item of selectedEvidence.values()) {
     const excerpt = `\n${item.source.path}:${item.source.startLine}–${item.source.endLine}\n${item.original}\n`;
     if (body.length + excerpt.length > LOCAL_LIMITS.answerCharacters) { missing.add('The source context character limit omitted additional passages.'); continue; }

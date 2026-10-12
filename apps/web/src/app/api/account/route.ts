@@ -1,5 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { accountWorkspaces, ensurePersonalWorkspace } from '../../../lib/account';
+import { isAllowedRequestOrigin } from '../../../lib/request-origin';
 export const runtime = 'nodejs';
 const headers = { 'Cache-Control': 'no-store', Vary: 'Cookie, Authorization' };
 export async function GET(): Promise<Response> {
@@ -10,8 +11,7 @@ export async function GET(): Promise<Response> {
   } catch { return Response.json({ error: 'Account or database access is unavailable.' }, { status: 503, headers }); }
 }
 export async function POST(request: Request): Promise<Response> {
-  const url = new URL(request.url);
-  if (request.headers.get('origin') !== url.origin) return Response.json({ error: 'Same-origin request required.' }, { status: 403, headers });
+  if (!isAllowedRequestOrigin(request, process.env.APP_ORIGIN)) return Response.json({ error: 'Same-origin request required.' }, { status: 403, headers });
   try {
     const { userId, sessionId } = await auth();
     if (!userId || !sessionId) return Response.json({ error: 'Sign in required.' }, { status: 401, headers });

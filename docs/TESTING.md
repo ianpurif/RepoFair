@@ -1,42 +1,45 @@
 # Verification strategy
 
-Local checks cover the authored fixture product. They do not establish hosted authorization, concurrent database connections or real payment settlement.
+Updated 2026-10-11. Check outcomes and their scope are in [the overhaul evidence](evidence/overhaul-validation.json). Current code is tested locally; hosted acceptance, concurrency and real settlement are separate gates.
 
 ## Commands
 
-- `node scripts/verify-starter.mjs`: 105 dependency-free starter/domain checks.
-- `bun run test:product`: Vitest parser, evidence, federation, SDK/MCP, SQL and payment-policy tests. Stop provider processes on 4311/4312 first; integration tests own these ports.
-- `bun run lint`: ESLint plus file hygiene.
-- `bun run typecheck`: contracts, core, worker, provider, SDK and Next sources.
-- `bun run build`: production Next build.
-- `bun run evaluate`: equal-source BM25 comparison and abstention guardrails; writes the measured fixture report.
-- `bun run test:browser`: start web on 3000 and both fixture providers first. Windows uses installed Edge; other hosts need Playwright Chromium. Tests do not auto-start or replace occupied services.
-- `bun run verify:release`: full product acceptance gate; remains blocked.
+- `node scripts/doctor.mjs`: prerequisites/configuration presence without secret values.
+- `node scripts/verify-starter.mjs`: 105 starter/domain checks, independent of full product acceptance.
+- `bun run test:product`: actual parser, worker, SQL/RLS, registry, provider runtime, SDK/MCP and payment-policy tests. Stop fixture processes on 4311/4312 first; existing integration tests own those ports.
+- `bun run lint`: ESLint, source hygiene and the Voyage/DeepSeek provider policy.
+- `bun run typecheck`: contracts/core/worker/provider/SDK and Next source.
+- `bun run build`: Next production build; do not run it against a simultaneous Next development server.
+- `bun run worker:check` / `bun run provider:check`: isolated Node executable bundles.
+- `bun run evaluate`: equal-source BM25 comparison and abstention guardrails; the tiny authored cases do not establish general quality.
+- `bun run verify:release`: must remain blocked until full externally accepted workflows are verified.
 
-## Evidence boundaries
+## Browser checks
 
-PostgreSQL-WASM executes the real migration with separate local test principals and a JWT-claim shim. It checks policy isolation, denied mutation, reservation accounting and replay rejection. It cannot prove hosted Clerk authentication, Storage policies or multi-connection reservation races.
+Start the web server on 3000 with `ATLAS_FIXTURES_ENABLED=true` in development, plus `bun run fixture:provider-a` and `bun run fixture:provider-b`. Then run `bun run test:browser`. Windows uses installed Edge; other hosts need Playwright Chromium. Tests never replace occupied services.
 
-Payment tests generate an official SDK challenge offline and exercise approval checks and uncertainty handling. They never sign or settle a transaction. Durable payment adapters are required but unwired; no paid recovery success is claimed.
+Two additional controls require explicit `ATLAS_BROWSER_TEST_SESSION=true`, configured development Clerk, and the already authorized principal record in ignored `.atlas/live-principal.json`. They create a 120-second ticket and a fresh session, verify the real account route, test browser mainnet refusal and history recovery against labelled commerce transports, and revoke only the new session/unused ticket. Existing sessions are preserved. Traces, saved auth state and failure screenshots are disabled for these opt-in cases.
 
-Browser tests exercise real fixture APIs, source navigation, original citations, version reset, explicit provider disclosure, failure states, keyboard and narrow layouts. These fixture checks do not establish authenticated import or paid approval.
+This real sign-in does not turn mocked catalog/history/RPC responses into hosted commerce acceptance. Ordinary fixture cases and actual anonymous API denial remain distinct.
 
-See `docs/evidence/local-execution.json` and `docs/evidence/browser-verification.json` for actual results. Independent security findings and scope are recorded in SECURITY.md. No remote CI or production deployment is implied by local checks.
+## SQL and payment boundaries
 
-Application AI checks: `bun run verify:ai` audits source/manifests/lock/environment names. `bunx vitest run tests/ai` covers 62 provider and grounding boundary cases using mocked HTTP. Browser AI tests explicitly mock generation responses and assert disclosure, citation navigation and no fallback after failure. They never prove live model quality, account access or billing.
+PGlite executes genuine migration SQL, RLS, triggers and AtlasDatabase transactions with a test claim shim. It verifies tenant isolation, denied direct mutation, capacities/rollback, lease fencing, immutable approvals, reservation accounting, single submission, replay rejection and provider-only migration installation. Its single serialized backend does **not** prove networked PostgreSQL lock contention or Clerk JWT validation.
 
-## Hosted verification — 2026-10-07
+Official offline MPP challenges, parser-built signed exports, native SDK/MCP HTTP and canonical-transfer checks run through the production implementation. Simulated RPC/identity/HTTPS transports are explicitly labelled. No test signature, transaction hash or receipt is claimed as a real wallet authorization or settlement.
 
-- `bun scripts/verify-integrations.ts`: read-only service/configuration probes; no secret output or inference calls.
-- `bun scripts/verify-hosted-database.ts`: verified client-to-pooler TLS, separate backend tenant isolation, server repository grants, membership revocation, concurrent budget reservations and idempotency. Uses generated principals and cleans generated rows; this is separate from Clerk JWT verification.
-- `bun scripts/verify-clerk-session.ts --allow-temporary-user`: real development Clerk widget sign-in, protected account route and Supabase JWT acceptance; deletes only its temporary test user/session. The Supabase OpenAPI root requires a secret key and is not a valid publishable-key authentication probe.
-- `bun scripts/verify-hosted-webhook.ts`: native signed handler and actual localhost route checks, concurrent delivery deduplication, revocation and database persistence. Does not prove GitHub-origin delivery or public reachability.
-- `node scripts/worker.mjs --once`: processes one queued import using a real linked user, installation token, immutable Git snapshot and isolated parser. Run `bun run worker` alongside the web server for continuous processing.
-- `bun scripts/verify-private-repository-ui.ts --allow-test-session --wait-ready`: opt-in real private browser acceptance against the locally recorded authorized principal/import. Creates a short-lived sign-in ticket and a new session, preserves existing sessions, and revokes only its own session. No source, credential, screenshot or browser-state artifacts are saved by the verifier.
-- `bun scripts/verify-hosted-import-locks.ts`: separate PostgreSQL backends verify repository-first locking, a reverse-order negative control and SKIP LOCKED; removes only generated audit records.
-- `bun scripts/verify-publication-draft-ui.ts --allow-test-session --allow-private-draft`: actual authenticated private draft create/save/reload/revoke, exact selected source preview, revision checks, negative routes and narrow/keyboard UI. Revokes only the new draft and test session; retains the draft audit record and preserves existing records/sessions.
-- `bun scripts/verify-publication-capacity.ts`: the actual capacity helper on two hosted transactions and different repositories with mixed-case UUIDs. Synthetic inaccessible metadata only; exactly one final slot succeeds and all generated rows are removed.
-- `bun scripts/verify-provider-replay.ts`: hosted absent-key replay and increment contention, namespace separation, rollback and untrusted-role denial; generated records are removed.
-- `bun scripts/verify-provider-ledger.ts`: hosted immutable quotes, single processing claims and retained uncertainty using explicitly synthetic authorization. Generates no receipt, source delivery or real sale; removes its generated provider records. Local ledger tests separately mock the authoritative verifier and do not establish chain settlement.
+[Independent verifier evidence](evidence/overhaul-verifier-commerce.json) and [security evidence](evidence/overhaul-security.json) list executed commands, regressions and limitations.
 
-Evidence files identify scope, observed outcomes and cleanup. The private import and browser reports must be read independently of fixture test totals. No private source is sent to AI by these checks.
+## Performance and read-only services
+
+`node --experimental-transform-types --max-old-space-size=768 scripts/import-benchmark.ts` reproduces the SQL/checkpoint import benchmark with generated source and simulated GitHub. Parser baseline/after reports separately measure isolated deterministic analysis. RSS is measured at return, not sampled peak; AI calls/cost are zero while infrastructure costs remain unmeasured.
+
+`bun run verify:integrations` probes Clerk, PostgreSQL/TLS, Supabase, GitHub App metadata and DeepSeek model availability. It sends no private source, performs no inference, applies no migrations and submits no payment. It creates/revokes only its own read-only installation token.
+
+`node --experimental-transform-types --max-old-space-size=768 scripts/verify-overhaul-import.ts --allow-authorized-source-read` requires the existing authorized principal/import records. It freshly verifies Clerk-linked GitHub access, reads only existing hosted membership/repository metadata, and imports actual immutable GitHub source using the production service into an in-memory PGlite database. It validates graph/source/citations and same-commit reuse, saves only aggregate evidence, and closes the local database. It applies no hosted migration and is not a hosted concurrency or new-session acceptance test.
+
+## Historical hosted evidence
+
+The dated 2026-10-07 reports independently record real Clerk/Supabase JWT acceptance, private GitHub import/source/answers/browser, separate-backend RLS/reservations/lock contention, localhost signed webhook handling, private draft administration and provider replay/quote/claim storage. They do not certify the overhaul's new schema, real remote webhook delivery, external publication or settlement.
+
+Opt-in scripts remain available in `scripts/verify-*.ts`; inspect their declared scope and owned-record cleanup before use. No current local success implies remote CI, deployment, successful paid delivery or general answer accuracy.

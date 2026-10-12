@@ -1,5 +1,7 @@
 import { verifyGitHubWebhook, GitHubError } from './github.ts';
 import type { AtlasDatabase } from './database.ts';
+import { IMPORT_INDEX_VERSION } from '../../../packages/contracts/src/import.ts';
+import { assertImportHistoryCapacity } from './repository-service.ts';
 export async function processGitHubWebhook(database: AtlasDatabase, body: Uint8Array, headers: Headers, secret: string | undefined) {
   const delivery = verifyGitHubWebhook(body, headers, secret);
   const payload = delivery.payload;
@@ -27,7 +29,10 @@ export async function processGitHubWebhook(database: AtlasDatabase, body: Uint8A
     const revoke = async (repositoryIds?: number[]) => {
       const changed = await tx.query<{id:string}>('update atlas.repositories set access_revoked=true,permission_revision=permission_revision+1 where github_installation_id=$1 and not access_revoked' + (repositoryIds ? ' and github_repository_id=any($2::bigint[])' : '') + ' returning id',repositoryIds ? [installationId,repositoryIds] : [installationId]);
       revoked += changed.rowCount ?? 0;
-      for (const repository of changed.rows) await tx.query("update atlas.jobs set status='cancelled',error_code='access-revoked',lease_until=null where snapshot_id in (select id from atlas.snapshots where repository_id=$1) and status in ('queued','running')",[repository.id]);
+      for (const repository of changed.rows) {
+        const jobs = await tx.query<{ snapshot_id: string }>("update atlas.jobs set status='cancelled',error_code='access-revoked',error_retryable=false,claim_token=null,lease_until=null,updated_at=now(),finished_at=now() where snapshot_id in (select id from atlas.snapshots where repository_id=$1) and status in ('queued','running') returning snapshot_id", [repository.id]);
+        await tx.query("update atlas.snapshots set status='cancelled' where id=any($1::uuid[]) and status<>'complete'", [jobs.rows.map(job => job.snapshot_id)]);
+      }
     };
     if (delivery.event === 'installation' && ['deleted','suspend'].includes(String(payload.action))) await revoke();
     if (delivery.event === 'installation_repositories' && payload.action === 'removed') {
@@ -44,13 +49,19 @@ export async function processGitHubWebhook(database: AtlasDatabase, body: Uint8A
       const repository = payload.repository as { id?: unknown } | undefined;
       if (!Number.isSafeInteger(repository?.id) || typeof payload.after !== 'string' || !/^[a-f0-9]{40}$/.test(payload.after) || typeof payload.ref !== 'string' || !payload.ref.startsWith('refs/heads/')) throw new GitHubError('invalid','Invalid immutable push');
       const ref = payload.ref.slice('refs/heads/'.length);
-      const repositories = await tx.query<{id:string;workspace_id:string}>('select id,workspace_id from atlas.repositories where github_installation_id=$1 and github_repository_id=$2 and not access_revoked for update',[installationId,repository!.id]);
+      if (!ref || ref.length > 255 || /[\s?#\\]/.test(ref) || ref.startsWith('-')) throw new GitHubError('invalid','Invalid push branch');
+      const repositories = await tx.query<{id:string;workspace_id:string;permission_revision:string}>('select id,workspace_id,permission_revision::text from atlas.repositories where github_installation_id=$1 and github_repository_id=$2 and not access_revoked for update',[installationId,repository!.id]);
       for (const row of repositories.rows) {
         const origin = await tx.query<{principal_id:string;revision:string}>("select j.principal_id,m.revision::text from atlas.jobs j join atlas.snapshots s on s.id=j.snapshot_id join atlas.memberships m on m.workspace_id=j.workspace_id and m.principal_id=j.principal_id where s.repository_id=$1 and s.requested_ref=$2 and m.role in ('owner','admin') order by j.created_at desc limit 1",[row.id,ref]);
         if (!origin.rows[0]) continue;
-        const snapshot = await tx.query<{id:string}>("insert into atlas.snapshots(workspace_id,repository_id,revision,status,requested_ref) values ($1,$2,$3,'queued',$4) on conflict(repository_id,revision) do nothing returning id",[row.workspace_id,row.id,payload.after,ref]);
+        const duplicate=await tx.query('SELECT id FROM atlas.snapshots WHERE repository_id=$1 AND revision=$2 AND index_version=$3',[row.id,payload.after,IMPORT_INDEX_VERSION]);
+        if(duplicate.rows.length)continue;
+        await assertImportHistoryCapacity(tx,row.workspace_id,true);
+        const snapshot = await tx.query<{id:string}>(`insert into atlas.snapshots(workspace_id,repository_id,revision,status,requested_ref,index_version,base_snapshot_id)
+          values ($1,$2,$3,'queued',$4,$5,(select id from atlas.snapshots where repository_id=$2 and workspace_id=$1 and status='complete' order by indexed_at desc nulls last,created_at desc limit 1))
+          on conflict(repository_id,revision,index_version) do nothing returning id`,[row.workspace_id,row.id,payload.after,ref,IMPORT_INDEX_VERSION]);
         if (!snapshot.rows[0]) continue;
-        await tx.query("insert into atlas.jobs(workspace_id,snapshot_id,principal_id,permission_revision) values ($1,$2,$3,$4)",[row.workspace_id,snapshot.rows[0].id,origin.rows[0].principal_id,origin.rows[0].revision]); queued++;
+        await tx.query("insert into atlas.jobs(workspace_id,snapshot_id,principal_id,permission_revision,repository_permission_revision) values ($1,$2,$3,$4,$5)",[row.workspace_id,snapshot.rows[0].id,origin.rows[0].principal_id,origin.rows[0].revision,row.permission_revision]); queued++;
       }
     }
     await tx.query('update atlas.webhook_deliveries set processed_at=now() where delivery_id=$1',[delivery.deliveryId]);

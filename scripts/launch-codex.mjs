@@ -7,8 +7,8 @@ const args = [
   '-c', `model_reasoning_effort=${JSON.stringify(p.lead.effort)}`,
   '-c', 'agents.enabled=true',
   '-c', `agents.max_concurrent_threads_per_session=${p.maxConcurrentSubagents}`,
-  '-c', 'agents.default_subagent_model="gpt-6.1-sol"',
-  '-c', 'agents.default_subagent_reasoning_effort="xhigh"',
+  '-c', `agents.default_subagent_model=${JSON.stringify(p.lead.model)}`,
+  '-c', `agents.default_subagent_reasoning_effort=${JSON.stringify(p.lead.effort)}`,
   'Read and execute START.md.',
 ];
 if (process.argv.includes('--dry-run')) {
@@ -16,7 +16,7 @@ if (process.argv.includes('--dry-run')) {
 } else {
   try {
     const spec = command('codex', args);
-    console.log('Starting Codex with Astra medium; project subagents use Astra medium and Sol xhigh.');
+    console.log('Starting Codex with gpt-6.1-sol max for the lead and every subagent; no fallbacks.');
     console.log('Approve login/project trust/network access in the client when required.');
     const r = spawnSync(spec.bin, spec.args, {cwd:ROOT,stdio:'inherit'});
     if (r.error) throw r.error;

@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-10-07T08:57:12.434Z",
-  "scope": "Real connected human account; existing private import; desktop and narrow browser source/graph/extractive retrieval. No import/workspace writes, provider purchases, AI calls, or private source egress.",
-  "command": "bun scripts/verify-private-repository-ui.ts --allow-test-session --wait-ready",
+  "checkedAt": "2026-10-12T14:32:34.912Z",
+  "scope": "Real connected human account; existing private import; desktop and narrow browser source/graph/extractive retrieval. No import/workspace writes, provider purchases, AI calls, or source sent to AI/unrelated origins.",
+  "command": "bun scripts/verify-private-repository-ui.ts --allow-test-session --wait-ready --origin CONFIGURED_APP_ORIGIN",
   "browser": {
     "engine": "Edge",
     "freshContext": true,
@@ -12,7 +12,7 @@
     "expectedIndexHttpErrors": 0,
     "expectedNegativeRouteHttpErrors": 6,
     "unexpectedConsoleErrors": 0,
-    "pageFailedRequestCount": 1,
+    "pageFailedRequestCount": 3,
     "aiRequests": 0,
     "bearerRequestsAtExternalOrigins": 0
   },
@@ -56,14 +56,27 @@
   "source": {
     "status": "verified",
     "fullFileMatchesExactGitSource": true,
-    "displayedLineCount": 52,
-    "provenanceVisible": true
+    "displayedLineCount": 2,
+    "provenanceVisible": true,
+    "exactSnapshotAndParsedSourceProvenanceVisible": true
   },
   "graph": {
     "status": "verified",
     "progressiveExpansion": true,
+    "selectionAutomaticallyLoadedNeighborhood": true,
+    "initialLoadedNodes": 120,
+    "initialLoadedEdges": 141,
+    "neighborhoodNodes": 3,
+    "neighborhoodEdges": 2,
+    "expectedLoadedUnionNodes": 121,
+    "expectedLoadedUnionEdges": 142,
+    "visibleNodesBeforeSelection": 12,
+    "visibleNodesAfterAutomaticExpansion": 13,
+    "collapseAndReexpandVerified": true,
     "existingNodePositionsPreserved": true,
-    "accessibleListMatchesNodeAndEdgeCounts": true,
+    "accessibleListMatchesLoadedUnionCountsAndMetadata": true,
+    "loadedNodeEdgeIdentitiesAndSourceProvenanceMatchAuthorizedIndex": true,
+    "accessibleListComparedAgainstFullIndex": false,
     "relationshipOriginChecked": true
   },
   "question": {
@@ -75,6 +88,9 @@
     "citationCount": 8,
     "allCitationsCommitPrincipalWorkspaceAndSourceBound": true,
     "citationNavigationMatchesSource": true,
+    "requestedCitationRangeResponseAndRenderingVerified": true,
+    "displayedCitationLineCount": 1,
+    "citationNavigationRespects120LinePage": true,
     "privateSourceSentToAi": false
   },
   "negativeRoutes": {
@@ -105,9 +121,167 @@
     "newSessionRevoked": true,
     "ticketConsumedSingleUse": true
   },
+  "priorRuns": [
+    {
+      "checkedAt": "2026-10-12T13:36:31.697Z",
+      "completedAt": "2026-10-12T13:37:24.095Z",
+      "status": "failed",
+      "originKind": "loopback-legacy",
+      "failureStage": "desktop-source-and-expansion",
+      "failureCode": "REAL_SYMBOL_EXPANSION_NOT_VERIFIED",
+      "verifiedAreas": [
+        "session",
+        "catalog",
+        "index",
+        "source",
+        "negativeRoutes"
+      ],
+      "cleanupVerified": true,
+      "existingSessionsRevokedByTest": 0,
+      "browserPageErrors": 0,
+      "unexpectedConsoleErrors": 0,
+      "observation": "Historical harness expected manual expansion after file selection; the current UI automatically loads the selected neighborhood. Full-index list counts were also stale for the paged workspace."
+    },
+    {
+      "checkedAt": "2026-10-12T13:59:05.929Z",
+      "completedAt": "2026-10-12T14:00:11.866Z",
+      "status": "failed",
+      "originKind": "loopback",
+      "failureStage": "question-citation-navigation",
+      "failureCode": "ANSWER_CITATION_NAVIGATION_DIFFERS_FROM_SOURCE",
+      "verifiedAreas": [
+        "session",
+        "catalog",
+        "index",
+        "source",
+        "graph",
+        "negativeRoutes"
+      ],
+      "cleanupVerified": true,
+      "existingSessionsRevokedByTest": 0,
+      "browserPageErrors": 0,
+      "unexpectedConsoleErrors": 0,
+      "observation": "Previous independently executed browser run; current results are recorded separately."
+    },
+    {
+      "checkedAt": "2026-10-12T14:03:13.851Z",
+      "completedAt": "2026-10-12T14:04:28.073Z",
+      "status": "failed",
+      "originKind": "loopback",
+      "failureStage": "keyboard-and-narrow-layout",
+      "failureCode": "NARROW_SOURCE_PANEL_NOT_VERIFIED",
+      "verifiedAreas": [
+        "session",
+        "catalog",
+        "index",
+        "source",
+        "graph",
+        "question",
+        "negativeRoutes"
+      ],
+      "cleanupVerified": true,
+      "existingSessionsRevokedByTest": 0,
+      "browserPageErrors": 0,
+      "unexpectedConsoleErrors": 0,
+      "observation": "Previous independently executed browser run; current results are recorded separately."
+    },
+    {
+      "checkedAt": "2026-10-12T14:06:22.239Z",
+      "completedAt": "2026-10-12T14:07:42.624Z",
+      "status": "verified",
+      "originKind": "loopback",
+      "failureStage": null,
+      "failureCode": null,
+      "verifiedAreas": [
+        "session",
+        "catalog",
+        "index",
+        "source",
+        "graph",
+        "question",
+        "negativeRoutes",
+        "accessibility"
+      ],
+      "cleanupVerified": true,
+      "existingSessionsRevokedByTest": 0,
+      "browserPageErrors": 0,
+      "unexpectedConsoleErrors": 0,
+      "observation": "Previous independently executed browser run; current results are recorded separately."
+    },
+    {
+      "checkedAt": "2026-10-12T14:08:48.721Z",
+      "completedAt": "2026-10-12T14:09:17.490Z",
+      "status": "failed",
+      "originKind": "configured-public",
+      "failureStage": "authenticated-negative-route-checks",
+      "failureCode": "NEGATIVE_ROUTE_MALFORMEDQUESTIONJSON_EXPECTED_400",
+      "expectedHttpStatus": 400,
+      "observedHttpStatus": null,
+      "observedGenericCode": null,
+      "verifiedAreas": [
+        "session",
+        "catalog"
+      ],
+      "cleanupVerified": true,
+      "existingSessionsRevokedByTest": 0,
+      "browserPageErrors": 0,
+      "unexpectedConsoleErrors": 3,
+      "observation": "Previous independently executed browser run; current results are recorded separately."
+    }
+  ],
+  "applicationOrigin": {
+    "kind": "configured-public",
+    "origin": "https://known-les-characters-narrow.trycloudflare.com",
+    "exactConfiguredHttpsOrigin": true
+  },
   "anonymousRepository": {
     "httpStatus": 401,
     "denied": true
+  },
+  "negativeRouteProgress": {
+    "testedCases": 6,
+    "statuses": {
+      "malformedQuestionJson": 400,
+      "oversizedQuestionBody": 413,
+      "emptyQuestion": 400,
+      "nonObjectQuestion": 400,
+      "wrongQuestionContentType": 400,
+      "malformedImportJson": 400
+    },
+    "codes": {
+      "malformedQuestionJson": "invalid-body",
+      "oversizedQuestionBody": "body-limit",
+      "emptyQuestion": "invalid-question",
+      "nonObjectQuestion": "invalid-body",
+      "wrongQuestionContentType": "invalid-body",
+      "malformedImportJson": "invalid-body"
+    }
+  },
+  "publicLoopbackOrigins": {
+    "status": "verified",
+    "publicDestinationIsConfiguredHttps": true,
+    "freshAuthenticatedRequestCookies": true,
+    "directLoopbackExceptionDidNotApplyBehindPublicProxy": true,
+    "cases": [
+      {
+        "origin": "http://localhost:3000",
+        "httpStatus": 403,
+        "noStore": true,
+        "code": "denied"
+      },
+      {
+        "origin": "http://127.0.0.1:3000",
+        "httpStatus": 403,
+        "noStore": true,
+        "code": "denied"
+      },
+      {
+        "origin": "http://[::1]:3000",
+        "httpStatus": 403,
+        "noStore": true,
+        "code": "denied"
+      }
+    ]
   },
   "navigation": {
     "status": "verified",
@@ -144,5 +318,5 @@
     "citationCount": 8
   },
   "status": "verified",
-  "completedAt": "2026-10-07T08:58:45.612Z"
+  "completedAt": "2026-10-12T14:34:15.268Z"
 }

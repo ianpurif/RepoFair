@@ -139,6 +139,79 @@ describe('GitHub App authentication and authorization', () => {
   });
 });
 describe('bounded immutable GitHub source download', () => {
+  it('checkpoints truncated trees and traverses only eligible subtrees without reading discarded partial entries', async () => {
+    const subtree = 'c'.repeat(40); const dependencyTree = 'd'.repeat(40);
+    const { client, access, api } = await authorized({
+      [`/repos/owner/repository/git/trees/${treeSha}?recursive=1`]: { sha: treeSha, truncated: true, tree: [{ path: 'partial.ts', sha: blobSha, type: 'blob', mode: '100644', size: bytes.length }] },
+      [`/repos/owner/repository/git/trees/${treeSha}`]: { sha: treeSha, truncated: false, tree: [{ path: 'src', sha: subtree, type: 'tree', mode: '040000' }, { path: 'node_modules', sha: dependencyTree, type: 'tree', mode: '040000' }] },
+      [`/repos/owner/repository/git/trees/${subtree}`]: { sha: subtree, truncated: false, tree: [{ path: 'index.ts', sha: blobSha, type: 'blob', mode: '100644', size: bytes.length }] },
+    });
+    const first = await client.discoverSnapshot(access, commitSha, undefined, { maxRequests: 1 });
+    expect(first.complete).toBe(false); expect(first.files).toEqual([]); expect(first.pending).toEqual([{ prefix: '', sha: treeSha, recursive: false }]);
+    const second = await client.discoverSnapshot(access, commitSha, first, { maxRequests: 1 });
+    expect(second.complete).toBe(false); expect(second.pending).toEqual([{ prefix: 'src', sha: subtree, recursive: false }]);
+    const third = await client.discoverSnapshot(access, commitSha, second, { maxRequests: 1 });
+    expect(third.complete).toBe(true); expect(third.files.map(file => file.path)).toEqual(['src/index.ts']); expect(third.treesVisited).toBe(3);
+    expect(api.calls.some(call => call.path.includes(dependencyTree) || call.path.includes('/git/blobs/'))).toBe(false);
+  });
+  it('accepts large metadata trees while excluding irrelevant files and enforcing the actual 5000 source-file bound', async () => {
+    const entry = { sha: blobSha, type: 'blob', mode: '100644', size: bytes.length };
+    const excluded = Array.from({ length: 12000 }, (_, position) => ({ ...entry, path: `node_modules/pkg/${position}.ts` }));
+    const treePath = `/repos/owner/repository/git/trees/${treeSha}?recursive=1`;
+    const { client, access, api } = await authorized({ [treePath]: { sha: treeSha, truncated: false, tree: [...excluded, { ...entry, path: 'main.py' }, { ...entry, path: 'oversized.go', size: 262145 }, { ...entry, path: '.env.local' }] } });
+    const state = await client.discoverSnapshot(access, commitSha);
+    expect(state.files.map(file => file.path)).toEqual(['main.py']); expect(state.discovered).toBe(12003); expect(state.skipped).toBe(12002);
+    api.entries[treePath] = { sha: treeSha, truncated: false, tree: Array.from({ length: 5001 }, (_, position) => ({ ...entry, path: `src/${position}.ts` })) };
+    await expect(client.discoverSnapshot(access, commitSha)).rejects.toMatchObject({ code: 'limit' });
+    expect(api.calls.some(call => call.path.includes('/git/blobs/'))).toBe(false);
+  });
+  it('classifies primary and secondary rate limits separately from authorization and retains Retry-After', async () => {
+    const cases: [Response, string, number | undefined][] = [
+      [new Response('limited', { status: 403, headers: { 'x-ratelimit-remaining': '0', 'x-ratelimit-reset': String(now / 1000 + 120), 'retry-after': '30' } }), 'rate-limit', 120000],
+      [Response.json({ message: 'You have exceeded a secondary rate limit.' }, { status: 403 }), 'rate-limit', 60000],
+      [new Response('limited', { status: 429, headers: { 'retry-after': '45' } }), 'rate-limit', 45000],
+      [new Response('forbidden', { status: 403 }), 'unauthorized', undefined],
+      [new Response('unavailable', { status: 503, headers: { 'retry-after': '20' } }), 'upstream', 20000],
+    ];
+    for (const [response, code, retryAfterMs] of cases) {
+      const { client, access, api } = await authorized(); api.entries[`/repos/owner/repository/commits/${commitSha}`] = response;
+      await expect(client.discoverSnapshot(access, commitSha)).rejects.toMatchObject({ code, retryAfterMs });
+    }
+  });
+  it('refreshes an expired installation token once on a 401 while keeping a single repository read scope', async () => {
+    const api = mockApi(); let refreshed = false;
+    const fetcher: typeof fetch = async (input, init) => {
+      if (String(input).includes('/git/blobs/') && (init?.headers as Record<string,string>).Authorization === 'Bearer ghs_test_only') {
+        api.entries['/app/installations/99/access_tokens'] = { token: 'ghs_refreshed_test_only', expires_at: '2026-10-07T01:00:00Z' }; refreshed = true;
+        return new Response('expired', { status: 401 });
+      }
+      return api.fetch(input, init);
+    };
+    const client = await createGitHubAppClient(env, { fetch: fetcher, now: () => now });
+    const user = await client.verifyUser({ principalId: 'clerk-user-1', githubUserId: 10, userAccessToken: 'user-test-only' });
+    const access = await client.authorizeRepository(user, { owner: 'owner', name: 'repository' });
+    expect((await client.downloadSnapshot(access, commitSha)).files[0]?.text).toBe(source); expect(refreshed).toBe(true);
+    const issuance = api.calls.filter(call => call.path.endsWith('/access_tokens')); expect(issuance).toHaveLength(2);
+    expect(JSON.parse(String(issuance[1]?.init?.body))).toEqual({ repository_ids: [100], permissions: { contents: 'read', metadata: 'read' } });
+  });
+  it('aborts active downloads and starts no new requests after the caller cancels', async () => {
+    const api = mockApi(); let started = 0; const controller = new AbortController();
+    const fetcher: typeof fetch = async (input, init) => {
+      if (!String(input).includes('/git/blobs/')) return api.fetch(input, init);
+      started++; return new Promise<Response>((_resolve, reject) => { init?.signal?.addEventListener('abort', () => reject(new Error('cancelled')), { once: true }); });
+    };
+    const client = await createGitHubAppClient(env, { fetch: fetcher, now: () => now });
+    const user = await client.verifyUser({ principalId: 'clerk-user-1', githubUserId: 10, userAccessToken: 'user-test-only' });
+    const access = await client.authorizeRepository(user, { owner: 'owner', name: 'repository' });
+    const work = client.downloadFiles(access, Array.from({ length: 10 }, (_, position) => ({ path: `src/${position}.ts`, size: bytes.length, blobSha })), { signal: controller.signal });
+    while (!started) await new Promise(resolve => setTimeout(resolve, 1));
+    controller.abort(); await expect(work).rejects.toMatchObject({ code: 'aborted' }); expect(started).toBeLessThanOrEqual(4);
+  });
+  it('preserves a UTF-8 byte order mark so staged text still hashes to the immutable blob', async () => {
+    const original = '\uFEFFexport const value = 1;\n'; const data = Buffer.from(original); const hash = createHash('sha1').update(`blob ${data.length}\0`).update(data).digest('hex');
+    const { client, access } = await authorized({ [`/repos/owner/repository/git/blobs/${hash}`]: { sha: hash, encoding: 'base64', size: data.length, content: data.toString('base64') } });
+    expect((await client.downloadFiles(access, [{ path: 'src/bom.ts', size: data.length, blobSha: hash }]))[0]?.text).toBe(original);
+  });
   it('inspects immutable authorized tree metadata without reading any source blob', async () => {
     const { client, access, api } = await authorized();
     expect(await client.inspectSnapshot(access, commitSha)).toEqual({ commitSha, treeSha, files: [{ path: 'src/index.ts', size: bytes.length, blobSha }], limitations: [] });
@@ -147,13 +220,13 @@ describe('bounded immutable GitHub source download', () => {
   it('preflights complete tree file, per-file and total byte bounds before any blob request', async () => {
     const treePath = `/repos/owner/repository/git/trees/${treeSha}?recursive=1`;
     const entry = { path: 'src/index.ts', sha: blobSha, type: 'blob', mode: '100644', size: bytes.length };
-    for (const limits of [{ maxFiles: 1, maxFileBytes: 512000, maxTotalBytes: 5000000 }, { maxFiles: 300, maxFileBytes: bytes.length - 1, maxTotalBytes: 5000000 }, { maxFiles: 300, maxFileBytes: 512000, maxTotalBytes: bytes.length }]) {
+    for (const limits of [{ maxFiles: 1, maxFileBytes: 262144, maxTotalBytes: 30000000 }, { maxFiles: 5000, maxFileBytes: bytes.length - 1, maxTotalBytes: 30000000 }, { maxFiles: 5000, maxFileBytes: 262144, maxTotalBytes: bytes.length }]) {
       const { client, access, api } = await authorized({ [treePath]: { sha: treeSha, truncated: false, tree: [entry, { ...entry, path: 'src/other.ts' }] } });
       await expect(client.downloadSnapshot(access, commitSha, limits)).rejects.toMatchObject({ code: 'limit' });
       expect(api.calls.some(call => call.path.includes('/git/blobs/'))).toBe(false);
     }
     const { client, access } = await authorized();
-    await expect(client.downloadSnapshot(access, commitSha, { maxFiles: 301, maxFileBytes: 512000, maxTotalBytes: 5000000 })).rejects.toThrow('trusted');
+    await expect(client.downloadSnapshot(access, commitSha, { maxFiles: 5001, maxFileBytes: 262144, maxTotalBytes: 30000000 })).rejects.toThrow('trusted');
   });
   it('bounds blob concurrency at four and preserves complete source order and hashes', async () => {
     const entry = { sha: blobSha, type: 'blob', mode: '100644', size: bytes.length };
@@ -170,7 +243,7 @@ describe('bounded immutable GitHub source download', () => {
     const access = await client.authorizeRepository(user, { owner: 'owner', name: 'repository' });
     const result = await client.downloadSnapshot(access, commitSha);
     expect(maximum).toBe(4); expect(active).toBe(0);
-    expect(result.files.map(file => file.path)).toEqual(Array.from({ length: 11 }, (_, index) => `src/${index}.ts`));
+    expect(result.files.map(file => file.path)).toEqual(Array.from({ length: 11 }, (_, index) => `src/${index}.ts`).sort());
     expect(result.files.every(file => file.text === source && file.blobSha === blobSha)).toBe(true);
   });
   it('resolves exact commit and verifies source blob bytes without executing source', async () => {

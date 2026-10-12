@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { answerLocal, lookupSource, parseLocalIndex, parseRepositoryIndex, validateLocalAnswer, validateLocalIndex, validateSourceIndex, LOCAL_LIMITS } from '../../packages/core/src/local/index.ts';
+import { answerLocal, lookupSource, parseLocalIndex, parseRepositoryIndex, validateLocalAnswer, validateLocalIndex, validateSourceIndex } from '../../packages/core/src/local/index.ts';
 import type { ParseRepositoryInput } from '../../packages/core/src/local/index.ts';
 import { indexFixture } from '../../apps/worker/src/fixture-service.ts';
+import { GIT_LIMITS } from '../../packages/core/src/local/limits.ts';
 
 // Synthetic unit inputs exercise the parser after the separately verified
 // GitHub download boundary; they make no claim of a real repository import.
@@ -47,13 +48,14 @@ describe('genuine Git index identity and retrieval', () => {
     expect(() => parseRepositoryIndex({ ...input(), snapshot: fixture.snapshot })).toThrow('Git commit');
     expect(() => validateSourceIndex({ ...fixture, mode: 'git' })).toThrow('snapshot');
   });
-  it('rejects missing/invalid manifest versions and mismatched source identity without inventing defaults', () => {
-    const noManifest = { ...input(), files: input().files.filter(file => file.path !== 'package.json') };
-    expect(() => parseRepositoryIndex(noManifest)).toThrow('root package.json');
+  it('accepts absent package identity and retains exact manifest matching without inventing versions', () => {
+    const noManifest = { ...input(),packageName:null,version:null,files: input().files.filter(file => file.path !== 'package.json') };
+    const plain = parseRepositoryIndex(noManifest); validateSourceIndex(plain); expect(plain.packageName).toBeNull(); expect(plain.version).toBeNull();
     for (const version of [undefined, 'latest', '^2.3.4', '', 2]) {
-      expect(() => parseRepositoryIndex(input({ 'package.json': JSON.stringify({ name: metadata.packageName, version }) }))).toThrow('supported exact version');
+      const index = parseRepositoryIndex(input({ 'package.json': JSON.stringify({ name: metadata.packageName, version }) },{version:null}));
+      validateSourceIndex(index); expect(index.version).toBeNull(); expect(index.packageName).toBe(metadata.packageName);
     }
-    expect(() => parseRepositoryIndex(input({ 'package.json': JSON.stringify({ version: metadata.version }) }))).toThrow('package name');
+    expect(parseRepositoryIndex(input({ 'package.json': JSON.stringify({ version: metadata.version }) },{packageName:null})).packageName).toBeNull();
     expect(() => parseRepositoryIndex(input({}, { version: '^2.3.4' }))).toThrow('exact package version');
     expect(() => parseRepositoryIndex(input({ 'package.json': JSON.stringify({ name: metadata.packageName, version: '9.0.0' }) }))).toThrow('identity');
     const git = parseRepositoryIndex(input()); expect(() => validateSourceIndex({ ...git, version: '9.0.0' })).toThrow('source manifest');
@@ -100,6 +102,6 @@ describe('genuine Git index identity and retrieval', () => {
       'tsconfig.json': '{"compilerOptions":{"plugins":[{"name":"untrusted-code"}]}}' }));
     expect((globalThis as Record<string, unknown>)[marker]).toBeUndefined(); expect(index.nodes.some(node => node.label === 'safeData')).toBe(true);
     expect(() => parseRepositoryIndex(input({ '../escape.ts': 'export const escape = true;' }))).toThrow('Invalid');
-    expect(() => parseRepositoryIndex(input({ 'src/huge.ts': 'x'.repeat(LOCAL_LIMITS.fileCharacters + 1) }))).toThrow('oversized');
+    expect(() => parseRepositoryIndex(input({ 'src/huge.ts': 'x'.repeat(GIT_LIMITS.fileCharacters + 1) }))).toThrow('oversized');
   });
 });

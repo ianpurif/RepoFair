@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-11T16:12:29Z",
+  "scope": "Publishing/payment setup clarification and caller-owned CLI; no external provisioning or purchase.",
+  "actualResearch": {
+    "chainId": 42431,
+    "blockNumber": 39150222,
+    "pathUsdDecimals": 6,
+    "rpc": "https://rpc.moderato.tempo.xyz",
+    "readOnly": true
+  },
+  "verification": {
+    "focusedCli": {
+      "passed": 16,
+      "total": 16,
+      "seconds": 9.27,
+      "reportedBy": "/root/publishing_setup_cli",
+      "transports": "explicit synthetic SDK/RPC/file transports"
+    },
+    "standaloneStrictTypecheck": {
+      "exitCode": 0,
+      "reportedBy": "/root/publishing_setup_cli"
+    },
+    "scopedEslint": {
+      "exitCode": 0,
+      "reportedBy": "/root/publishing_setup_cli"
+    },
+    "actualNodeHelp": {
+      "exitCode": 0
+    },
+    "actualNodeMissingArguments": {
+      "exitCode": 1,
+      "expectedCode": "origin-required"
+    },
+    "fullTypecheck": {
+      "exitCode": 0,
+      "executedBy": "lead"
+    },
+    "fullLintPolicyHygiene": {
+      "exitCode": 0,
+      "executedBy": "lead"
+    }
+  },
+  "guards": [
+    "Read-only default; no signing key read or allowance/reservation mutation",
+    "Wrong RPC chain denied before authentication/reservation/key",
+    "Exact price approval and sufficient existing allowance required",
+    "Caller-owned signing key outside checkout",
+    "Signer-free existing purchase resume",
+    "Token reread per Atlas request",
+    "Exclusive explicit private result file; no private source or raw errors in stdout"
+  ],
+  "implementation": "Caller-owned native viem local-account signer through AuthenticatedAtlasClient; actual signing unverified.",
+  "boundaries": {
+    "walletKeysCreated": 0,
+    "fundingRequests": 0,
+    "signatures": 0,
+    "broadcasts": 0,
+    "hostedWrites": 0,
+    "externalDeployments": 0,
+    "sourceExports": 0,
+    "productionReady": false
+  },
+  "sources": [
+    "https://github.com/tempoxyz/docs/blob/main/src/pages/docs/quickstart/connection-details.mdx",
+    "https://github.com/tempoxyz/docs/blob/main/src/pages/docs/quickstart/faucet.mdx",
+    "https://github.com/wevm/mppx/blob/mppx@0.13.1/src/tempo/client/Charge.ts",
+    "https://github.com/wevm/viem/blob/viem@2.57.2/src/actions/wallet/signTransaction.ts",
+    "https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/",
+    "https://supabase.com/docs/guides/database/connecting-to-postgres"
+  ]
+}

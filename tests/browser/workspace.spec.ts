@@ -28,7 +28,7 @@ browserTest.afterEach(async ({ browserMessages }, info) => {
 
 async function openWorkspace(page: Page, id: FixtureId = 'jobboard-app@1.0.0'): Promise<LocalIndex> {
   const response = page.waitForResponse(response => response.url().includes('/api/fixtures?') && response.status() === 200);
-  await page.goto('/app');
+  await page.goto('/demo');
   let index = await (await response).json() as LocalIndex;
   if (id !== 'jobboard-app@1.0.0') {
     const changed = page.waitForResponse(response => response.url().includes('/api/fixtures?') && response.status() === 200);
@@ -173,7 +173,7 @@ browserTest('provider approval explicitly discloses a separate bounded outbound 
   expect(result.payment).toBe('not-attempted');
 });
 
-browserTest('two real providers extend graph with distinct exact-version provenance and clickable source', async ({ page }) => {
+browserTest('two explicit fixture HTTP providers extend graph with distinct exact-version provenance and clickable source', async ({ page }) => {
   const local = await openWorkspace(page);
   const result = await approveProviders(page, ['fixture-retry', 'fixture-events'], 'How are retries recorded and delayed?');
   expect(result.providers.map(provider => provider.providerId)).toEqual(['fixture-retry', 'fixture-events']);
@@ -241,7 +241,7 @@ browserTest('mobile panels, keyboard evidence navigation and reduced motion fit 
 
 browserTest('publishing remains gated and configured Clerk sign-in offers real authentication', async ({ page }) => {
   await page.goto('/app/publish');
-  await expect(page.getByText('Private drafts are available; publication is unavailable', { exact: true })).toBeVisible();
+  await expect(page.getByText('Publication requires separate approval', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Sign in to manage drafts' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Create private draft' })).toHaveCount(0);
   expect((await page.request.post('/api/publications', { data: {} })).status()).toBe(401);
@@ -254,20 +254,16 @@ browserTest('publishing remains gated and configured Clerk sign-in offers real a
   await expect(page.getByText('Snapshot ready', { exact: true })).toBeVisible();
 });
 
-browserTest('activity records actual index/source/retrieval/provider operations and can be cleared', async ({ page }) => {
-  await page.goto('/app/activity'); await expect(page.getByText('No activity in this session', { exact: true })).toBeVisible();
+browserTest('normal purchase history hides fixture operations and requires an authenticated account', async ({ page }) => {
   await openWorkspace(page);
   await page.getByRole('button', { name: 'src/run-job.ts', exact: true }).click();
   await expect(page.locator('.source-view')).toBeVisible(); await ask(page, 'How does planFailure work?');
-  await approveProviders(page, ['fixture-retry'], 'How do retries work?');
   await page.getByRole('navigation', { name: 'Application' }).getByRole('link', { name: 'Activity', exact: true }).click();
-  const history = page.locator('.activity-list');
-  for (const operation of ['fixture.index', 'source.lookup', 'lexical-source-search', 'validate-citations', 'provider.context']) await expect(history).toContainText(operation);
-  await expect(history).toContainText('Payment not attempted.');
-  await expect(history).not.toContainText('0x');
-  await page.getByRole('button', { name: 'Clear history' }).click();
-  await expect(page.getByText('No activity in this session', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Clear history' })).toBeDisabled();
+  await expect(page.getByRole('heading', { name: 'Sign in to view purchases' })).toBeVisible();
+  await expect(page.locator('.activity-list')).toHaveCount(0);
+  await expect(page.getByText('fixture.index', { exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Clear history' })).toHaveCount(0);
+  expect((await page.request.get('/api/purchases?workspaceId=00000000-0000-4000-8000-000000000000')).status()).toBe(401);
 });
 
 browserTest('invalid snapshot, private path and cross-origin HTTP operations fail closed', async ({ page }) => {
@@ -284,14 +280,14 @@ browserTest('invalid snapshot, private path and cross-origin HTTP operations fai
   expect(unsupported.status()).toBe(400); expect(await unsupported.json()).toMatchObject({ error: expect.stringContaining('No payment was attempted.') });
 });
 
-browserTest('injected indexing transport failure shows retry and records failed then actual recovered operation', async ({ page }) => {
-  await page.route('**/api/fixtures?*', route => route.abort('failed'), { times: 1 });
-  await page.goto('/app');
+browserTest('injected fixture indexing transport failure shows retry and actual recovered graph', async ({ page }) => {
+  let indexingUnavailable = true;
+  await page.route('**/api/fixtures?*', route => indexingUnavailable ? route.abort('failed') : route.continue());
+  await page.goto('/demo');
   await expect(page.getByRole('heading', { name: 'Unable to load this snapshot' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Retrieve source evidence' })).toBeDisabled();
+  indexingUnavailable = false;
   await page.getByRole('button', { name: 'Retry source indexing' }).click();
   await expect(page.getByText('Snapshot ready', { exact: true })).toBeVisible();
-  await page.getByRole('navigation', { name: 'Application' }).getByRole('link', { name: 'Activity', exact: true }).click();
-  const entries = page.locator('.activity-list li').filter({ hasText: 'fixture.index' });
-  await expect(entries).toHaveCount(2); await expect(entries.first()).toContainText('complete'); await expect(entries.last()).toContainText('failed');
+  await expect(page.getByRole('button', { name: 'src/run-job.ts', exact: true })).toBeVisible();
 });

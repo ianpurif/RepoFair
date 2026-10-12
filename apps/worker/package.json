@@ -11,11 +11,15 @@
     "./github": "./src/github.ts",
     "./repositories": "./src/repository-service.ts",
     "./github-webhook": "./src/github-webhook.ts",
-    "./publications": "./src/publication-service.ts"
+    "./publications": "./src/publication-service.ts",
+    "./commerce": "./src/commerce-service.ts",
+    "./publication-registry": "./src/publication-registry.ts"
   },
   "dependencies": {
     "@atlas/core": "workspace:*",
     "@atlas/contracts": "workspace:*",
-    "pg": "8.23.1"
+    "pg": "8.23.1",
+    "mppx": "0.13.1",
+    "viem": "2.57.2"
   }
 }

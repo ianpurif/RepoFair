@@ -8,7 +8,7 @@ try {
   for await (const chunk of process.stdin) {
     const part = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
     bytes += part.length;
-    if (bytes > 12_000_000) throw new Error('input-limit');
+    if (bytes > 64_000_000) throw new Error('input-limit');
     chunks.push(part);
   }
   const input = JSON.parse(Buffer.concat(chunks).toString('utf8')) as ParseRepositoryInput;

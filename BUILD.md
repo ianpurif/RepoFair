@@ -6,7 +6,7 @@ Build **Chronos Atlas** from the ground up in the current directory. This is an 
 
 Inspect the directory before making changes. This distribution contains an intentional starter scaffold. Preserve useful files and user changes; complete its missing functionality rather than erasing it.
 
-This file contains the complete product build prompt from the conversation, with the requested Astra-medium/Sol-extra-high agent configuration and starter-entry clarifications. Current account access and integrations must be checked locally. Sources are listed in `docs/SOURCES.md`; legacy product concepts are not active requirements.
+This file contains the complete product build prompt from the conversation, with the requested GPT-6.1-Sol-only maximum-reasoning agent configuration and starter-entry clarifications. Current account access and integrations must be checked locally. Sources are listed in `docs/SOURCES.md`; legacy product concepts are not active requirements.
 
 ## 1. Product Definition
 
@@ -54,15 +54,15 @@ Use the following exact requested models and effort levels:
 
 | Role | Model | Reasoning | Responsibility |
 |---|---|---|---|
-| Primary coordinator | `gpt-6-astra` | `medium` | Own architecture, integration, progress, and final acceptance. |
-| `atlas_architect` | `gpt-6-astra` | `medium` | Read-only architecture, scope, and milestone review. |
-| `atlas_researcher` | `gpt-6-astra` | `medium` | Read-only verification of official APIs and compatibility. |
-| `atlas_security` | `gpt-6-astra` | `medium` | Read-only authorization, payment, and data-boundary review. |
-| `atlas_engineer` | `gpt-6.1-sol` | `xhigh` | Indexing, graph retrieval, providers, data, payments, and SDK. |
-| `atlas_frontend` | `gpt-6.1-sol` | `xhigh` | Workspace, graph interactions, publishing, accessibility. |
-| `atlas_verifier` | `gpt-6.1-sol` | `xhigh` | Independent automated and browser verification. |
+| Primary coordinator | `gpt-6.1-sol` | `max` | Own architecture, integration, progress, and final acceptance. |
+| `atlas_architect` | `gpt-6.1-sol` | `max` | Read-only architecture, scope, and milestone review. |
+| `atlas_researcher` | `gpt-6.1-sol` | `max` | Read-only verification of official APIs and compatibility. |
+| `atlas_security` | `gpt-6.1-sol` | `max` | Read-only authorization, payment, and data-boundary review. |
+| `atlas_engineer` | `gpt-6.1-sol` | `max` | Indexing, graph retrieval, providers, data, payments, and SDK. |
+| `atlas_frontend` | `gpt-6.1-sol` | `max` | Workspace, graph interactions, publishing, accessibility. |
+| `atlas_verifier` | `gpt-6.1-sol` | `max` | Independent automated and browser verification. |
 
-`xhigh` is the configuration token for the user's **Extra high** request. Do not replace it with `high`, `extrahigh`, `max`, or a different model.
+`max` is the exact reasoning effort requested by the user. Every development agent must use `gpt-6.1-sol` with `max`. No other models, lower efforts or fallbacks are permitted.
 
 Verify the selected models are available in the installed client/account. Use actual Codex subagents where supported, with at most two concurrent subagents and non-overlapping file ownership. Standalone TOML custom-agent files are supplied in `.codex/agents/`; verify installed-client compatibility before relying on them. Do not claim delegation occurred when it did not.
 

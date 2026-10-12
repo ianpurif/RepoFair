@@ -1,12 +1,15 @@
-import { BodyDigest, Receipt } from 'mppx';
+import { BodyDigest, Challenge, Receipt } from 'mppx';
 import type { Store } from 'mppx';
 import { Mppx, tempo } from 'mppx/server';
 import type { Client } from 'viem';
+import { getChainId } from 'viem/actions';
 import { tempoModerato } from 'viem/tempo/chains';
 import type { PurchaseTerms } from '../../../packages/contracts/src/index.ts';
 import { parseQuestion } from '../../../packages/contracts/src/local.ts';
 import { isExactVersion } from '../../../packages/core/src/versions.ts';
 import { atomicToDecimal, validateTestnetTerms, validateTestnetTermsShape, TEMPO_TESTNET_NETWORK } from '../../../packages/sdk/src/payment-policy.ts';
+import { inspectPaymentCredential } from '../../worker/src/tempo-verification.ts';
+import type { PaymentSubmission } from '../../worker/src/tempo-verification.ts';
 
 export type TempoProviderConfig = Readonly<{
   providerId: string; origin: string; realm: string; recipient: `0x${string}`;
@@ -24,6 +27,8 @@ export type TempoProviderDependencies = Readonly<{
   lookup(authorization: AuthorizedRetrieval, requestDigest: string): Promise<(DurablePurchaseClaim & { terms: PurchaseTerms }) | null>;
   /** Provider-owned atomic claim of credential processing. Buyer approval and budget reservation belong to the calling SDK, not this independent provider's database. */
   claim(authorization: AuthorizedRetrieval, terms: PurchaseTerms): Promise<DurablePurchaseClaim>;
+  /** Save the immutable challenge, canonical transaction hash and derived sender before broadcast. */
+  bindSubmission(authorization: AuthorizedRetrieval, terms: PurchaseTerms, submission: PaymentSubmission): Promise<void>;
   /** Separate authoritative finality/terms reconciliation. An untrusted receipt header is never enough. */
   verifySettlement(authorization: AuthorizedRetrieval, terms: PurchaseTerms, receipt: Receipt.Receipt): Promise<boolean>;
   saveSettlement(authorization: AuthorizedRetrieval, terms: PurchaseTerms, receipt: Receipt.Receipt): Promise<void>;
@@ -50,7 +55,7 @@ async function boundedBody(request: Request): Promise<string> {
   return new TextDecoder('utf-8', { fatal: true }).decode(content);
 }
 
-/** Unwired testnet adapter. No environment flags, signer, route, RPC defaults or credentials activate it. */
+/** Explicit testnet adapter. Runtime integration requires independent configuration and durable adapters. */
 export function createTempoTestnetAdapter(config: TempoProviderConfig | null, dependencies: TempoProviderDependencies | null): {
   status: 'configured-unverified' | 'unavailable'; handle(request: Request): Promise<Response>;
 } {
@@ -64,13 +69,13 @@ export function createTempoTestnetAdapter(config: TempoProviderConfig | null, de
     && !/^0x0{40}$/i.test(config.token) && !/^0x0{40}$/i.test(config.recipient), 'Configured token and recipient are required');
   atomicToDecimal(config.atomicPrice, config.decimals);
   requireAdapter(dependencies.replayStore && ['get', 'put', 'delete', 'update'].every(name => typeof (dependencies.replayStore as unknown as Record<string, unknown>)[name] === 'function'), 'Durable atomic replay adapter required');
-  for (const name of ['authorize', 'quote', 'lookup', 'claim', 'verifySettlement', 'saveSettlement', 'markUnknown', 'deliver', 'getClient', 'now'] as const) requireAdapter(typeof dependencies[name] === 'function', `Required ${name} adapter is missing`);
+  for (const name of ['authorize', 'quote', 'lookup', 'claim', 'bindSubmission', 'verifySettlement', 'saveSettlement', 'markUnknown', 'deliver', 'getClient', 'now'] as const) requireAdapter(typeof dependencies[name] === 'function', `Required ${name} adapter is missing`);
   const method = tempo.charge({ testnet: true, chainId: tempoModerato.id, currency: config.token, decimals: config.decimals,
     recipient: config.recipient, supportedModes: ['pull'], machineTokenEnabled: false,
     waitForConfirmation: true, html: false, store: dependencies.replayStore, storeKeyPrefix: `${config.providerId}:`,
     getClient: async ({ chainId }) => {
       requireAdapter(chainId === tempoModerato.id, 'Only Tempo Moderato is permitted');
-      const client = await dependencies.getClient(); requireAdapter(client.chain?.id === tempoModerato.id, 'RPC client is not Tempo Moderato'); return client;
+      const client = await dependencies.getClient(); requireAdapter(client.chain?.id === tempoModerato.id && await getChainId(client) === tempoModerato.id, 'RPC endpoint is not Tempo Moderato'); return client;
     } });
   const payment = Mppx.create({ methods: [method], realm: config.realm, secretKey: config.secretKey, requiresAuth: true });
   async function handle(request: Request): Promise<Response> {
@@ -79,7 +84,8 @@ export function createTempoTestnetAdapter(config: TempoProviderConfig | null, de
     let body: string; let input: RetrievalInput; let authorized: AuthorizedRetrieval;
     try {
       body = await boundedBody(request.clone()); const raw: unknown = JSON.parse(body);
-      requireAdapter(object(raw) && typeof raw.packageName === 'string' && raw.packageName.length > 0 && raw.packageName.length <= 200
+      requireAdapter(object(raw) && Object.keys(raw).length === 4 && Object.keys(raw).every(key => ['packageName','version','question','idempotencyKey'].includes(key))
+        && typeof raw.packageName === 'string' && raw.packageName.length > 0 && raw.packageName.length <= 200
         && typeof raw.version === 'string' && isExactVersion(raw.version) && typeof raw.idempotencyKey === 'string'
         && /^[A-Za-z0-9_-]{16,128}$/.test(raw.idempotencyKey), 'Invalid exact-version request');
       input = Object.freeze({ packageName: raw.packageName, version: raw.version, question: parseQuestion(raw.question), idempotencyKey: raw.idempotencyKey });
@@ -127,6 +133,16 @@ export function createTempoTestnetAdapter(config: TempoProviderConfig | null, de
     if (!request.headers.has('Payment-Authorization')) {
       const result = await charge(request); requireAdapter(result.status === 402, 'An unpaid request must not be delivered'); return result.challenge;
     }
+    let submission: PaymentSubmission;
+    try {
+      const headers = new Headers(request.headers); headers.delete('Payment-Authorization');
+      const unpaid = await charge(new Request(request.url,{method:'POST',headers,body}));
+      requireAdapter(unpaid.status === 402,'Bound challenge is unavailable');
+      const challenge = Challenge.deserialize(unpaid.challenge.headers.get('WWW-Authenticate')!);
+      submission = await inspectPaymentCredential(request.headers.get('Payment-Authorization')!,{
+        terms,origin:config!.origin,realm:config!.realm,challengeId:challenge.id,idempotencyKey:input.idempotencyKey,tokenDecimals:config!.decimals,
+      },dependencies!.now());
+    } catch { return reply(400,'Invalid, unsupported or changed payment credential; no charge attempted'); }
     let claim: DurablePurchaseClaim;
     try { claim = await dependencies!.claim(authorized, terms); } catch { return reply(503, 'Durable payment reservation unavailable'); }
     if (claim.state === 'settled') {
@@ -135,6 +151,7 @@ export function createTempoTestnetAdapter(config: TempoProviderConfig | null, de
     if (claim.state !== 'claimed') return reply(409, 'Payment is pending, unknown or rejected; reconcile before any new purchase', claim.state === 'rejected' ? 'not-attempted' : 'unknown');
     let settled = false;
     try {
+      await dependencies!.bindSubmission(authorized,terms,submission);
       const result = await charge(request);
       requireAdapter(result.status === 200, 'Submitted payment credential was not accepted');
       // withReceipt obtains the actual SDK receipt; never construct receipt fields ourselves.

@@ -1,12 +1,12 @@
 import { answerFixtureWithAi } from '@atlas/worker/ai';
-import { readBounded } from '../../fixture-boundary';
+import { readBounded, fixturesEnabled } from '../../fixture-boundary';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 export async function POST(request: Request): Promise<Response> {
   const headers = { 'Cache-Control': 'no-store', 'X-Atlas-Mode': 'fixture' };
   const url = new URL(request.url);
   // This unauthenticated fixture capability must not become a public paid API.
-  if (process.env.ATLAS_LOOPBACK_SERVER !== 'true' || !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)
+  if (!fixturesEnabled() || process.env.ATLAS_LOOPBACK_SERVER !== 'true' || !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)
     || (request.headers.get('origin') !== null && request.headers.get('origin') !== url.origin)) {
     return Response.json({ error: 'AI fixture requests require the local application origin.' }, { status: 403, headers });
   }

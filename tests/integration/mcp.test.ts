@@ -1,7 +1,8 @@
-import { it, expect } from 'vitest';
+import { it, expect,vi,afterAll } from 'vitest';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createAtlasMcpServer } from '../../packages/sdk/src/mcp.ts';
+vi.stubEnv('ATLAS_MODE','fixture');vi.stubEnv('ATLAS_FIXTURES_ENABLED','true');afterAll(()=>vi.unstubAllEnvs());
 it('negotiates real MCP, lists tools and returns cited fixture evidence', async () => {
   const server = createAtlasMcpServer(); const client = new Client({ name: 'atlas-test', version: '1.0.0' });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();

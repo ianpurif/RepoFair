@@ -10,6 +10,24 @@ export class AtlasDatabaseError extends Error {
   }
 }
 function configuration(message: string): never { throw new AtlasDatabaseError('configuration', message); }
+/** Accept only complete certificate PEMs; OpenSSL alone ignores surrounding/trailing bytes. */
+function certificateAuthorityPem(source: string): string {
+  if (Buffer.byteLength(source) > 1_000_000) throw new Error();
+  const pem = source.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n').replace(/\r\n/g, '\n').trim();
+  const certificates = [...pem.matchAll(/-----BEGIN CERTIFICATE-----\n([A-Za-z0-9+/= \t\n]+)\n-----END CERTIFICATE-----/g)];
+  if (!certificates.length || certificates.length > 64) throw new Error();
+  let position = 0;
+  for (const certificate of certificates) {
+    if (pem.slice(position, certificate.index).trim()) throw new Error();
+    const encoded = certificate[1]!.replace(/[ \t\n]/g, '');
+    if (!/^[A-Za-z0-9+/]+={0,2}$/.test(encoded) || encoded.length % 4 !== 0) throw new Error();
+    const der = Buffer.from(encoded, 'base64');
+    if (der.toString('base64') !== encoded || !new X509Certificate(der).raw.equals(der)) throw new Error();
+    position = certificate.index + certificate[0].length;
+  }
+  if (pem.slice(position).trim()) throw new Error();
+  return pem;
+}
 function sanitize(error: unknown, phase: 'connection' | 'query' = 'query'): AtlasDatabaseError {
   if (error instanceof AtlasDatabaseError) return error;
   const code = error && typeof error === 'object' && 'code' in error ? String(error.code) : '';
@@ -44,17 +62,22 @@ export async function loadDatabasePoolConfiguration(env: Readonly<Record<string,
   const port = url.port ? Number(url.port) : 5432;
   if (!Number.isSafeInteger(port) || port < 1 || port > 65535) return configuration('DATABASE_URL has an invalid port');
   const ssl: { rejectUnauthorized: true; ca?: string } = { rejectUnauthorized: true };
-  const caFile = env.DATABASE_SSL_CA_FILE?.trim();
-  if (caFile) {
+  const fileValue = env.DATABASE_SSL_CA_FILE; const inlineValue = env.DATABASE_SSL_CA;
+  if ((fileValue !== undefined && typeof fileValue !== 'string') || (inlineValue !== undefined && typeof inlineValue !== 'string')) {
+    return configuration('Database CA configuration must use a certificate PEM string or file path');
+  }
+  const caFile = fileValue?.trim(); const inlineCa = inlineValue?.trim();
+  if (caFile && inlineCa) return configuration('Configure exactly one of DATABASE_SSL_CA or DATABASE_SSL_CA_FILE');
+  if (caFile || inlineCa) {
     let ca: string;
     try {
-      const file = await stat(caFile);
-      if (!file.isFile() || file.size < 1 || file.size > 1_000_000) throw new Error();
-      ca = await readFile(caFile, 'utf8');
-      const certificates = ca.match(/-----BEGIN CERTIFICATE-----[\s\S]*?-----END CERTIFICATE-----/g);
-      if (!certificates?.length) throw new Error();
-      for (const certificate of certificates) new X509Certificate(certificate);
-    } catch { return configuration('DATABASE_SSL_CA_FILE must be an accessible certificate PEM file'); }
+      if (caFile) {
+        if (caFile.length > 8192) throw new Error();
+        const file = await stat(caFile);
+        if (!file.isFile() || file.size < 1 || file.size > 1_000_000) throw new Error();
+        ca = certificateAuthorityPem(await readFile(caFile, 'utf8'));
+      } else ca = certificateAuthorityPem(inlineValue!);
+    } catch { return configuration('Database CA must be a valid certificate PEM string or accessible certificate PEM file'); }
     ssl.ca = ca;
   }
   return {

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-12T16:25:02.055Z",
+  "scope": "local production deployment preparation",
+  "productionDeployed": false,
+  "publicPermanentDomainConfigured": false,
+  "searchIndexingEnabled": false,
+  "externalPaymentBroadcastsInThisExecution": 0,
+  "sourcePublicationActivatedInThisExecution": false,
+  "checks": {
+    "frozenInstall": "pass; npx --yes bun@1.4.1 install --frozen-lockfile",
+    "typecheck": "pass",
+    "lintPolicyHygiene": "pass",
+    "nodeTests": "123/123 pass",
+    "productTests": "496/496 pass across 33 files",
+    "nextProductionBuild": "pass after final indexing gate; local development origin keeps metadataBase warning/noindex",
+    "productionSeoBrowser": "4/4 pass against rebuilt local production server after final indexing gate",
+    "workerDockerImage": "built; Node v22.23.3 smoke pass",
+    "providerDockerImage": "built; Node v22.23.3 smoke pass",
+    "centralMigrationPlan": "pass; exactly seven central SQL files, provider SQL excluded",
+    "doctor": "pass; prerequisites only",
+    "gitDiffCheck": "pass",
+    "releaseGate": "blocked as designed: P2-P6 and live security/payment/federation acceptance outstanding",
+    "starterVerification": "pass; 123/123 Node checks plus hygiene",
+    "indexingGate": "pass; explicit ATLAS_SEARCH_INDEXING_ENABLED=true required even for production; absent/false/preview stay noindex",
+    "providerMigrationPlan": "pass; exactly three provider SQL files, central SQL excluded; apply requires separate Supabase roles and remains unrun"
+  },
+  "review": {
+    "engineer": "completed scoped database/commerce/provider secret implementation and focused tests",
+    "frontend": "completed public metadata, SEO, notices and focused browser tests",
+    "security": "completed scoped independent review; recursive container excludes and diagnostic echo corrected",
+    "verifier": "completed scoped independent review; provider Supabase roles and Vercel pool lifecycle corrected",
+    "architecture": "attempted exact requested role; capacity error, no completed review",
+    "research": "attempted exact requested role; capacity error after partial code findings, no completed review",
+    "requestedModel": "gpt-6.1-sol",
+    "requestedEffort": "max",
+    "observedModel": null,
+    "observedEffort": null
+  },
+  "remaining": [
+    "Atlas-only repository and permanent HTTPS domain",
+    "Vercel production deployment with production Clerk and central Supabase",
+    "central migration application and live RLS/authentication validation",
+    "real GitHub App webhook delivery and revocation",
+    "always-on worker host",
+    "independent provider Supabase project and HTTPS host",
+    "owner-approved signed export and provider activation",
+    "authorized Moderato payment settlement/delivery/recovery",
+    "operator legal/privacy details and search-console verification"
+  ]
+}

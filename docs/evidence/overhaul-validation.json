@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-11T15:28:34Z",
+  "task": "production-engineering-overhaul",
+  "branch": "codex/production-engineering-overhaul",
+  "productionReady": false,
+  "network": "eip155:42431",
+  "mode": "tempo-testnet",
+  "commands": [
+    {
+      "command": "bun run test:product",
+      "exitCode": 0,
+      "result": "350 tests passed in 28 files; 0 skipped",
+      "durationSeconds": 39.42,
+      "scope": "Local parser/worker/SQL/RLS/commerce/provider/SDK/MCP tests; external identity/RPC/HTTPS fixture transports explicitly separated."
+    },
+    {
+      "command": "ATLAS_BROWSER_TEST_SESSION=true bun run test:browser --reporter=list,./tests/browser/evidence-reporter.ts",
+      "exitCode": 0,
+      "result": "21 passed, 0 skipped; Microsoft Edge",
+      "durationSeconds": 59.8,
+      "evidence": "docs/evidence/browser-verification.json",
+      "scope": "19 fixture/transport/anonymous controls; two actual development Clerk sign-in controls with simulated commerce/wallet transports. No real signature or settlement."
+    },
+    {
+      "command": "node scripts/verify-starter.mjs",
+      "exitCode": 0,
+      "result": "105 passed, 0 skipped",
+      "durationSeconds": 3.09305,
+      "scope": "Dependency-free helper/scaffold/domain checks only."
+    },
+    {
+      "command": "bun run lint",
+      "exitCode": 0,
+      "result": "ESLint, source hygiene and Voyage/DeepSeek application-provider policy passed"
+    },
+    {
+      "command": "bun run typecheck",
+      "exitCode": 0,
+      "result": "Full source TypeScript passed"
+    },
+    {
+      "command": "ATLAS_FIXTURES_ENABLED=false ATLAS_MODE=tempo-testnet NEXT_PUBLIC_ATLAS_MODE=tempo-testnet bun run build",
+      "exitCode": 0,
+      "result": "Next 16.3.8 production build passed"
+    },
+    {
+      "command": "bun run worker:check",
+      "exitCode": 0,
+      "result": "Isolated parser and Node worker bundles passed"
+    },
+    {
+      "command": "bun run provider:check",
+      "exitCode": 0,
+      "result": "Independent Node provider bundle passed; 16 modules, 88.40 KB"
+    },
+    {
+      "command": "bun run evaluate",
+      "exitCode": 0,
+      "result": "3 authored evaluation cases, 2 abstention guards passed",
+      "scope": "Tiny equal-source lexical/BM25 fixture comparison; no general answer-quality or private AI claim."
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "exitCode": 0,
+      "result": "Pinned workspace dependencies installed successfully",
+      "scope": "Earlier milestone install; no global tools installed."
+    },
+    {
+      "command": "bun run verify:integrations",
+      "exitCode": 0,
+      "result": "Read-only configured external integration probes passed",
+      "evidence": "docs/evidence/integration-probes.json",
+      "scope": "Metadata/TLS/service reachability; no inference, migration, source download or payment."
+    },
+    {
+      "command": "node --experimental-transform-types --max-old-space-size=768 scripts/verify-overhaul-import.ts --allow-authorized-source-read",
+      "exitCode": 0,
+      "result": "Real authorized GitHub import passed with source/graph/answer validation",
+      "evidence": "docs/evidence/overhaul-real-import.json",
+      "scope": "Production service, fresh linked GitHub authorization and actual private source reads; new SQL in in-memory PGlite only. Hosted metadata read-only."
+    }
+  ],
+  "productionSmoke": {
+    "serverMode": "Next production; fixture enablement deliberately set true to verify production denial",
+    "port": 3000,
+    "serverStoppedAfterCheck": true,
+    "results": [
+      {
+        "paths": [
+          "/",
+          "/sign-in",
+          "/app",
+          "/app/repositories",
+          "/app/providers",
+          "/app/activity",
+          "/app/publish",
+          "/app/settings"
+        ],
+        "status": 200
+      },
+      {
+        "paths": [
+          "/api/catalog",
+          "/api/purchases",
+          "/api/repositories"
+        ],
+        "status": 401,
+        "cacheControl": "no-store"
+      },
+      {
+        "paths": [
+          "/api/fixtures",
+          "/api/providers"
+        ],
+        "status": 503,
+        "result": "Fixture APIs disabled in production even with explicit enable flag"
+      },
+      {
+        "path": "/demo",
+        "status": 404
+      }
+    ],
+    "scope": "HTTP status/authentication/fixture isolation only; no authenticated hosted workflow after new migrations."
+  },
+  "importResults": {
+    "real": {
+      "files": 199,
+      "durationMs": 94647,
+      "slices": 9,
+      "failures": 0,
+      "nodes": 1886,
+      "edges": 7400,
+      "evidencePassages": 4415,
+      "citations": 5,
+      "sameCommitReuse": true
+    },
+    "generatedParser": [
+      {
+        "files": 17,
+        "beforeMs": 193,
+        "afterMs": 109
+      },
+      {
+        "files": 145,
+        "beforeMs": 1478,
+        "afterMs": 271
+      },
+      {
+        "files": 1001,
+        "before": "rejected by old bounds",
+        "afterMs": 722
+      },
+      {
+        "files": 4001,
+        "before": "rejected by old bounds",
+        "afterMs": 2398
+      }
+    ],
+    "generatedPipelineLarge": {
+      "files": 4001,
+      "initialMs": 8571,
+      "oneFileChangeMs": 8102,
+      "downloadedOnUpdate": 1,
+      "reusedOnUpdate": 4000,
+      "initialSimulatedHttpRequests": 5288,
+      "updateSimulatedHttpRequests": 1288
+    },
+    "scope": "Generated sparse TypeScript repositories and simulated GitHub distinguish parser/pipeline overhead from real network import. Graph parsing still rebuilds a bounded snapshot; incremental optimization reuses unchanged verified blobs.",
+    "memory": "RSS at return only, not sampled peak; real parent 563662848 bytes including PGlite. Isolated parser uses 768 MiB V8 heap bound and 60 second deadline.",
+    "aiCalls": 0,
+    "indexingProviderCostUsd": 0,
+    "infrastructureCost": "Not measured; zero provider indexing cost does not mean zero hosting/compute/storage cost."
+  },
+  "independentReviews": {
+    "actualRoles": [
+      "atlas_architect",
+      "atlas_researcher",
+      "atlas_engineer",
+      "atlas_frontend",
+      "atlas_security",
+      "atlas_verifier"
+    ],
+    "securityEvidence": "docs/evidence/overhaul-security.json",
+    "verifierEvidence": "docs/evidence/overhaul-verifier-commerce.json",
+    "requestedModel": "gpt-6.1-sol",
+    "requestedEffort": "max",
+    "observedModel": null,
+    "observedEffort": null,
+    "boundary": "Actual task delegation/reviews; configuration does not establish backend model identity. No review simulates a second engineer."
+  },
+  "resolvedFailures": [
+    "Whole-index TS reference scans and low root-package/file prerequisites made general and large repositories fail or stall; bounded multilingual indexing now completes representative cases.",
+    "Imports previously restarted downloads after failures and lacked durable manifest/blob checkpoints; checkpoints, leases, backoff, cancellation and hash-bound reuse are exercised.",
+    "Private metadata leaked through anonymous provider control requests; signed audience/digest/revision control proof is required.",
+    "Signed passages previously accepted forged graph relationships; canonical source and complete node/edge proofs now reject them.",
+    "Authenticated PostgreSQL readers attempted unsupported FOR SHARE row locks; read paths no longer require mutation privileges.",
+    "Provider settlement callback attempted a nested database connection; it now reuses the active transaction, including a one-connection regression.",
+    "Native Edge exposed SDK Illegal invocation from unbound fetch; receiver binding fixed and 21 browser/12 independent SDK checks passed.",
+    "An initial history-capacity test expected symbol nodes in the root file/package projection; the fixture now queries the retained source scope. No production defect was suppressed."
+  ],
+  "remainingGates": [
+    "New hosted migrations and multi-backend concurrency/RLS acceptance",
+    "Real updated hosted browser import, large network repository and changed-commit recovery",
+    "Remote GitHub webhook events/delivery",
+    "Independent HTTPS operator installation and issuer configuration; real owner activation and second-account discovery",
+    "Explicitly authorized wallet/testnet funding/signing, real Moderato settlement and interrupted delivery recovery",
+    "Organization/Google/private Storage acceptance",
+    "Private AI operating-cost reservations, durable traces and broader evaluation"
+  ],
+  "safety": {
+    "hostedMigrationsApplied": false,
+    "externalDeployment": false,
+    "externalPublication": false,
+    "walletSignatures": 0,
+    "transactionBroadcasts": 0,
+    "paidAiCalls": 0,
+    "privateSourceSentToAi": false,
+    "privateSourceInEvidence": false,
+    "globalToolsInstalled": false
+  },
+  "releaseGate": {
+    "expectedExitCode": 1,
+    "status": "blocked",
+    "reason": "External acceptance remains absent; local success does not make the product production-ready."
+  }
+}

@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "product": "Chronos Atlas",
   "stage": "implementation",
-  "currentPhase": "remaining-integration-acceptance",
-  "nextAction": "Complete external publication/endpoint control, provider entitlement/finality/delivery, remaining identity/storage and private AI/SDK/MCP adapters; validate approved external flows without treating storage tests as settlement.",
+  "currentPhase": "vercel-deployment-prepared-local",
+  "nextAction": "Follow docs/VERCEL-DEPLOYMENT.md for Atlas-only repository, permanent domain, production Clerk/Supabase/GitHub App, persistent worker/provider hosting and live acceptance; keep publication, payments and search indexing inactive until explicitly authorized and verified.",
   "milestones": [
     {
       "id": "P0",
@@ -29,7 +29,10 @@
         "apps/provider/src/fixture-server.ts",
         "docs/PROVIDER-PUBLISHING.md",
         "docs/evidence/publication-draft.json",
-        "docs/evidence/publication-capacity.json"
+        "docs/evidence/publication-capacity.json",
+        "docs/evidence/overhaul-validation.json",
+        "docs/evidence/publishing-execution.json",
+        "docs/evidence/publishing-infrastructure.json"
       ]
     },
     {
@@ -40,7 +43,8 @@
         "tests/tempo",
         "supabase/migrations/202610030001_atlas.sql",
         "docs/evidence/provider-replay.json",
-        "docs/evidence/provider-ledger.json"
+        "docs/evidence/provider-ledger.json",
+        "docs/evidence/overhaul-validation.json"
       ]
     },
     {
@@ -49,7 +53,8 @@
       "status": "partial",
       "acceptanceEvidence": [
         "tests/integration/federation.test.ts",
-        "tests/integration/answer-boundary.test.ts"
+        "tests/integration/answer-boundary.test.ts",
+        "docs/evidence/overhaul-validation.json"
       ]
     },
     {
@@ -58,7 +63,8 @@
       "status": "partial",
       "acceptanceEvidence": [
         "docs/evidence/browser-verification.json",
-        "tests/integration/mcp-stdio.test.ts"
+        "tests/integration/mcp-stdio.test.ts",
+        "docs/evidence/overhaul-validation.json"
       ]
     },
     {
@@ -67,13 +73,14 @@
       "status": "partial",
       "acceptanceEvidence": [
         "docs/evidence/retrieval-evaluation.json",
-        "docs/SECURITY.md"
+        "docs/SECURITY.md",
+        "docs/evidence/overhaul-validation.json"
       ]
     }
   ],
   "liveIntegrationsVerified": false,
   "lastUpdatedBy": "lead",
-  "updatedAt": "2026-10-07",
+  "updatedAt": "2026-10-12T16:25:02.055Z",
   "applicationAi": {
     "embeddingProvider": "Voyage AI",
     "generationProvider": "DeepSeek",
@@ -104,6 +111,98 @@
     "providerReplayStorage": true,
     "providerSaleStorage": true,
     "externalPublication": false,
-    "tempoSettlement": false
+    "tempoSettlement": false,
+    "historicalEvidenceDate": "2026-10-07",
+    "newOverhaulMigrationsApplied": true,
+    "newOverhaulMigrationsProvenance": "Already installed before this setup; exact native signatures verified; not replayed or historically journal-backfilled by this execution.",
+    "newOverhaulHostedConcurrencyVerified": false,
+    "providerReplaySaleConcurrencyVerified": true,
+    "providerInfrastructureEvidence": "docs/evidence/publishing-infrastructure.json",
+    "providerConcurrencyScope": "Real separate native PostgreSQL backends with synthetic audit authorization/records and verified cleanup; not buyer signing/spending or settlement.",
+    "privateBrowserCurrentLoopback": true,
+    "privateBrowserConfiguredHttps": true,
+    "privateBrowserEvidence": "docs/evidence/private-repository-ui.json",
+    "privateBrowserCurrentScope": "Fresh development Clerk sessions; existing real hosted private immutable import; current production UI on loopback and configured temporary HTTPS; no new hosted import, private AI or commerce acceptance."
+  },
+  "developmentAgentConfiguration": {
+    "model": "gpt-6.1-sol",
+    "reasoningEffort": "max",
+    "fallbackAllowed": false,
+    "updatedAt": "2026-10-11",
+    "observedModel": null,
+    "observedEffort": null,
+    "requiresSessionReload": true,
+    "actualCustomRolesExecuted": [
+      "atlas_architect",
+      "atlas_researcher",
+      "atlas_engineer",
+      "atlas_frontend",
+      "atlas_security",
+      "atlas_verifier"
+    ],
+    "executionAttestation": "Actual six role tasks completed; backend model/effort not exposed by available runtime metadata."
+  },
+  "productionOverhaul": {
+    "implemented": true,
+    "productionReady": false,
+    "mode": "tempo-testnet",
+    "network": "eip155:42431",
+    "fixturesInNormalProduct": false,
+    "localVerificationEvidence": "docs/evidence/overhaul-validation.json",
+    "securityEvidence": "docs/evidence/overhaul-security.json",
+    "independentVerifierEvidence": "docs/evidence/overhaul-verifier-commerce.json",
+    "importBenchmarkEvidence": "docs/evidence/import-pipeline-benchmark.json",
+    "externalDeploymentPerformed": false,
+    "paymentBroadcasts": 0,
+    "privateSourceSentToAi": false,
+    "temporaryHttpsExposed": true,
+    "permanentDeploymentPerformed": false,
+    "activeSourcePublication": false
+  },
+  "publishingSetup": {
+    "configured": false,
+    "configurationStatus": "infrastructure-only; publication identity awaits an approved signed artifact",
+    "infrastructureProvisioned": true,
+    "callerExample": "packages/sdk/examples/moderato.ts",
+    "evidence": "docs/evidence/publishing-execution.json",
+    "historicalCliEvidence": "docs/evidence/publishing-setup.json",
+    "browserWalletCompatibilityVerified": false,
+    "browserWalletCompatibilityStatus": "unverified",
+    "actualRpcChain": 42431,
+    "paymentBroadcasts": 0,
+    "servicePurchases": 0,
+    "activePublication": false,
+    "sourceExports": 0,
+    "issuerKeyPairConfigured": true,
+    "mppSecretConfigured": true,
+    "providerDatabaseSeparate": true,
+    "providerLoginRestricted": true,
+    "providerDatabaseLocation": "Separate database on the existing Supabase project/cluster; not proof of an independent operator.",
+    "providerMigrationsApplied": [
+      "202610070005_provider_replay.sql",
+      "202610070006_provider_ledger.sql",
+      "202610110003_provider_delivery.sql"
+    ],
+    "centralMigrationsAppliedByThisExecution": 0,
+    "buyerTestnetFunded": true,
+    "buyerPathUsdAtomicUnitsObserved": "1000000000000",
+    "testFundingRequests": 1,
+    "privateKeyLocation": "Outside checkout and OneDrive; restricted Windows ACLs",
+    "atlasTemporaryOrigin": "https://known-les-characters-narrow.trycloudflare.com",
+    "providerTemporaryOrigin": "https://dennis-headline-bytes-pct.trycloudflare.com",
+    "providerService": "Preparation-only builtin bundle; all routes 503; no payment challenge or source/database/payment runtime",
+    "temporaryOriginsChangeOnRestart": true,
+    "requestOriginRepairImplemented": true,
+    "requestOriginSecurityReview": "Actual bounded atlas_security review and48 native synthetic-route cases; fresh authenticated public HTTPS rejected all three loopback Origins with403denied/no-store."
+  },
+  "vercelDeployment": {
+    "locallyPrepared": true,
+    "permanentlyDeployed": false,
+    "productionAcceptanceVerified": false,
+    "searchIndexingEnabled": false,
+    "evidence": "docs/evidence/vercel-local-preflight.json",
+    "rootDirectory": "apps/web",
+    "runtime": "Node.js 22.x",
+    "operatorActionRequired": true
   }
 }

@@ -1,61 +1,48 @@
-# Tempo / MPP implementation plan
+# Tempo Moderato commerce
 
-Status: **partially implemented; settlement unavailable**. Real testnet settlement and delivery recovery remain unverified.
+Updated 2026-10-12. Charge, receipt, authorization and recovery adapters are implemented and tested locally. Two testnet accounts and buyer faucet funding are prepared. **No service purchase, wallet signing, payment broadcast or settlement was performed.**
 
-## Implemented but unwired testnet adapter
+## Fixed network and protocol
 
-`apps/provider/src/tempo-adapter.ts` uses mppx 0.13.1 official one-time charge.
-It supports only the viem Tempo Moderato chain definition. Token, recipient,
-decimals, origin and secret are required; there are no RPC/address defaults.
-It forces pull mode and waitForConfirmation:true, with sponsorship, machine
-tokens and splits disabled. No route or environment flag enables it.
+The only supported network is Tempo Moderato, chain **42431** (`eip155:42431`). PathUSD is `0x20c0000000000000000000000000000000000000`, with six decimal places. Startup checks the actual RPC chain, and the client checks the signer RPC before signing. No automatic network switch, mainnet fallback, token swap or application-held wallet key exists.
 
-The factory requires durable authorization, immutable quote, purchase lookup,
-atomic claim, authoritative settlement verification, persistence, unknown-state
-handling, resumable delivery, AtomicStore and an RPC client. Production adapters
-remain unavailable. Pending/unknown purchases cannot automatically charge again;
-settled delivery can resume after quote expiry.
+The pinned integration is **mppx 0.13.1 / viem 2.57.2**, using the documented Tempo charge method in **pull** mode. The caller owns the wallet client and signs the prepared transaction; the provider processes the credential. `polyfill:false` avoids global fetch interception, `autoSwap:false` prevents implicit swaps, and expected chain/recipient constraints bind the official challenge.
 
-`postgres-replay-store.ts` now supplies a provider-owned durable AtomicStore.
-Migration `202610070005_provider_replay.sql` creates its isolated schema. Every
-writer takes a transaction advisory lock, including when a key does not yet
-exist. Namespaces separate providers; authenticated and anonymous roles cannot
-read or write replay state. Hosted verification passed eight concurrent first
-claims with exactly one winner and eight concurrent updates without lost writes.
-Generated audit rows were removed. See `docs/evidence/provider-replay.json`.
+Primary references checked during the overhaul:
 
-Buyer approval and budget reservation belong to the buyer SDK/database.
-An independent provider's claim owns credential processing in its own ledger;
-it must never require access to the buyer's database or budget credentials.
-`postgres-purchase-ledger.ts` and migration 006 now implement immutable quotes,
-single processing claims, retained unknown outcomes and immutable receipt
-persistence with a mandatory authoritative verifier. Hosted storage checks
-passed eight concurrent quotes/one row and eight processing claims/one winner;
-authorization was synthetic and no settlement receipt was fabricated. SQL
-constraints and triggers reject null/wrong-type terms, altered bindings,
-reopening processed sales and enabling delivery. Real entitlement, authoritative
-chain reconciliation and delivery callbacks are still missing. The charge
-adapter remains unwired. See `docs/evidence/provider-ledger.json`.
+- [Tempo connection details](https://tempo.xyz/developers/docs/quickstart/connection-details.md) and [testnet funding](https://tempo.xyz/developers/docs/quickstart/faucet.md).
+- [MPP Tempo charge](https://mpp.dev/payment-methods/tempo/charge.md), [server charge API](https://mpp.dev/sdk/typescript/server/Method.tempo.charge.md), and [client setup](https://mpp.dev/sdk/typescript/client/Mppx.create).
+- [MPP receipts](https://mpp.dev/protocol/receipts).
 
-`packages/sdk/src/payment-policy.ts` validates the official challenge against
-approved terms, observed provider origin, body digest, exact version,
-network/token/recipient, integer amount, expiry and idempotency. The caller owns
-the official prepared payment and signer; no global fetch patch, key loading or
-signing retry. SQL stores the SDK's sha-256=base64 request digest, while the
-complete-terms fingerprint remains SHA-256 hex.
+## Approval and one-time submission
 
-Twelve offline policy/adapter tests pass, including a genuine SDK-generated 402
-challenge. No signed payment credential is submitted and no RPC call is made. Real settlement,
-finality and recovery remain unverified; test data are not transaction receipts.
+1. An authenticated buyer chooses an exact accessible publication and question. Atlas gets an official unpaid quote, validates origin, realm, operation, release, body digest, token, integer amount, recipient and expiry, then atomically reserves the configured workspace allowance.
+2. The SDK claims signing once in PostgreSQL **before** invoking the caller-owned signer. The browser separately requires a connected Moderato wallet and explicit exact-price approval. MCP exposes no new-purchase approval, allowance-change or signing tool.
+3. Atlas inspects the signed Tempo transaction, freezes its hash/sender, and records the first credential dispatch before requesting the provider. Raw credentials and signing secrets are not stored.
+4. Provider replay and immutable sale records are held in the provider's own database. Fresh issuer entitlement is checked before quoting, charging and returning context.
+5. Both sides validate the authoritative RPC chain, canonical transaction/block/receipt and exact TIP-20 TransferWithMemo sender, token, recipient, amount and challenge attribution. A browser hash or SDK receipt alone is insufficient.
+6. Source and graph members must match the owner's Ed25519 signatures and immutable publication digest before Atlas exposes delivered context.
 
-Research current official MPP and Tempo documentation in SOURCES. Pin a tested SDK. Use documented one-time charge/paid MCP behavior; no custom protocol, escrow, token or automatic refund promise.
+An unknown/lost response retains its reservation and blocks new signing. **Resume checks the recorded transaction and retrieves existing delivery; it never rebroadcasts or forwards a second payment credential.** An unsigned reservation can be cancelled. Pending/unknown purchases cannot be cancelled as though no charge happened.
 
-Payments purchase independently operated code-intelligence context, not access to a generic chatbot and not repairs. Start with direct provider settlement. Platform fee/split follows only after a real core flow.
+Payment, delivery and evidence sufficiency are independent. A settled payment can have failed/revoked/insufficient delivery. Revocation blocks new reads and reuse, including after an in-flight provider response; it cannot erase received bytes. No automatic refund is promised.
 
-Before execution validate access/version/request, freeze quote terms and reserve the external-service allowance in a serializable/appropriately locked transaction. Generate/validate cryptographic request binding in the trusted integration. The starter termsIdentity string is a comparison helper, not payment verification.
+The PathUSD allowance covers the service price. It does not guarantee gas, wallet fees or infrastructure costs.
 
-Track draft/approved/reserved/pending/unknown/settled/failed/expired separately from delivery and evidence sufficiency. Persist idempotency keys. Unknown is not failed; no blind resubmission. Resume paid delivery without another charge. If a provider does not support safe reconciliation, expose that limitation and stop.
+## Configuration and acceptance
 
-Real integration acceptance: authorize testnet-only signer and recipient, complete a supported provider request, retain actual receipt/transaction metadata, verify returned context, interrupt delivery and recover it without a second purchase. Two provider instances must use independent configured recipients before the demonstration claims independent settlement.
+Atlas needs the reviewed central migrations, HTTPS issuer origin and Ed25519 signing-key file. Each provider needs its own database, HTTPS origin, issuer public key, MPP secret file, fixed identity/price/recipient and Moderato RPC. See [PROVIDER-PUBLISHING.md](PROVIDER-PUBLISHING.md) and [.env.example](../.env.example).
 
-Never enable live mode merely because env variables are present. Require passing checks and explicit mainnet authorization. Audit gas/fees separately; the retrieval allowance is not a universal hard total-cost limit.
+The browser uses an injected EIP-1193 wallet supporting Tempo pull signing. Hardware/extension behavior remains unverified; unsupported signing fails explicitly. Headless callers supply their own signer through the authenticated SDK.
+
+Adding Moderato to an ordinary EVM wallet does not establish this compatibility. With the pinned libraries, Atlas's browser pull mode requests `eth_signTransaction` with Tempo transaction fields. No real extension has passed that path. The first acceptance attempt can instead use the caller-owned local-account signer in `packages/sdk/examples/moderato.ts`; its key remains outside application configuration.
+
+The example defaults to `--check`: actual RPC chain, authenticated account/catalog and existing allowance, with no reservation, key read or signing. `--purchase` separately requires the exact `--approve-atomic-amount`, an outside-checkout `--key-file` and stable `--idempotency-key`. It cannot increase allowance. `--resume <purchase UUID>` accepts no signer and never supplies another credential. Token files are reread per request; stdout omits private source and raw errors. An explicit outside-checkout output file is created exclusively. These CLI guards are checked with simulated transports, not live purchases.
+
+The official Moderato RPC is `https://rpc.moderato.tempo.xyz`; its explorer is `https://explore.testnet.tempo.xyz`. The official test faucet accepts `POST https://tempo.xyz/developers/api/faucet` with an address-only JSON body. Test allocations can change; funding and fee sufficiency remain separate from workspace allowance. The default Tempo Wallet/CLI documentation uses mainnet and does not establish a configured Atlas Moderato browser signer.
+
+Current evidence executes genuine SQL, official offline challenges, signed source/graph proofs, SDK/MCP transports, canonical-transfer validation and interrupted-delivery recovery against **explicit simulated identity/RPC/provider transports**. PGlite's serialized backend does not prove networked PostgreSQL concurrency.
+
+On 2026-10-12, generated separate buyer and recipient testnet account keys under the restricted outside-checkout secret folder. One address-only official faucet request returned HTTP 200; native Moderato RPC then showed buyer PathUSD balance **1,000,000,000,000 atomic units** (six decimals), previously zero. A private marker prevents an automatic second faucet request. No transaction hash or settlement receipt was claimed from the faucet response; test funding does not prove service-payment signing, fees or delivery. The provider's prepared test price is **10,000 atomic units** (0.01 test PathUSD).
+
+Hosted central migration signatures, separate provider migrations and verified native client TLS now pass. Eleven provider infrastructure checks include real multi-backend replay/sale contention, with synthetic audit rows cleaned. Temporary HTTPS exposure was explicitly approved; publication and payments remain inactive. Release still requires approved source export, installed immutable publication, real endpoint control, two independent operators/recipients, actual signing/settlement and delivery recovered without another charge. Browser extension/hardware compatibility remains unverified; no real-money spending was authorized or performed.

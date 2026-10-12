@@ -1,9 +1,7 @@
 import 'server-only';
-import { createAtlasDatabase } from '@atlas/worker/database';
-let database: ReturnType<typeof createAtlasDatabase> | undefined;
-function connection() { return database ??= createAtlasDatabase(process.env).catch(error => { database = undefined; throw error; }); }
+import { workspaceDatabase } from './database';
 export async function accountWorkspaces(principalId: string) {
-  const db = await connection();
+  const db = await workspaceDatabase();
   return db.withPrincipalTransaction(principalId, async transaction => {
     const result = await transaction.query<{ id: string; name: string; role: string }>(
       'select w.id,w.name,m.role from atlas.workspaces w join atlas.memberships m on m.workspace_id=w.id where m.principal_id=$1 order by w.created_at limit 100', [principalId]);
@@ -12,7 +10,7 @@ export async function accountWorkspaces(principalId: string) {
 }
 /** Called only after server session verification. No client workspace/role is accepted. */
 export async function ensurePersonalWorkspace(principalId: string) {
-  const db = await connection();
+  const db = await workspaceDatabase();
   return db.withAdminTransaction(async transaction => {
     await transaction.query('select pg_advisory_xact_lock(hashtextextended($1,0))', ['atlas-personal:' + principalId]);
     const existing = await transaction.query<{ workspace_id: string }>('select workspace_id from atlas.personal_workspaces where principal_id=$1', [principalId]);

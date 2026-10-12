@@ -207,7 +207,328 @@
       ],
       "recordedAt": "2026-10-07T09:27:37.850Z",
       "completedAt": "2026-10-07T09:44:33.805Z"
+    },
+    {
+      "task": "/root/overhaul_architecture",
+      "role": "atlas_architect",
+      "status": "completed",
+      "allowedWritePaths": [],
+      "milestone": "production-overhaul",
+      "recordedAt": "2026-10-11T13:16:08.207Z",
+      "completionRecordedAt": "2026-10-11T15:25:50Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/overhaul_research",
+      "role": "atlas_researcher",
+      "status": "completed",
+      "allowedWritePaths": [],
+      "milestone": "production-overhaul",
+      "recordedAt": "2026-10-11T13:16:08.207Z",
+      "completionRecordedAt": "2026-10-11T15:25:50Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/overhaul_imports",
+      "role": "atlas_engineer",
+      "allowedWritePaths": [
+        "apps/worker/src/github.ts",
+        "apps/worker/src/repository-service.ts",
+        "apps/worker/src/github-webhook.ts",
+        "apps/worker/src/worker-main.ts",
+        "scripts/worker.mjs",
+        "tests/integration/github.test.ts",
+        "tests/integration/repository-service.test.ts",
+        "tests/integration/github-webhook.test.ts",
+        "tests/local/parser.test.ts"
+      ],
+      "status": "completed",
+      "milestone": "production-overhaul",
+      "completionRecordedAt": "2026-10-11T15:25:50Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/overhaul_ux",
+      "role": "atlas_frontend",
+      "allowedWritePaths": [
+        "apps/web/src/app except app/api",
+        "apps/web/src/components except lead-owned commerce integration",
+        "tests/browser/production-ux.spec.ts",
+        "tests/browser/workspace.spec.ts"
+      ],
+      "status": "completed",
+      "milestone": "production-overhaul",
+      "completionRecordedAt": "2026-10-11T15:25:50Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/overhaul_security",
+      "role": "atlas_security",
+      "allowedWritePaths": [
+        "tests/integration/sdk-production.test.ts",
+        "docs/evidence/overhaul-security.json"
+      ],
+      "status": "completed",
+      "milestone": "production-overhaul",
+      "completionRecordedAt": "2026-10-11T15:25:50Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/overhaul_verification",
+      "role": "atlas_verifier",
+      "allowedWritePaths": [
+        "tests/integration/commerce-overhaul-artifacts.test.ts",
+        "tests/integration/commerce-overhaul-buyer.test.ts",
+        "tests/integration/commerce-overhaul-registry.test.ts",
+        "tests/integration/commerce-overhaul-http.test.ts",
+        "tests/integration/import-history-capacity.test.ts",
+        "docs/evidence/overhaul-verifier-commerce.json"
+      ],
+      "status": "completed",
+      "milestone": "production-overhaul",
+      "completionRecordedAt": "2026-10-11T15:25:50Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/publishing_setup_research",
+      "role": "atlas_researcher",
+      "allowedWritePaths": [],
+      "status": "completed",
+      "milestone": "publishing-setup-clarification",
+      "completionRecordedAt": "2026-10-11T16:12:29Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/publishing_setup_cli",
+      "role": "atlas_engineer",
+      "allowedWritePaths": [
+        "packages/sdk/examples/moderato.ts",
+        "tests/integration/moderato-cli.test.ts"
+      ],
+      "status": "completed",
+      "milestone": "publishing-setup-clarification",
+      "completionRecordedAt": "2026-10-11T16:12:29Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/publishing_setup_research",
+      "role": "atlas_researcher",
+      "milestone": "publishing-infrastructure",
+      "allowedWritePaths": [],
+      "status": "completed",
+      "result": "Actual current official Supavisor/custom database routing, Moderato read-only metadata and installed cloudflared official-checksum research",
+      "completionRecordedAt": "2026-10-12T14:51:13.681Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/publishing_setup_cli",
+      "role": "atlas_engineer",
+      "milestone": "publishing-infrastructure-runtime",
+      "allowedWritePaths": [
+        "apps/provider/src/main.ts",
+        "apps/provider/src/preparation.ts",
+        "apps/provider/src/prepare-main.ts",
+        "scripts/provider.mjs",
+        "scripts/provider-configuration.mjs",
+        "tests/provider-launcher.test.mjs",
+        "tests/integration/provider-preparation.test.ts"
+      ],
+      "status": "completed",
+      "result": "Provider-only settings isolation, dedicated builtin readiness and actual native bundle/start guards;12 launcher and15 preparation cases passed",
+      "completionRecordedAt": "2026-10-12T14:51:13.681Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/overhaul_security",
+      "role": "atlas_security",
+      "milestone": "publishing-infrastructure-security",
+      "allowedWritePaths": [],
+      "status": "completed",
+      "result": "Actual bounded provisioning/SCRAM/grant/env/WindowsACL review; CA absence and atomic state replacement findings corrected by lead",
+      "completionRecordedAt": "2026-10-12T14:51:13.681Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/overhaul_verification",
+      "role": "atlas_verifier",
+      "milestone": "publishing-native-infrastructure",
+      "allowedWritePaths": [
+        "scripts/verify-publishing-infrastructure.ts",
+        "docs/evidence/publishing-infrastructure.json"
+      ],
+      "status": "completed",
+      "result": "Native hosted exact schema/role/TLS and separate-backend replay/sale/unknown tests11/11 with verified zero remaining owned audit rows",
+      "completionRecordedAt": "2026-10-12T14:51:13.681Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/publishing_setup_cli",
+      "role": "atlas_engineer",
+      "milestone": "publishing-browser-origin-repair",
+      "allowedWritePaths": [
+        "apps/web/src/lib/request-origin.ts",
+        "apps/web/src/lib/repositories.ts",
+        "apps/web/src/app/api/account/route.ts",
+        "tests/integration/request-origin.test.ts"
+      ],
+      "status": "completed",
+      "result": "Exact configured proxy/browser origin guard and account integration;48 native helper/route cases plus scoped type/lint passed",
+      "completionRecordedAt": "2026-10-12T14:51:13.681Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/publishing_origin_security",
+      "role": "atlas_security",
+      "milestone": "publishing-browser-origin-security",
+      "allowedWritePaths": [],
+      "status": "completed",
+      "result": "Actual independent source review and48/48 native route/helper rerun; no concrete scoped finding; real ingress separately verified by browser task",
+      "completionRecordedAt": "2026-10-12T14:51:13.681Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/overhaul_verification",
+      "role": "atlas_verifier",
+      "milestone": "publishing-https-browser",
+      "allowedWritePaths": [
+        "scripts/verify-private-repository-ui.ts",
+        "docs/evidence/private-repository-ui.json"
+      ],
+      "status": "completed-with-agent-return-error",
+      "executionStatus": "Browser report verified with owned session cleanup before model stream disconnected",
+      "agentReturnStatus": "stream-disconnected-before-final-message",
+      "result": "Full localhost and current publicHTTPS private source/graph/8citations/accessibility passed; public malformed400/413 and foreign/three-loopback403denied measured",
+      "leadFollowup": "Validated saved report/JSON, source provenance result and cleanup; ran final strict standalone TypeScript/ESLint exit0; no duplicate browser run",
+      "completionRecordedAt": "2026-10-12T14:51:13.681Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/vercel_engineering",
+      "role": "atlas_engineer",
+      "milestone": "vercel-deployment-preparation",
+      "allowedWritePaths": [
+        "apps/worker/src",
+        "apps/provider/src",
+        "scripts/provider-configuration.mjs",
+        "tests/integration",
+        "tests/provider-launcher.test.mjs"
+      ],
+      "status": "completed",
+      "completedAt": "2026-10-12T16:25:02.055Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/vercel_public_web",
+      "role": "atlas_frontend",
+      "milestone": "vercel-deployment-preparation",
+      "allowedWritePaths": [
+        "apps/web/src/app",
+        "apps/web/src/lib/site-metadata.ts",
+        "tests/browser/production-seo.spec.ts"
+      ],
+      "status": "completed",
+      "completedAt": "2026-10-12T16:25:02.055Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/vercel_security",
+      "role": "atlas_security",
+      "milestone": "vercel-deployment-preparation",
+      "allowedWritePaths": [],
+      "status": "completed",
+      "completedAt": "2026-10-12T16:25:02.055Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/vercel_verifier",
+      "role": "atlas_verifier",
+      "milestone": "vercel-deployment-preparation",
+      "allowedWritePaths": [],
+      "status": "completed",
+      "completedAt": "2026-10-12T16:25:02.055Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/vercel_architecture",
+      "role": "atlas_architect",
+      "milestone": "vercel-deployment-preparation",
+      "allowedWritePaths": [],
+      "status": "capacity-unavailable",
+      "completedAt": "2026-10-12T16:25:02.055Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/vercel_research",
+      "role": "atlas_researcher",
+      "milestone": "vercel-deployment-preparation",
+      "allowedWritePaths": [],
+      "status": "capacity-unavailable",
+      "completedAt": "2026-10-12T16:25:02.055Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
     }
   ],
-  "note": "Populate only with actual task handles and path ownership from the current session."
+  "note": "Actual delegated task handles; completed execution recorded after work. Requested model/effort configuration is not backend execution attestation. No nested delegation or agent commits."
 }

@@ -1,9 +1,9 @@
 import { federateFixture } from '@atlas/worker/federation';
 import { parseFixtureId, parseQuestion } from '@atlas/contracts';
-import { readBounded } from '../fixture-boundary';
+import { readBounded, fixturesEnabled } from '../fixture-boundary';
 export const runtime = 'nodejs';
 export async function POST(request: Request) {
-  if ((process.env.ATLAS_MODE ?? 'fixture') !== 'fixture') return Response.json({ error: 'Fixture federation disabled' }, { status: 503 });
+  if (!fixturesEnabled() || (process.env.ATLAS_MODE ?? 'fixture') !== 'fixture') return Response.json({ error: 'Fixture federation disabled' }, { status: 503 });
   if (request.headers.get('origin') && request.headers.get('origin') !== new URL(request.url).origin) return Response.json({ error: 'Cross-origin request denied' }, { status: 403 });
   try {
     if (!request.headers.get('content-type')?.startsWith('application/json')) throw new Error('Expected JSON');
