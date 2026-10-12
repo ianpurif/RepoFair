@@ -27,6 +27,7 @@
         "@atlas/core": "workspace:*",
         "@atlas/worker": "workspace:*",
         "mppx": "0.13.1",
+        "pg": "8.23.1",
         "viem": "2.57.2",
         "zod": "4.6.5",
       },
