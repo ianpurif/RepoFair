@@ -1,6 +1,6 @@
 # Tempo Moderato commerce
 
-Updated 2026-10-12. Charge, receipt, authorization and recovery adapters are implemented and tested locally. Two testnet accounts and buyer faucet funding are prepared. **No service purchase, wallet signing, payment broadcast or settlement was performed.**
+Updated 2026-10-13. The real free Vercel web/provider, separate provider database and signed public RepoFair publication are active. One 10,000-unit Moderato purchase is undergoing live verification. The initial unpaid quote failed before reservation/signing; the measured transport deadline is being repaired. [Current commerce evidence](evidence/repofair-live-commerce.json) records the actual outcome. Browser extension signing remains unverified.
 
 ## Fixed network and protocol
 

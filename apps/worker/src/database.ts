@@ -82,7 +82,7 @@ export async function loadDatabasePoolConfiguration(env: Readonly<Record<string,
   }
   return {
     host: url.hostname.replace(/^\[|\]$/g, ''), port, user, password, database,
-    ssl, enableChannelBinding: true, application_name: 'chronos-atlas',
+    ssl, enableChannelBinding: true, application_name: 'repofair',
     max: 5, min: 0, maxLifetimeSeconds: 300, maxUses: 100,
     connectionTimeoutMillis: 10_000, idleTimeoutMillis: 10_000, query_timeout: 15_000,
     allowExitOnIdle: true,

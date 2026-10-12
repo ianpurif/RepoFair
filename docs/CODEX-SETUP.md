@@ -1,9 +1,9 @@
 # Codex setup and troubleshooting
 
-Open the extracted `chronos-atlas-codex-starter` folder, including hidden `.codex` and `.agents` directories. Use a current signed-in Codex client and send `Read and execute START.md.`
+Open the existing RepoFair checkout, including hidden `.codex` and `.agents` directories. Its current filesystem folder name may retain the original scaffold name. Use a current signed-in Codex client and send `Read and execute START.md.`
 
 ## Exact configuration
-Lead: `gpt-6-astra`, `medium`. Implementation/default subagents: `gpt-6.1-sol`, `xhigh`. Read-only architecture/research/security override to Astra medium. Extra high is spelled `xhigh` in configuration. The requested level is not `max`.
+Lead and all six custom roles: `gpt-6.1-sol`, exactly `max`, with no alternate models, lower efforts or fallbacks. Actual role tasks are recorded separately from configuration; unavailable runtime model/effort metadata remains unverified.
 
 Current official docs use standalone `.codex/agents/*.toml` with name, description and developer_instructions. Each file supplies model, effort and sandbox. `[agents].max_concurrent_threads_per_session = 2` excludes the main thread. No legacy config_file registration table is needed for this format.
 

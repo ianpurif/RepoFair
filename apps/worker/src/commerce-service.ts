@@ -92,7 +92,7 @@ export function createCommerceService(database:AtlasDatabase,env:Readonly<Record
     });
     if(existing) {const authorization=await currentAuthorization(principal,sessionId,existing);return {purchase:record(existing),approval:existing.approval,requestBody:existing.request_body,authorizationToken:authorization.token,endpoint:existing.provider_url};}
     const authorization=await registry.grant(principal,sessionId,workspace,providerId,digest,idem);
-    const response=await http(provider.endpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${authorization.token}`},body,maximumBytes:65_536});
+    const response=await http(provider.endpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${authorization.token}`},body,maximumBytes:65_536,timeoutMs:180_000});
     required(response.status===402,'quote-unavailable','The authorized provider did not issue a Tempo testnet quote',422);
     let approval:Approval;
     try {
@@ -169,7 +169,7 @@ export function createCommerceService(database:AtlasDatabase,env:Readonly<Record
       });
     }
     const authorization=await currentAuthorization(principal,sessionId,row);let response:Response;
-    try {response=await http(row.provider_url,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${authorization.token}`,...(credential?{'Payment-Authorization':credential}:{})},body:row.request_body,maximumBytes:1_000_000});}
+    try {response=await http(row.provider_url,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${authorization.token}`,...(credential?{'Payment-Authorization':credential}:{})},body:row.request_body,maximumBytes:1_000_000,timeoutMs:180_000});}
     catch {await markUnknown(principal,id);throw new PublicationServiceError('payment-unknown','Provider outcome is unknown; resume this purchase without sending another credential',503);}
     if(response.status!==200) {
       if(row.payment_state!=='settled')await markUnknown(principal,id);

@@ -1,17 +1,23 @@
-# SDK scope
+# RepoFair SDK
 
-The supplied `@atlas/sdk` is a starter-only client for the source scaffold's capability endpoint. It validates the origin, bounds the response, sets a timeout, rejects redirects and checks the returned capability shape. It is not a general provider client or an MCP implementation.
+The existing `@atlas/sdk` workspace package exports `RepoFairClient` for public capabilities and `AuthenticatedRepoFairClient` for real authenticated repository and commerce APIs. Legacy package names and exported aliases remain compatible with existing integrations.
 
-After bootstrap and starting the web scaffold:
+Use your existing Clerk session for authenticated calls:
 
 ```ts
-import { ChronosAtlasClient } from '@atlas/sdk';
-const atlas = new ChronosAtlasClient('http://localhost:3000', {
-  allowLocalDevelopment: true,
+import { RepoFairClient, AuthenticatedRepoFairClient } from '@atlas/sdk';
+const origin = 'https://repofair.vercel.app';
+const publicClient = new RepoFairClient(origin);
+console.log(await publicClient.capabilities());
+const client = new AuthenticatedRepoFairClient(origin, {
+  sessionToken: () => clerk.session.getToken(),
 });
-console.log(await atlas.capabilities());
+const account = await client.account();
+const repositories = await client.repositories(account.workspaces[0].id);
 ```
 
-Implement repository/graph/context/provider/purchase/recovery methods during P1–P5, with shared runtime schemas and explicit authorization. A future headless purchase method accepts a caller-controlled signer; do not automatically derive signing authority from a model request.
+Credentials go only to the exact RepoFair HTTPS origin. Requests reject redirects, enforce byte bounds and use bounded deadlines. Ordinary API requests allow 30 seconds; explicit quotes and existing paid delivery/recovery allow 240 seconds to cover fresh cross-service authorization below Vercel's 300-second Function limit. No request automatically retries a signature, credential or payment.
 
-Do not publish the package until the user authorizes publication and the interface/release gates pass.
+Repository methods include import/status/control, progressive maps, exact source ranges, extractive questions and exact dependency resolution. Commerce methods expose catalog/history, integer allowances, explicit approval, unsigned cancellation and signer-free recovery. `pay` accepts a caller-owned Moderato signer and claims signing once before invoking it. A pending/unknown outcome retains its reservation and must be reconciled rather than replaced.
+
+See [MCP.md](MCP.md) for actual authenticated MCP tools and [TEMPO.md](TEMPO.md) for fixed testnet terms, the protected caller-owned CLI and current verification boundaries. A model cannot grant authentication or spending authority. Fixture clients require explicit development enablement and cannot access production fixtures. The workspace package has not been published to a registry.

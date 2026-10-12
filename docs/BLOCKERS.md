@@ -1,5 +1,11 @@
 # Current integration blockers
 
+Updated 2026-10-13: **https://repofair.vercel.app is publicly deployed**, alongside the real free provider. Actual Clerk sign-in, authorized 323-file import (5,862 nodes / 1,508 edges), original source/citations, six live browser checks and signed activation of two public RepoFair files passed. Initial quote failure occurred before signing/reservation; live commerce verification continues. The dated preparation status below is retained as history.
+
+Current remaining acceptance: real Moderato purchase/delivery/recovery; browser extension Tempo signing; second independent operator/customer; new hosted central signing/spending contention; remote GitHub events (App still has no subscriptions); broader organization/Storage/private AI acceptance. Free-host Clerk development authentication has a 100-user cap and development guarantees. SEO permits crawling but does not prove search engine inclusion. No paid plan, custom domain, mainnet or real money was used.
+
+## Historical preparation scope
+
 Updated 2026-10-12. Publishing infrastructure is prepared and two explicitly approved temporary HTTPS tunnels are running. Source publication and payments remain inactive. The overhaul implements durable imports, persisted UX, signed owner exports, authenticated SDK/MCP and independent Moderato adapters; infrastructure checks do not establish paid acceptance.
 
 ## Required deployment and acceptance

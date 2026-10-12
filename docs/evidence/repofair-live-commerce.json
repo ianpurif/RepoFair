@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-12T19:00:20.005Z",
+  "status": "incomplete",
+  "network": 42431,
+  "purchaseId": null,
+  "stage": "quote",
+  "elapsedMs": 29505,
+  "errorName": "Error",
+  "httpStatus": 503,
+  "code": "unavailable",
+  "paymentRetryPerformed": false,
+  "mainnet": false,
+  "realMoneySpent": false
+}

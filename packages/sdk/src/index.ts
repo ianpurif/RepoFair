@@ -31,7 +31,7 @@ async function readBoundedJson(response: Response): Promise<unknown> {
     return JSON.parse(text) as unknown;
   } finally { reader.releaseLock(); }
 }
-/** Starter-only capability client. Paid requests and MCP are not implemented. */
+/** Capability discovery; authenticated workflows use AuthenticatedRepoFairClient. */
 export class RepoFairClient {
   readonly #base: URL;
   constructor(baseUrl: string, options: { allowLocalDevelopment?: boolean } = {}) {

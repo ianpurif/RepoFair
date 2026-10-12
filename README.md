@@ -2,7 +2,7 @@
 
 **Map your code. Connect the knowledge.**
 
-RepoFair imports authorized GitHub repositories into immutable code maps and source-grounded answers. Owners can export selected knowledge to an independent provider and activate a version-specific Tempo Moderato service. Authenticated workflows and payment adapters are implemented; hosted deployment and a real testnet purchase remain unverified. See [the overhaul report](docs/OVERHAUL.md) and [current blockers](docs/BLOCKERS.md).
+RepoFair imports authorized GitHub repositories into immutable code maps and source-grounded answers. Owners can export selected knowledge to an independent provider and activate a version-specific Tempo Moderato service. Live at **https://repofair.vercel.app**, deployed from the existing ianpurif/RepoFair repository on Vercel Hobby. Real sign-in, a 323-file GitHub import, source maps/citations and a signed public publication have passed live verification. Testnet payment acceptance and remaining limits are recorded in [current blockers](docs/BLOCKERS.md).
 
 ## Run locally
 
@@ -20,7 +20,7 @@ Open **http://localhost:3000**, sign in, connect GitHub in account settings, and
 bun run worker
 ```
 
-The launcher rejects an occupied port 3000. Apply the reviewed central migrations before using the new import and commerce APIs; no hosted migrations were applied during the overhaul.
+The launcher rejects an occupied port 3000. The existing hosted central schema has been verified without replaying migrations; the separate provider database has its three reviewed provider migrations installed.
 
 ## Implemented workflows
 
@@ -68,4 +68,4 @@ bun run evaluate
 bun run verify:release
 ```
 
-Browser checks require explicit local services; [TESTING.md](docs/TESTING.md) records commands and evidence boundaries. The release gate stays blocked until hosted publishing, testnet settlement, delivery recovery and full acceptance pass. No public deployment, mainnet activity or successful payment is claimed.
+Browser checks require explicit local services; [TESTING.md](docs/TESTING.md) records commands and evidence boundaries. The public web and provider are deployed. Six real live browser checks passed. The full release gate remains blocked by the documented acceptance limits; real payment evidence is recorded separately. Only Moderato testnet is permitted; no mainnet or real-money activity occurred.

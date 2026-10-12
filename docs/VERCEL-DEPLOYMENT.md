@@ -1,6 +1,8 @@
 # Deploy RepoFair on free Vercel hosting
 
-Use the existing repository **https://github.com/ianpurif/RepoFair**. The requested public hostname is **https://repofair.vercel.app**, subject to Vercel availability. Do not create another source repository, buy a domain, select a paid plan, or enable mainnet. Only Tempo Moderato chain 42431 and PathUSD are implemented.
+Use the existing repository **https://github.com/ianpurif/RepoFair**. The requested public hostname is **https://repofair.vercel.app**, assigned and live. Do not create another source repository, buy a domain, select a paid plan, or enable mainnet. Only Tempo Moderato chain 42431 and PathUSD are implemented.
+
+Current deployments are https://repofair.vercel.app and https://repofair-provider.vercel.app. Both use the same existing GitHub repository and Hobby plan. Pushing main triggers deployment; verify the production alias after READY.
 
 ## Web project
 
@@ -41,7 +43,11 @@ Do not replay migrations on the existing hosted database. Fresh installations ma
 
 Owners review and export selected immutable source before an independently configured provider installs it. The provider has its own HTTPS origin, database, issuer public key, MPP secret, recipient public address and exact integer terms; the web project must not inherit its secrets. A fresh provider Supabase target requires the standard `anon`, `authenticated` and `service_role` roles. The `migrate-provider.mjs --plan` / `--apply` command reads only provider credentials, journals exactly three provider migrations and refuses a central schema.
 
-A configured provider still requires a real signed export, endpoint control and buyer-approved Moderato payment/delivery/recovery. No payment, provider sale, customer or receipt is fabricated for deployment. The release gate remains blocked until actual acceptance evidence exists.
+For Vercel, import the **same** existing repository as a second Hobby project named repofair-provider, Root Directory apps/provider, framework Other, Node22, outside-root source enabled and Fluid Compute/300 seconds. apps/provider/vercel.json routes requests to api/index.ts. Keep rewriteRelativeImportExtensions enabled in its tsconfig: Vercel emits JavaScript, so transitive relative .ts imports must become .js.
+
+Configure only the 13 provider fields: ATLAS_PROVIDER_ID, ATLAS_PROVIDER_ORIGIN, ATLAS_PROVIDER_DATABASE_URL, ATLAS_PROVIDER_DATABASE_SSL_CA, ATLAS_PROVIDER_AUTHORIZATION_ISSUER, ATLAS_PROVIDER_ISSUER_PUBLIC_KEY, ATLAS_PROVIDER_MPP_SECRET, ATLAS_PROVIDER_RECIPIENT, ATLAS_PROVIDER_PRICE_UNITS, ATLAS_PROVIDER_REALM, TEMPO_RPC_URL, TEMPO_CHAIN_ID and TEMPO_TOKEN_ADDRESS. Use the actual signed artifact identity, provider HTTPS origin, web issuer origin, independent database/MPP secret and issuer public key. Keep buyer wallet keys and the issuer private key outside this project.
+
+The current two-file public RepoFair export is installed and active. A configured provider still requires a real signed export, endpoint control and buyer-approved Moderato payment/delivery/recovery. No payment, provider sale, customer or receipt is fabricated for deployment. The release gate remains blocked until actual acceptance evidence exists.
 
 ## Live verification
 

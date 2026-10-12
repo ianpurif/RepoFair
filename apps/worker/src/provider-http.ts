@@ -25,7 +25,13 @@ export function isPublicProviderAddress(address: string): boolean {
   }
   return false;
 }
-export type ProviderHttp = (url: string, options?: Readonly<{ method?: 'GET' | 'POST'; headers?: Readonly<Record<string,string>>; body?: string; maximumBytes?: number }>) => Promise<Response>;
+export class ProviderHttpError extends Error {
+  constructor(public readonly code: 'provider-timeout' | 'provider-connection') {
+    super(code === 'provider-timeout' ? 'Provider request timed out' : 'Provider connection failed');
+    this.name = 'ProviderHttpError';
+  }
+}
+export type ProviderHttp = (url: string, options?: Readonly<{ method?: 'GET' | 'POST'; headers?: Readonly<Record<string,string>>; body?: string; maximumBytes?: number; timeoutMs?: number }>) => Promise<Response>;
 /** HTTP no-content statuses cannot be passed even an empty buffer as a Fetch body. */
 export function boundedProviderResponse(status:number,headers:Headers,body:Buffer):Response {
   if (!Number.isInteger(status) || status<200 || status>599) throw new Error('Invalid provider HTTP status');
@@ -34,25 +40,34 @@ export function boundedProviderResponse(status:number,headers:Headers,body:Buffe
 /** Resolve and pin the public address for this TLS connection. No redirects, cookies or ambient credentials. */
 export const providerHttp: ProviderHttp = async (input, options = {}) => {
   const url = publicProviderUrl(input); const maximum = options.maximumBytes ?? 1_000_000;
-  if (!Number.isSafeInteger(maximum) || maximum < 1 || maximum > 4_000_000 || (options.body && Buffer.byteLength(options.body) > 8192)) throw new Error('Provider request exceeds bounds');
+  const timeoutMs = options.timeoutMs === undefined ? 10_000 : options.timeoutMs;
+  if (!Number.isSafeInteger(maximum) || maximum < 1 || maximum > 4_000_000 || (options.body && Buffer.byteLength(options.body) > 8192)
+    || !Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 180_000) throw new Error('Provider request exceeds bounds');
+  const startedAt = Date.now();
   let dnsTimer:ReturnType<typeof setTimeout>|undefined;
-  const addresses=await Promise.race([lookup(url.hostname,{all:true,verbatim:true}),new Promise<never>((_resolve,reject)=>{dnsTimer=setTimeout(()=>reject(new Error('Provider DNS deadline exceeded')),5000);})]).finally(()=>clearTimeout(dnsTimer));
+  const addresses=await Promise.race([lookup(url.hostname,{all:true,verbatim:true}),new Promise<never>((_resolve,reject)=>{
+    dnsTimer=setTimeout(()=>reject(new ProviderHttpError('provider-timeout')),Math.min(5000,timeoutMs));
+  })]).catch(error=>{throw error instanceof ProviderHttpError ? error : new ProviderHttpError('provider-connection');}).finally(()=>clearTimeout(dnsTimer));
   if (!addresses.length || addresses.length>16 || addresses.some(item => !isPublicProviderAddress(item.address))) throw new Error('Provider DNS includes an unsupported address');
+  // DNS and HTTP share one hard budget; socket activity cannot extend it.
+  const remainingMs = timeoutMs - (Date.now() - startedAt);
+  if (remainingMs <= 0) throw new ProviderHttpError('provider-timeout');
   const pinned = addresses[0]!;
   return new Promise<Response>((resolve,reject) => {
-    const request = httpsRequest(url, {
+    let request: ReturnType<typeof httpsRequest>;
+    try { request = httpsRequest(url, {
       method: options.method ?? 'GET', headers: { Accept: 'application/json', ...options.headers },
       // Node can request either a single address or an array; both remain pinned.
       lookup: (_hostname, lookupOptions, callback) => {
         if (lookupOptions.all) callback(null, [{ address: pinned.address, family: pinned.family }]);
         else callback(null, pinned.address, pinned.family);
-      }, timeout: 8000, maxHeaderSize: 16_384,
+      }, timeout: remainingMs, maxHeaderSize: 16_384,
     }, response => {
       const status = response.statusCode ?? 502;
       if (status >= 300 && status < 400) { response.destroy(); request.destroy(); reject(new Error('Provider redirects are disallowed')); return; }
       const chunks: Buffer[] = []; let size = 0;
       response.on('data', (chunk: Buffer) => { size += chunk.length; if (size > maximum) { response.destroy(); request.destroy(); reject(new Error('Provider response exceeds bounds')); } else chunks.push(chunk); });
-      response.on('error', () => reject(new Error('Provider response interrupted')));
+      response.on('error', () => reject(new ProviderHttpError('provider-connection')));
       response.on('end', () => {
         try {
           const headers = new Headers();
@@ -62,10 +77,15 @@ export const providerHttp: ProviderHttp = async (input, options = {}) => {
           resolve(boundedProviderResponse(status,headers,Buffer.concat(chunks)));
         } catch { reject(new Error('Invalid provider HTTP response')); }
       });
-    });
-    const deadline = setTimeout(() => request.destroy(new Error('Provider deadline exceeded')), 10_000);
-    request.once('close', () => clearTimeout(deadline)); request.once('timeout', () => request.destroy(new Error('Provider timed out')));
-    request.once('error', () => reject(new Error('Provider connection failed')));
-    if (options.body) request.write(options.body); request.end();
+    }); } catch { reject(new ProviderHttpError('provider-connection')); return; }
+    const timeOut = () => {
+      const error = new ProviderHttpError('provider-timeout');
+      reject(error); request.destroy(error);
+    };
+    const deadline = setTimeout(timeOut, remainingMs);
+    request.once('close', () => clearTimeout(deadline)); request.once('timeout', timeOut);
+    request.once('error', error => reject(error instanceof ProviderHttpError ? error : new ProviderHttpError('provider-connection')));
+    try { if (options.body) request.write(options.body); request.end(); }
+    catch { const error = new ProviderHttpError('provider-connection'); reject(error); request.destroy(error); }
   });
 };

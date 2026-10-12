@@ -79,7 +79,7 @@ export async function createIndependentProvider(env: Readonly<Record<string,stri
     && env.ATLAS_PROVIDER_RECIPIENT?.toLowerCase() === terms.recipient.toLowerCase() && env.ATLAS_PROVIDER_PRICE_UNITS === terms.atomicPrice,
   'Independent provider origin, recipient or integer pricing differs from the signed export');
   const config: TempoProviderConfig = {providerId:artifact.id,origin,realm:env.ATLAS_PROVIDER_REALM ?? new URL(origin).hostname,
-    recipient:terms.recipient as `0x${string}`,token:MODERATO_PATHUSD,decimals:6,atomicPrice:terms.atomicPrice,secretKey:secret,quoteLifetimeMs:60_000};
+    recipient:terms.recipient as `0x${string}`,token:MODERATO_PATHUSD,decimals:6,atomicPrice:terms.atomicPrice,secretKey:secret,quoteLifetimeMs:300_000};
   const replayStore = createPostgresReplayStore(database,artifact.id);
   async function currentArtifact(connection?:AtlasTransaction): Promise<void> {
     const read=async(tx:AtlasTransaction)=>(await tx.query<{terms_digest:string}>('SELECT terms_digest FROM atlas_provider.publications WHERE provider_id=$1',[artifact.id])).rows[0];
@@ -90,11 +90,14 @@ export async function createIndependentProvider(env: Readonly<Record<string,stri
     const grant = verifyProviderGrant(token,key,issuer,artifact.id,now());
     requireValue(grant.publicationDigest === artifact.termsDigest && grant.packageName === input.packageName && grant.version === input.version
       && grant.idempotencyKey === input.idempotencyKey && grant.requestDigest === digest,'Delegation differs from this exact request');
-    const response = await http(`${issuer}/api/provider-grants/introspect`,{method:'POST',headers:{'X-Atlas-Provider-Grant':token,'Content-Type':'application/json'},body:'{}',maximumBytes:8192});
+    // Reauthorization also occurs inside provider transactions with a 15-second idle guard.
+    const response = await http(`${issuer}/api/provider-grants/introspect`,{method:'POST',headers:{'X-Atlas-Provider-Grant':token,'Content-Type':'application/json'},body:'{}',maximumBytes:8192,timeoutMs:12_000});
     requireValue(response.ok,'Current provider delegation authorization is unavailable');
     const active = await response.json() as {active?:boolean;grant?:ProviderGrant};
     requireValue(active.active === true && active.grant && canonicalJson(active.grant) === canonicalJson(grant),'Current issuer authorization differs from the signed delegation');
-    await currentArtifact(connection); return {principalId:grant.principalId,permissionRevision:grant.permissionRevision,input};
+    await currentArtifact(connection);
+    requireValue(grant.expiresAtMs > now(),'Provider delegation expired during reauthorization');
+    return {principalId:grant.principalId,permissionRevision:grant.permissionRevision,input};
   }
   async function submission(auth: AuthorizedRetrieval): Promise<PaymentSubmission|null> {
     const row = await database.withAdminTransaction(async tx => (await tx.query<{challenge_id:string;realm:string;transaction_hash:`0x${string}`;sender:`0x${string}`}>(

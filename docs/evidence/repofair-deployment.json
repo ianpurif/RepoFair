@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-12T17:40:48.414Z",
+  "updatedAt": "2026-10-12T19:03:58.980Z",
   "product": "RepoFair",
   "repository": "https://github.com/ianpurif/RepoFair",
   "requestedOrigin": "https://repofair.vercel.app",
-  "status": "locally-verified-deployment-pending",
+  "status": "publicly-deployed-commerce-verification-pending",
   "newRepositoryCreated": false,
   "customDomain": false,
   "paidPlan": false,
@@ -12,12 +12,14 @@
   "realMoneySpent": false,
   "tests": {
     "node": "125/125",
-    "product": "516/516",
+    "product": "539/539 before native emission tests; 3/3 additional emission and 37/37 SDK/database regression checks passed",
     "localBrowser": "5/5",
     "typecheck": "pass",
     "lint": "pass",
     "build": "pass",
-    "parserBundle": "native Node pass; traced in jobs Function"
+    "parserBundle": "native Node pass; traced in jobs Function",
+    "liveBrowser": "6/6",
+    "providerEmission": "3/3; real Vercel health200"
   },
   "externalSetup": {
     "projectName": "repofair",
@@ -33,10 +35,30 @@
     "githubEnabled": true,
     "githubAppSlug": "repofair"
   },
-  "liveVerification": "pending",
+  "liveVerification": "real sign-in, GitHub import, original source, extractive citations, publishing/catalog and private boundaries verified",
   "paymentBroadcasts": 0,
   "limitations": [
-    "Clerk development instance on .vercel.app retains provider-documented limits.",
-    "No active source publication or real testnet settlement is claimed."
-  ]
+    "Free .vercel.app uses real Clerk development sessions with the documented 100-user cap and development guarantees.",
+    "SEO permits indexing; actual search engine inclusion is not guaranteed or verified.",
+    "Remote GitHub webhook event subscriptions and actual delivery remain unverified.",
+    "Provider is independently configured but remains under the same operator.",
+    "Real testnet payment/delivery/recovery is being verified; browser extension signing remains unverified."
+  ],
+  "productionOrigin": "https://repofair.vercel.app",
+  "providerOrigin": "https://repofair-provider.vercel.app",
+  "provider": {
+    "projectName": "repofair-provider",
+    "rootDirectory": "apps/provider",
+    "framework": "Other",
+    "productionDeployment": "dpl_8hQfRrBBUw1hyZZB1wkT76Qd4pmV",
+    "status": "READY",
+    "health": 200,
+    "database": "separate restricted provider database on existing Supabase cluster",
+    "environmentFields": 13,
+    "walletPrivateKeysHosted": false,
+    "issuerPrivateKeyHosted": false
+  },
+  "importEvidence": "docs/evidence/repofair-live-import.json",
+  "publicationEvidence": "docs/evidence/repofair-live-publication.json",
+  "commerceEvidence": "docs/evidence/repofair-live-commerce.json"
 }

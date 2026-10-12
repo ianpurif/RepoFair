@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "product": "RepoFair",
   "stage": "implementation",
-  "currentPhase": "repofair-free-vercel-deployment",
-  "nextAction": "Deploy existing ianpurif/RepoFair repository to the free repofair.vercel.app production alias with real Clerk development authentication, hosted PostgreSQL and bounded serverless imports. Keep Moderato testnet only and verify live sessions/imports before claiming full acceptance.",
+  "currentPhase": "repofair-live-testnet-acceptance",
+  "nextAction": "Complete one bounded real Moderato testnet purchase and signer-free recovery; keep unknown outcomes reserved. Record live acceptance and remaining external webhook/authentication limits.",
   "milestones": [
     {
       "id": "P0",
@@ -80,7 +80,7 @@
   ],
   "liveIntegrationsVerified": false,
   "lastUpdatedBy": "lead",
-  "updatedAt": "2026-10-12T17:14:04.805Z",
+  "updatedAt": "2026-10-12T19:03:58.980Z",
   "applicationAi": {
     "embeddingProvider": "Voyage AI",
     "generationProvider": "DeepSeek",
@@ -110,7 +110,7 @@
     "publicationCapacity": true,
     "providerReplayStorage": true,
     "providerSaleStorage": true,
-    "externalPublication": false,
+    "externalPublication": true,
     "tempoSettlement": false,
     "historicalEvidenceDate": "2026-10-07",
     "newOverhaulMigrationsApplied": true,
@@ -122,7 +122,12 @@
     "privateBrowserCurrentLoopback": true,
     "privateBrowserConfiguredHttps": true,
     "privateBrowserEvidence": "docs/evidence/private-repository-ui.json",
-    "privateBrowserCurrentScope": "Fresh development Clerk sessions; existing real hosted private immutable import; current production UI on loopback and configured temporary HTTPS; no new hosted import, private AI or commerce acceptance."
+    "privateBrowserCurrentScope": "Fresh development Clerk sessions; existing real hosted private immutable import; current production UI on loopback and configured temporary HTTPS; no new hosted import, private AI or commerce acceptance.",
+    "publicVercelImport": true,
+    "publicVercelBrowser": true,
+    "publicVercelImportEvidence": "docs/evidence/repofair-live-import.json",
+    "publicVercelBrowserEvidence": "docs/evidence/repofair-live-browser.json",
+    "publicPublicationEvidence": "docs/evidence/repofair-live-publication.json"
   },
   "developmentAgentConfiguration": {
     "model": "gpt-6.1-sol",
@@ -152,27 +157,28 @@
     "securityEvidence": "docs/evidence/overhaul-security.json",
     "independentVerifierEvidence": "docs/evidence/overhaul-verifier-commerce.json",
     "importBenchmarkEvidence": "docs/evidence/import-pipeline-benchmark.json",
-    "externalDeploymentPerformed": false,
+    "externalDeploymentPerformed": true,
     "paymentBroadcasts": 0,
     "privateSourceSentToAi": false,
     "temporaryHttpsExposed": true,
-    "permanentDeploymentPerformed": false,
-    "activeSourcePublication": false
+    "permanentDeploymentPerformed": true,
+    "activeSourcePublication": true,
+    "liveDeploymentEvidence": "docs/evidence/repofair-deployment.json"
   },
   "publishingSetup": {
-    "configured": false,
-    "configurationStatus": "infrastructure-only; publication identity awaits an approved signed artifact",
+    "configured": true,
+    "configurationStatus": "actual signed public export installed and publication active on free Vercel provider",
     "infrastructureProvisioned": true,
     "callerExample": "packages/sdk/examples/moderato.ts",
-    "evidence": "docs/evidence/publishing-execution.json",
+    "evidence": "docs/evidence/repofair-live-publication.json",
     "historicalCliEvidence": "docs/evidence/publishing-setup.json",
     "browserWalletCompatibilityVerified": false,
     "browserWalletCompatibilityStatus": "unverified",
     "actualRpcChain": 42431,
     "paymentBroadcasts": 0,
     "servicePurchases": 0,
-    "activePublication": false,
-    "sourceExports": 0,
+    "activePublication": true,
+    "sourceExports": 1,
     "issuerKeyPairConfigured": true,
     "mppSecretConfigured": true,
     "providerDatabaseSeparate": true,
@@ -190,19 +196,24 @@
     "privateKeyLocation": "Outside checkout and OneDrive; restricted Windows ACLs",
     "atlasTemporaryOrigin": "https://known-les-characters-narrow.trycloudflare.com",
     "providerTemporaryOrigin": "https://dennis-headline-bytes-pct.trycloudflare.com",
-    "providerService": "Preparation-only builtin bundle; all routes 503; no payment challenge or source/database/payment runtime",
+    "providerService": "configured real testnet runtime, health200, signed endpoint control verified",
     "temporaryOriginsChangeOnRestart": true,
     "requestOriginRepairImplemented": true,
-    "requestOriginSecurityReview": "Actual bounded atlas_security review and48 native synthetic-route cases; fresh authenticated public HTTPS rejected all three loopback Origins with403denied/no-store."
+    "requestOriginSecurityReview": "Actual bounded atlas_security review and48 native synthetic-route cases; fresh authenticated public HTTPS rejected all three loopback Origins with403denied/no-store.",
+    "atlasOrigin": "https://repofair.vercel.app",
+    "providerOrigin": "https://repofair-provider.vercel.app"
   },
   "vercelDeployment": {
     "locallyPrepared": true,
-    "permanentlyDeployed": false,
+    "permanentlyDeployed": true,
     "productionAcceptanceVerified": false,
-    "searchIndexingEnabled": false,
-    "evidence": "docs/evidence/vercel-local-preflight.json",
+    "searchIndexingEnabled": true,
+    "evidence": "docs/evidence/repofair-deployment.json",
     "rootDirectory": "apps/web",
     "runtime": "Node.js 22.x",
-    "operatorActionRequired": true
+    "operatorActionRequired": true,
+    "searchEngineInclusionVerified": false,
+    "liveBrowserEvidence": "docs/evidence/repofair-live-browser.json",
+    "operatorAction": "Enable actual GitHub App webhook events; development Clerk limits and browser wallet compatibility remain."
   }
 }

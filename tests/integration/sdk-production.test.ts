@@ -153,6 +153,33 @@ describe('authenticated SDK over native loopback HTTP', () => {
   it('never follows a redirect or forwards authorization to its destination', async () => {
     behavior = 'redirect'; await expect(api().account()).rejects.toThrow(); expect(seen.map(item => item.url)).toEqual(['/api/account']);
   });
+  it('permits a slow authorized quote or read-only delivery while ordinary requests still expire at 30 seconds, without retrying', async () => {
+    vi.useFakeTimers();
+    const timeout = vi.spyOn(AbortSignal, 'timeout').mockImplementation(milliseconds => {
+      const controller = new AbortController();
+      setTimeout(() => controller.abort(new DOMException('Bounded test timeout', 'TimeoutError')), milliseconds);
+      return controller.signal;
+    });
+    const transport = vi.fn(async (_input: string | URL | Request, options?: RequestInit) => new Promise<Response>((complete, reject) => {
+      const signal = options!.signal!;
+      const timer = setTimeout(() => complete(Response.json(reservation)), 45_000);
+      signal.addEventListener('abort', () => { clearTimeout(timer); reject(signal.reason); }, { once: true });
+    }));
+    const client = new AuthenticatedAtlasClient('https://repofair.sdk-verifier.dev', { sessionToken: async () => sessionToken, fetch: transport as typeof fetch });
+    try {
+      for (const operation of [
+        () => client.approvePurchase({ workspaceId, providerId, question: 'retry', idempotencyKey, approvedAtomicAmount: '1000' }),
+        () => client.resumePurchase(purchaseId),
+      ]) {
+        const pending = operation(); await vi.advanceTimersByTimeAsync(45_000);
+        await expect(pending).resolves.toEqual(reservation);
+      }
+      const ordinary = client.account(); const rejected = expect(ordinary).rejects.toMatchObject({ name: 'TimeoutError' });
+      await vi.advanceTimersByTimeAsync(30_000); await rejected;
+      expect(timeout.mock.calls.map(call => call[0])).toEqual([240_000, 240_000, 30_000]);
+      expect(transport).toHaveBeenCalledTimes(3);
+    } finally { timeout.mockRestore(); vi.useRealTimers(); }
+  });
   it('rejects missing, multiline, empty, or unbounded session credentials without leakage', async () => {
     await expect(api(async () => null).account()).rejects.toMatchObject({ status: 401, code: 'session-required' });
     seen.length = 0;

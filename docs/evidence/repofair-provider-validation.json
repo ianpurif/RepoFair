@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-12T19:11:52.364Z",
+  "status": "bounded-local-review-passed",
+  "actualRoles": [
+    {
+      "task": "/root/repofair_provider_vercel",
+      "role": "atlas_engineer",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/repofair_provider_security",
+      "role": "atlas_security",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    }
+  ],
+  "checks": {
+    "engineer": "91/91 focused plus1/1 added final-expiry regression; core TypeScript/scoped lint passed",
+    "security": "134/134 initial provider/commerce regression cases,76/76 deadline/SDK/buyer/adapter,64/64 registry/artifact/ledger,1/1 final-expiry recovery",
+    "lead": "37/37 SDK/database and14/14 registry,125/125 starter, full TypeScript/lint/build passed"
+  },
+  "findingsClosed": [
+    "Owned provider initialization failure closes its own pool without closing caller-supplied pools.",
+    "Vercel emitted transitive .ts imports rewrite to.js and actual native emitted Node runtime loads.",
+    "Measured eight-second provider timeout no longer truncates bounded commerce authorization.",
+    "Issuer and provider grant expiry rechecked after external waits and before source delivery."
+  ],
+  "transport": {
+    "defaultMs": 10000,
+    "maximumMs": 180000,
+    "introspectionMs": 12000,
+    "dnsMaximumMs": 5000,
+    "sdkCommerceMs": 240000,
+    "vercelFunctionMs": 300000,
+    "grantLifetimeMs": 120000,
+    "newQuoteLifetimeMs": 300000,
+    "sqlIdleMs": 15000,
+    "sqlTransactionMs": 30000
+  },
+  "retained": [
+    "DNS/IP filtering and pinning",
+    "TLS certificate and hostname validation",
+    "no redirects",
+    "request and response byte bounds",
+    "current identity/workspace/repository/publication fences",
+    "atomic integer budgets",
+    "single signing claim and credential dispatch",
+    "pending/unknown reservations",
+    "immutable existing quotes",
+    "signer-free delivery recovery"
+  ],
+  "limitations": [
+    "Tests explicitly inject identity/RPC/provider transports; they do not attest live settlement.",
+    "Same operator remains; no independent-customer claim.",
+    "Runtime model and effort not exposed by tool metadata."
+  ],
+  "mainnet": false,
+  "realMoneySpent": false
+}

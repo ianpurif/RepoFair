@@ -39,7 +39,7 @@ export function createPublicationRegistry(database: AtlasDatabase, env: Readonly
   const http = dependencies.http ?? providerHttp; const now = dependencies.now ?? Date.now;
   const activeSession = dependencies.sessionActive ?? ((principal: string,session: string) => sessionActive(env, principal, session));
   const issuer = (): string => {
-    required(env.ATLAS_PUBLIC_ORIGIN, 'issuer-unavailable', 'Configure the public Atlas HTTPS origin before publishing', 503);
+    required(env.ATLAS_PUBLIC_ORIGIN, 'issuer-unavailable', 'Configure the public RepoFair HTTPS origin before publishing', 503);
     const origin = publicProviderUrl(env.ATLAS_PUBLIC_ORIGIN).origin;
     required(origin === env.ATLAS_PUBLIC_ORIGIN, 'issuer-unavailable', 'RepoFair issuer must be an exact HTTPS origin', 503); return origin;
   };
@@ -163,7 +163,8 @@ export function createPublicationRegistry(database: AtlasDatabase, env: Readonly
     return database.withAdminTransaction(async tx=>{
       await fenceAvailable(tx,grant.principalId,row,row.verified,row.buyer);
       const current=(await tx.query<{revision:string}>('SELECT revision::text FROM atlas.memberships WHERE workspace_id=$1 AND principal_id=$2 FOR SHARE',[grant.workspaceId,grant.principalId])).rows[0];
-      required(current?.revision===membership.revision,'delegation-denied','Workspace membership changed during session verification',403);return grant;
+      required(current?.revision===membership.revision,'delegation-denied','Workspace membership changed during session verification',403);
+      required(grant.expiresAtMs>now(),'delegation-denied','Provider delegation expired during authorization',403);return grant;
     });
   }
   return { exportDraft,activateDraft,catalog,available,grant,introspect };

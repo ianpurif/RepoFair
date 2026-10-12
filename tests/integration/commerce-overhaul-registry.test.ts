@@ -168,6 +168,17 @@ describe('actual publication registration and fresh authorization fences', () =>
     await pause.arrived; await sql.query("UPDATE atlas.publications SET state='revoked' WHERE id=$1", [current.id]); pause.release();
     expect(await pending).toMatchObject({ code: 'publication-unavailable' });
   });
+  it('rejects a grant that expires while the current session check is pending, then accepts a fresh scoped grant', async () => {
+    await activate(); const issued = await registry().grant(buyer, sessionId, purchaseWorkspace, current.id, requestDigest, idem);
+    const pause = barrier(); sessionActive.mockImplementationOnce(async () => { pause.started(); await pause.wait; return true; });
+    const pending = registry().introspect(issued.token).then(() => null, error => error);
+    await pause.arrived; now = issued.grant.expiresAtMs; pause.release();
+    expect(await pending).toMatchObject({ code: 'delegation-denied', status: 403 });
+    const fresh = await registry().grant(buyer, sessionId, purchaseWorkspace, current.id, requestDigest, idem);
+    expect(fresh.grant.requestDigest).toBe(issued.grant.requestDigest);
+    expect(fresh.grant.idempotencyKey).toBe(issued.grant.idempotencyKey);
+    expect(await registry().introspect(fresh.token)).toEqual(fresh.grant);
+  });
   it('rejects a draft change after the candidate publication read and refreshes administrative proof', async () => {
     await activate();
     authority.mockImplementationOnce(async () => {

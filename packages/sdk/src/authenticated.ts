@@ -12,30 +12,30 @@ type ChargeParameters=NonNullable<Parameters<typeof tempo.charge>[0]>;
 export type ModeratoSigner=Readonly<{account:NonNullable<ChargeParameters['account']>;getClient:NonNullable<ChargeParameters['getClient']>}>;
 export class AtlasApiError extends Error {
   readonly status:number;readonly code:string;
-  constructor(status:number,code:string){super(`Atlas operation failed (${status}, ${code})`);this.status=status;this.code=code;}
+  constructor(status:number,code:string){super(`RepoFair operation failed (${status}, ${code})`);this.status=status;this.code=code;}
 }
-function id(value:string):string {if(!/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(value))throw new Error('Invalid Atlas identifier');return encodeURIComponent(value);}
+function id(value:string):string {if(!/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(value))throw new Error('Invalid RepoFair identifier');return encodeURIComponent(value);}
 async function json(response:Response):Promise<Record<string,unknown>> {
-  const reader=response.body?.getReader();if(!reader)throw new Error('Empty Atlas response');const parts:Uint8Array[]=[];let size=0;
-  try {for(;;){const next=await reader.read();if(next.done)break;size+=next.value.byteLength;if(size>4_000_000){await reader.cancel();throw new Error('Atlas response exceeds bounds');}parts.push(next.value);}}
+  const reader=response.body?.getReader();if(!reader)throw new Error('Empty RepoFair response');const parts:Uint8Array[]=[];let size=0;
+  try {for(;;){const next=await reader.read();if(next.done)break;size+=next.value.byteLength;if(size>4_000_000){await reader.cancel();throw new Error('RepoFair response exceeds bounds');}parts.push(next.value);}}
   finally {reader.releaseLock();}
   const bytes=new Uint8Array(size);let offset=0;for(const part of parts){bytes.set(part,offset);offset+=part.length;}
   const value:unknown=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));
   if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('Invalid RepoFair response');return value as Record<string,unknown>;
 }
-/** Authenticated repository and purchase API. The session credential is sent only to this exact Atlas origin. */
+/** Authenticated repository and purchase API. The session credential is sent only to this exact RepoFair origin. */
 export class AuthenticatedAtlasClient {
   readonly #origin:URL;readonly #token:()=>Promise<string|null>;readonly #fetch:typeof fetch;
   constructor(origin:string,options:{sessionToken:()=>Promise<string|null>;allowLocalDevelopment?:boolean;fetch?:typeof fetch}) {
     const url=new URL(origin);const local=['localhost','127.0.0.1','[::1]'].includes(url.hostname);
-    if(url.origin!==origin||url.username||url.password||url.search||url.hash||(url.protocol!=='https:'&&!(options.allowLocalDevelopment&&local&&url.protocol==='http:')))throw new Error('Use an exact Atlas HTTPS origin or explicit loopback development origin');
+    if(url.origin!==origin||url.username||url.password||url.search||url.hash||(url.protocol!=='https:'&&!(options.allowLocalDevelopment&&local&&url.protocol==='http:')))throw new Error('Use an exact RepoFair HTTPS origin or explicit loopback development origin');
     this.#origin=url;this.#token=options.sessionToken;this.#fetch=(options.fetch??globalThis.fetch).bind(globalThis);
   }
-  async #request<T>(path:string,input?:unknown):Promise<T> {
-    if(!path.startsWith('/api/')||path.startsWith('//'))throw new Error('Invalid Atlas route');const token=await this.#token();
+  async #request<T>(path:string,input?:unknown,timeoutMs=30_000):Promise<T> {
+    if(!path.startsWith('/api/')||path.startsWith('//'))throw new Error('Invalid RepoFair route');const token=await this.#token();
     if(token!==null&&(typeof token!=='string'||!token||token.length>16_384||/[\r\n]/.test(token)))throw new Error('Invalid session credential');
-    const body=input===undefined?undefined:JSON.stringify(input);if(body&&new TextEncoder().encode(body).length>65_536)throw new Error('Atlas request exceeds bounds');
-    const response=await this.#fetch(new URL(path,this.#origin),{method:body?'POST':'GET',redirect:'error',credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(30_000),
+    const body=input===undefined?undefined:JSON.stringify(input);if(body&&new TextEncoder().encode(body).length>65_536)throw new Error('RepoFair request exceeds bounds');
+    const response=await this.#fetch(new URL(path,this.#origin),{method:body?'POST':'GET',redirect:'error',credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(timeoutMs),
       headers:{...(token?{Authorization:`Bearer ${token}`} :{}),...(body?{'Content-Type':'application/json',Origin:this.#origin.origin}:{})},...(body?{body}:{})});
     const data=await json(response);if(!response.ok)throw new AtlasApiError(response.status,typeof data.code==='string'&&/^[a-z0-9-]{1,100}$/.test(data.code)?data.code:'unavailable');return data as T;
   }
@@ -55,10 +55,12 @@ export class AuthenticatedAtlasClient {
   catalog(packageName?:string,version?:string){const query=new URLSearchParams();if(packageName)query.set('packageName',packageName);if(version)query.set('version',version);return this.#request<{providers:CatalogProvider[]}>(`/api/catalog?${query}`);}
   purchaseHistory(workspaceId:string){return this.#request<{purchases:PurchaseRecord[];budgets:PurchaseBudget[]}>(`/api/purchases?workspaceId=${id(workspaceId)}`);}
   setAllowance(workspaceId:string,allowance:string){return this.#request<{budget:PurchaseBudget}>('/api/purchases/budget',{workspaceId,allowance});}
-  approvePurchase(input:{workspaceId:string;providerId:string;question:string;idempotencyKey:string;approvedAtomicAmount:string}){return this.#request<PurchaseReservation>('/api/purchases',input);}
+  // Independent provider calls include repeated fresh authorization and durable delivery.
+  // Their bounded server deadline fits below the 300-second Vercel Function limit.
+  approvePurchase(input:{workspaceId:string;providerId:string;question:string;idempotencyKey:string;approvedAtomicAmount:string}){return this.#request<PurchaseReservation>('/api/purchases',input,240_000);}
   cancelUnsigned(purchaseId:string){return this.#request(`/api/purchases/${id(purchaseId)}/cancel`,{});}
   /** Reconcile/retrieve an already submitted purchase; this never supplies another credential. */
-  resumePurchase(purchaseId:string){return this.#request<PaidKnowledge>(`/api/purchases/${id(purchaseId)}/resume`,{});}
+  resumePurchase(purchaseId:string){return this.#request<PaidKnowledge>(`/api/purchases/${id(purchaseId)}/resume`,{},240_000);}
   /** Caller owns the signer. Server reserves/claims policy before signing; uncertain outcomes cannot be retried. */
   async pay(reservation:PurchaseReservation,signer:ModeratoSigner):Promise<PaidKnowledge> {
     const approval=reservation.approval;
@@ -74,7 +76,7 @@ export class AuthenticatedAtlasClient {
       claimSigning:async()=> (await this.#request<{state:'claimed'|'pending'|'unknown'|'settled'|'failed'}>(`/api/purchases/${id(reservation.purchase.id)}/claim-signing`,{})).state,markUnknown});
     try {
       await this.#request(`/api/purchases/${id(reservation.purchase.id)}/credential`,{credential});
-      return await this.#request<PaidKnowledge>(`/api/purchases/${id(reservation.purchase.id)}/resume`,{credential});
+      return await this.#request<PaidKnowledge>(`/api/purchases/${id(reservation.purchase.id)}/resume`,{credential},240_000);
     }catch(error){try{await markUnknown();}catch{/* Durable pending claim remains reserved. */}throw error;}
   }
 }

@@ -371,6 +371,34 @@ describe('independent provider installation and authorization', () => {
     revokeAfterSave = false; const recovered = await runtime.handle(fixture.request()); expect(recovered.status).toBe(200);
     expect((await sql.query('SELECT * FROM atlas_provider.deliveries')).rows).toHaveLength(1);
   });
+  it('withholds saved paid context when the grant expires during final introspection and resumes with a fresh grant without another credential', async () => {
+    const fixture = await seededUnbroadcastProviderSale(); let clock = fixture.now; let expireAfterSave = true; let grant = fixture.grant;
+    const runtime = await createIndependentProvider(environment, { database, client: fixture.rpc, now: () => clock,
+      http: vi.fn(async (_url, options) => {
+        expect(options?.timeoutMs).toBe(12_000);
+        const saved = (await sql.query<{ count: number }>('SELECT count(*)::int AS count FROM atlas_provider.deliveries')).rows[0]!.count;
+        if (saved && expireAfterSave) clock = grant.expiresAtMs + 1;
+        return Response.json({ active: true, grant });
+      }) });
+    rejectNestedAcquisition = true;
+    const response = await runtime.handle(fixture.request()); expect(response.status).toBe(503);
+    const withheld = await response.text(); expect(withheld).toContain('"payment":"settled"'); expect(withheld).not.toContain('return value + 1');
+    expect((await sql.query('SELECT state FROM atlas_provider.sales')).rows).toEqual([{ state: 'settled' }]);
+    expect((await sql.query('SELECT * FROM atlas_provider.deliveries')).rows).toHaveLength(1);
+    expect((await sql.query('SELECT * FROM atlas_provider.submissions')).rows).toHaveLength(1);
+    expireAfterSave = false; grant = { ...fixture.grant, expiresAtMs: clock + 120_000 };
+    const freshToken = createProviderGrant(grant, keys.privateKey);
+    const resumedRequest = new Request(origin + '/context/retrieve', { method: 'POST', body: fixture.body,
+      headers: { Authorization: 'Bearer ' + freshToken } });
+    expect(resumedRequest.headers.has('Payment-Authorization')).toBe(false);
+    const recovered = await runtime.handle(resumedRequest); expect(recovered.status).toBe(200);
+    const delivered = await recovered.json() as { context: ContextBundle; sourceSignatures: typeof artifact.sourceSignatures; graphSignatures: typeof artifact.graphSignatures };
+    expect(() => verifyContext(delivered.context, delivered.sourceSignatures, delivered.graphSignatures)).not.toThrow();
+    expect((await sql.query('SELECT * FROM atlas_provider.deliveries')).rows).toHaveLength(1);
+    expect((await sql.query('SELECT * FROM atlas_provider.submissions')).rows).toHaveLength(1);
+    expect(fixture.requestMock.mock.calls.every(([call]) => call.method === 'eth_chainId')).toBe(true);
+    expect((await sql.query('SELECT * FROM atlas.purchases')).rows).toEqual([]);
+  });
   it('guards recorded provider submissions and deliveries against trusted accidental replacement', async () => {
     const fixture = await seededUnbroadcastProviderSale();
     const runtime = await createIndependentProvider(environment, { database, client: fixture.rpc, now: () => fixture.now,

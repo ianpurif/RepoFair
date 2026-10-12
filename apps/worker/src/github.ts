@@ -363,7 +363,7 @@ export class GitHubAppClient {
       if (tree.truncated) {
         if (!next.recursive) throw new GitHubError('limit', 'A repository subtree exceeds GitHub traversal limits');
         pending.unshift({ ...next, recursive: false });
-        limitation('GitHub truncated the recursive tree; Atlas traversed bounded subtrees instead.'); continue;
+        limitation('GitHub truncated the recursive tree; RepoFair traversed bounded subtrees instead.'); continue;
       }
       const localPaths = new Set<string>();
       for (const value of tree.tree) {

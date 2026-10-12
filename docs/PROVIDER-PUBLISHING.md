@@ -1,6 +1,6 @@
 # Owner publication and independent providers
 
-Updated 2026-10-12. Signing configuration, a separate hosted provider database and temporary HTTPS origins are now prepared. Signed export, control proof, catalog discovery, fresh entitlement, Moderato charging and durable delivery are implemented. Source publication remains inactive; real paid delivery remains unverified.
+Updated 2026-10-13. RepoFair is live at https://repofair.vercel.app and its real provider at https://repofair-provider.vercel.app. An owner-reviewed signed export containing only package.json and packages/core/src/versions.ts from the public RepoFair repository is installed and active. Signed endpoint control and actual catalog discovery succeeded. [Current publication evidence](evidence/repofair-live-publication.json) and [separate commerce evidence](evidence/repofair-live-commerce.json) define the verified scope. Earlier temporary-host preparation below is historical.
 
 ## Explicit owner workflow
 

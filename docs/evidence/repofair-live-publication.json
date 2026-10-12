@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-12T19:03:58.980Z",
+  "status": "active",
+  "origin": "https://repofair.vercel.app",
+  "providerOrigin": "https://repofair-provider.vercel.app",
+  "publicationId": "8ceacea2-0631-494e-bc6c-fc47d2c45cea",
+  "commitSha": "395d76316b25f7005822931520e3d2f2de3d6fff",
+  "packageName": "repofair",
+  "version": "0.0.0",
+  "revision": 2,
+  "termsDigest": "f2e11958de24ac9b109d943ed8267535952c2d6df565cc264c284f2187927737",
+  "files": [
+    "package.json",
+    "packages/core/src/versions.ts"
+  ],
+  "fileCount": 2,
+  "totalBytes": 3119,
+  "accessPolicy": "public",
+  "network": "eip155:42431",
+  "atomicPrice": "10000",
+  "ownerAuthority": "fresh real Clerk-linked GitHub administrative checks",
+  "signature": "actual Ed25519 signed export installed in separate provider PostgreSQL",
+  "endpointControl": "actual signed activation returned active",
+  "sourceScope": "only two files from the operator-owned public RepoFair repository",
+  "independentOperator": false,
+  "privateSourceExported": false,
+  "mainnet": false,
+  "realMoneySpent": false
+}

@@ -572,6 +572,42 @@
       "requestedEffort": "max",
       "observedModel": null,
       "observedEffort": null
+    },
+    {
+      "task": "/root/repofair_provider_vercel",
+      "role": "atlas_engineer",
+      "milestone": "repofair-free-provider",
+      "status": "completed",
+      "completedAt": "2026-10-12T19:11:52.364Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null,
+      "allowedWritePaths": [
+        "apps/provider/src/vercel.ts",
+        "apps/provider/src/runtime.ts",
+        "apps/worker/src/provider-http.ts",
+        "apps/worker/src/commerce-service.ts",
+        "tests/integration/provider-vercel.test.ts",
+        "tests/integration/provider-runtime-initialization.test.ts",
+        "tests/integration/provider-vercel-emission.test.ts",
+        "tests/integration/commerce-overhaul-http.test.ts",
+        "tests/integration/commerce-overhaul-artifacts.test.ts"
+      ],
+      "scope": "Actual implementation/native emission/bounded timeout/expiry task; local tests only; no credentials or live payments."
+    },
+    {
+      "task": "/root/repofair_provider_security",
+      "role": "atlas_security",
+      "milestone": "repofair-free-provider",
+      "status": "completed",
+      "completedAt": "2026-10-12T19:11:52.364Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null,
+      "allowedWritePaths": [],
+      "scope": "Actual independent read-only provider/transport/expiry review and focused regression execution; synthetic authorization/RPC tests are separate from live acceptance."
     }
   ],
   "note": "Actual delegated task handles; completed execution recorded after work. Requested model/effort configuration is not backend execution attestation. No nested delegation or agent commits."

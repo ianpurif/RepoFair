@@ -2,8 +2,8 @@ import { EventEmitter } from 'node:events';
 import { lookup } from 'node:dns/promises';
 import { request } from 'node:https';
 import type { IncomingMessage, RequestOptions } from 'node:http';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { boundedProviderResponse, isPublicProviderAddress, providerHttp, publicProviderUrl } from '../../apps/worker/src/provider-http.ts';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { boundedProviderResponse, isPublicProviderAddress, ProviderHttpError, providerHttp, publicProviderUrl } from '../../apps/worker/src/provider-http.ts';
 
 vi.mock('node:dns/promises', () => ({ lookup: vi.fn() }));
 vi.mock('node:https', () => ({ request: vi.fn() }));
@@ -14,6 +14,7 @@ let status = 200; let body = Buffer.from('{"ok":true}');
 let responseHeaders: Record<string, string | string[]> = { 'content-type': 'application/json' };
 let captured: RequestOptions | null = null; let pin: unknown[] = [];
 beforeEach(() => {
+  vi.useRealTimers();
   status = 200; body = Buffer.from('{"ok":true}'); responseHeaders = { 'content-type': 'application/json' }; captured = null; pin = [];
   vi.mocked(lookup).mockReset(); vi.mocked(request).mockReset();
   vi.mocked(lookup).mockResolvedValue([{ address: '1.1.1.1', family: 4 }, { address: '2606:4700:4700::1111', family: 6 }] as never);
@@ -39,6 +40,7 @@ beforeEach(() => {
     return outgoing as never;
   });
 });
+afterEach(() => { vi.useRealTimers(); });
 describe('native provider destination and transport boundaries', () => {
   it('requires a public HTTPS hostname and refuses credentials, literal IPs, local namespaces, and alternate ports', () => {
     expect(publicProviderUrl('https://provider.verifier.dev/context/retrieve').hostname).toBe('provider.verifier.dev');
@@ -102,5 +104,114 @@ describe('native provider destination and transport boundaries', () => {
       status = invalid; await expect(providerHttp('https://provider.verifier.dev/context/retrieve')).rejects.toThrow('Invalid provider HTTP response');
       expect(() => boundedProviderResponse(invalid, new Headers(), Buffer.alloc(0))).toThrow('Invalid provider HTTP status');
     }
+  });
+});
+
+describe('bounded provider deadlines with synthetic DNS/TLS and a fake clock', () => {
+  const endpoint = 'https://provider.verifier.dev/context/retrieve';
+  const sentinel = 'SYNTHETIC_SECRET_MUST_NOT_LEAK';
+
+  function stalledConnection() {
+    const outgoing = Object.assign(new EventEmitter(), {
+      write: vi.fn(), end: vi.fn(), destroy: vi.fn((error?: Error) => {
+        if (error) outgoing.emit('error', error);
+        outgoing.emit('close');
+      }),
+    });
+    vi.mocked(request).mockImplementation((...arguments_: unknown[]) => {
+      captured = arguments_[1] as RequestOptions;
+      return outgoing as never;
+    });
+    return outgoing;
+  }
+
+  function fakeClock() { vi.useFakeTimers({ toFake: ['Date', 'setTimeout', 'clearTimeout'] }); }
+
+  it.each([1, 12_000, 30_000, 180_000])('accepts a bounded %i ms override and aligns socket/hard deadline settings', async timeoutMs => {
+    fakeClock();
+    const response = await providerHttp(endpoint, { timeoutMs });
+    expect(response.status).toBe(200); expect(captured?.timeout).toBe(timeoutMs);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it.each([0, -1, 180_001, Number.MAX_SAFE_INTEGER, Number.POSITIVE_INFINITY, Number.NaN, 1.5, '12000', null])(
+    'rejects unsupported timeout %s before DNS or TLS starts', async timeoutMs => {
+      await expect(providerHttp(endpoint, { timeoutMs: timeoutMs as number })).rejects.toThrow('request exceeds bounds');
+      expect(lookup).not.toHaveBeenCalled(); expect(request).not.toHaveBeenCalled();
+    });
+
+  it('retains the ten-second default and rejects a stalled request at the actual hard deadline', async () => {
+    fakeClock(); const outgoing = stalledConnection(); let settled = false;
+    const failure = providerHttp(endpoint).then(() => null, error => { settled = true; return error as Error; });
+    await vi.advanceTimersByTimeAsync(0);
+    expect(captured?.timeout).toBe(10_000);
+    await vi.advanceTimersByTimeAsync(9_999); expect(settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(await failure).toBeInstanceOf(ProviderHttpError);
+    expect(await failure).toMatchObject({ code: 'provider-timeout', message: 'Provider request timed out' });
+    expect(outgoing.destroy).toHaveBeenCalledOnce(); expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('allows a longer bounded override without the old ten-second timer truncating it', async () => {
+    fakeClock(); const outgoing = stalledConnection(); let settled = false;
+    const failure = providerHttp(endpoint, { timeoutMs: 180_000 }).then(() => null, error => { settled = true; return error as Error; });
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(settled).toBe(false); expect(captured?.timeout).toBe(180_000);
+    await vi.advanceTimersByTimeAsync(169_999); expect(settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(await failure).toMatchObject({ code: 'provider-timeout' });
+    expect(outgoing.destroy).toHaveBeenCalledOnce(); expect(request).toHaveBeenCalledOnce();
+  });
+
+  it('counts DNS time against the same hard budget and aligns the remaining socket allowance', async () => {
+    fakeClock(); stalledConnection(); let settled = false;
+    vi.mocked(lookup).mockImplementation(() => new Promise(resolveDns => {
+      setTimeout(() => resolveDns([{ address: '1.1.1.1', family: 4 }] as never), 2_000);
+    }));
+    const failure = providerHttp(endpoint, { timeoutMs: 30_000 }).then(() => null, error => { settled = true; return error as Error; });
+    await vi.advanceTimersByTimeAsync(2_000); expect(captured?.timeout).toBe(28_000);
+    await vi.advanceTimersByTimeAsync(27_999); expect(settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1); expect(await failure).toMatchObject({ code: 'provider-timeout' });
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it.each([500, 180_000])('bounds DNS independently within a %i ms total allowance', async timeoutMs => {
+    fakeClock(); vi.mocked(lookup).mockImplementation(() => new Promise(() => {}));
+    const failure = providerHttp(endpoint, { timeoutMs }).then(() => null, error => error as Error);
+    await vi.advanceTimersByTimeAsync(Math.min(5_000, timeoutMs));
+    expect(await failure).toMatchObject({ code: 'provider-timeout', message: 'Provider request timed out' });
+    expect(request).not.toHaveBeenCalled(); expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('reports a socket timeout distinctly and discards untrusted event/error details', async () => {
+    fakeClock(); const outgoing = stalledConnection();
+    const failure = providerHttp(endpoint, { timeoutMs: 12_000 }).then(() => null, error => error as Error);
+    await vi.advanceTimersByTimeAsync(0); outgoing.emit('timeout', new Error(sentinel));
+    const error = await failure;
+    expect(error).toMatchObject({ code: 'provider-timeout', message: 'Provider request timed out' });
+    expect(String(error)).not.toContain(sentinel); expect(error).not.toHaveProperty('cause');
+    expect(outgoing.destroy).toHaveBeenCalledOnce(); expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('sanitizes asynchronous TLS failures without leaking raw messages or codes', async () => {
+    fakeClock(); const outgoing = stalledConnection();
+    const failure = providerHttp(endpoint).then(() => null, error => error as Error);
+    await vi.advanceTimersByTimeAsync(0);
+    outgoing.emit('error', Object.assign(new Error(sentinel), { code: sentinel })); outgoing.emit('close');
+    const error = await failure;
+    expect(error).toMatchObject({ code: 'provider-connection', message: 'Provider connection failed' });
+    expect(String(error)).not.toContain(sentinel); expect(error).not.toHaveProperty('cause');
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('sanitizes DNS rejection and synchronous TLS creation failures without retrying', async () => {
+    vi.mocked(lookup).mockRejectedValueOnce(new Error(sentinel));
+    const dnsError = await providerHttp(endpoint).then(() => null, error => error as Error);
+    expect(dnsError).toMatchObject({ code: 'provider-connection', message: 'Provider connection failed' });
+    expect(String(dnsError)).not.toContain(sentinel); expect(request).not.toHaveBeenCalled();
+    vi.mocked(request).mockImplementationOnce(() => { throw new Error(sentinel); });
+    const tlsError = await providerHttp(endpoint).then(() => null, error => error as Error);
+    expect(tlsError).toMatchObject({ code: 'provider-connection', message: 'Provider connection failed' });
+    expect(String(tlsError)).not.toContain(sentinel); expect(request).toHaveBeenCalledOnce();
   });
 });

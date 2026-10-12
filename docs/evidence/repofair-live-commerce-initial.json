@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-12T18:46:45.685Z",
+  "status": "incomplete",
+  "network": 42431,
+  "purchaseId": null,
+  "code": "unavailable",
+  "paymentRetryPerformed": false,
+  "mainnet": false,
+  "realMoneySpent": false
+}
