@@ -16,12 +16,12 @@ Primary references checked during the overhaul:
 
 ## Approval and one-time submission
 
-1. An authenticated buyer chooses an exact accessible publication and question. Atlas gets an official unpaid quote, validates origin, realm, operation, release, body digest, token, integer amount, recipient and expiry, then atomically reserves the configured workspace allowance.
+1. An authenticated buyer chooses an exact accessible publication and question. RepoFair gets an official unpaid quote, validates origin, realm, operation, release, body digest, token, integer amount, recipient and expiry, then atomically reserves the configured workspace allowance.
 2. The SDK claims signing once in PostgreSQL **before** invoking the caller-owned signer. The browser separately requires a connected Moderato wallet and explicit exact-price approval. MCP exposes no new-purchase approval, allowance-change or signing tool.
-3. Atlas inspects the signed Tempo transaction, freezes its hash/sender, and records the first credential dispatch before requesting the provider. Raw credentials and signing secrets are not stored.
+3. RepoFair inspects the signed Tempo transaction, freezes its hash/sender, and records the first credential dispatch before requesting the provider. Raw credentials and signing secrets are not stored.
 4. Provider replay and immutable sale records are held in the provider's own database. Fresh issuer entitlement is checked before quoting, charging and returning context.
 5. Both sides validate the authoritative RPC chain, canonical transaction/block/receipt and exact TIP-20 TransferWithMemo sender, token, recipient, amount and challenge attribution. A browser hash or SDK receipt alone is insufficient.
-6. Source and graph members must match the owner's Ed25519 signatures and immutable publication digest before Atlas exposes delivered context.
+6. Source and graph members must match the owner's Ed25519 signatures and immutable publication digest before RepoFair exposes delivered context.
 
 An unknown/lost response retains its reservation and blocks new signing. **Resume checks the recorded transaction and retrieves existing delivery; it never rebroadcasts or forwards a second payment credential.** An unsigned reservation can be cancelled. Pending/unknown purchases cannot be cancelled as though no charge happened.
 
@@ -31,15 +31,15 @@ The PathUSD allowance covers the service price. It does not guarantee gas, walle
 
 ## Configuration and acceptance
 
-Atlas needs the reviewed central migrations, HTTPS issuer origin and Ed25519 signing-key file. Each provider needs its own database, HTTPS origin, issuer public key, MPP secret file, fixed identity/price/recipient and Moderato RPC. See [PROVIDER-PUBLISHING.md](PROVIDER-PUBLISHING.md) and [.env.example](../.env.example).
+RepoFair needs the reviewed central migrations, HTTPS issuer origin and Ed25519 signing-key file. Each provider needs its own database, HTTPS origin, issuer public key, MPP secret file, fixed identity/price/recipient and Moderato RPC. See [PROVIDER-PUBLISHING.md](PROVIDER-PUBLISHING.md) and [.env.example](../.env.example).
 
 The browser uses an injected EIP-1193 wallet supporting Tempo pull signing. Hardware/extension behavior remains unverified; unsupported signing fails explicitly. Headless callers supply their own signer through the authenticated SDK.
 
-Adding Moderato to an ordinary EVM wallet does not establish this compatibility. With the pinned libraries, Atlas's browser pull mode requests `eth_signTransaction` with Tempo transaction fields. No real extension has passed that path. The first acceptance attempt can instead use the caller-owned local-account signer in `packages/sdk/examples/moderato.ts`; its key remains outside application configuration.
+Adding Moderato to an ordinary EVM wallet does not establish this compatibility. With the pinned libraries, RepoFair's browser pull mode requests `eth_signTransaction` with Tempo transaction fields. No real extension has passed that path. The first acceptance attempt can instead use the caller-owned local-account signer in `packages/sdk/examples/moderato.ts`; its key remains outside application configuration.
 
 The example defaults to `--check`: actual RPC chain, authenticated account/catalog and existing allowance, with no reservation, key read or signing. `--purchase` separately requires the exact `--approve-atomic-amount`, an outside-checkout `--key-file` and stable `--idempotency-key`. It cannot increase allowance. `--resume <purchase UUID>` accepts no signer and never supplies another credential. Token files are reread per request; stdout omits private source and raw errors. An explicit outside-checkout output file is created exclusively. These CLI guards are checked with simulated transports, not live purchases.
 
-The official Moderato RPC is `https://rpc.moderato.tempo.xyz`; its explorer is `https://explore.testnet.tempo.xyz`. The official test faucet accepts `POST https://tempo.xyz/developers/api/faucet` with an address-only JSON body. Test allocations can change; funding and fee sufficiency remain separate from workspace allowance. The default Tempo Wallet/CLI documentation uses mainnet and does not establish a configured Atlas Moderato browser signer.
+The official Moderato RPC is `https://rpc.moderato.tempo.xyz`; its explorer is `https://explore.testnet.tempo.xyz`. The official test faucet accepts `POST https://tempo.xyz/developers/api/faucet` with an address-only JSON body. Test allocations can change; funding and fee sufficiency remain separate from workspace allowance. The default Tempo Wallet/CLI documentation uses mainnet and does not establish a configured RepoFair Moderato browser signer.
 
 Current evidence executes genuine SQL, official offline challenges, signed source/graph proofs, SDK/MCP transports, canonical-transfer validation and interrupted-delivery recovery against **explicit simulated identity/RPC/provider transports**. PGlite's serialized backend does not prove networked PostgreSQL concurrency.
 

@@ -136,7 +136,7 @@ describe('authenticated SDK over native loopback HTTP', () => {
     expect(() => new AuthenticatedAtlasClient(apiOrigin, { sessionToken: async () => null })).toThrow();
     expect(() => api()).not.toThrow();
   });
-  it('sends current session only to Atlas and preserves exact snapshot/source selectors over real HTTP', async () => {
+  it('sends current session only to RepoFair and preserves exact snapshot/source selectors over real HTTP', async () => {
     const client = api(); expect((await client.account()).principalId).toBe(principalId);
     await client.repositories(workspaceId); const map = await client.map(repositoryId, snapshotId, { query: 'retry & auth', folder: 'src/' });
     expect(map.index.snapshot.snapshotId).toBe(snapshotId);
@@ -161,7 +161,7 @@ describe('authenticated SDK over native loopback HTTP', () => {
   });
   it('cancels an oversized response and rejects non-object JSON and malformed UTF-8', async () => {
     behavior = 'oversized'; await expect(api().account()).rejects.toThrow('response exceeds bounds');
-    behavior = 'bad-json'; await expect(api().account()).rejects.toThrow('Invalid Atlas response');
+    behavior = 'bad-json'; await expect(api().account()).rejects.toThrow('Invalid RepoFair response');
     behavior = 'bad-utf8'; await expect(api().account()).rejects.toThrow();
   });
   it('reports sanitized status/code without propagating private server error contents', async () => {
@@ -211,7 +211,7 @@ describe('authenticated production MCP protocol and process transport', () => {
     const server = createAtlasMcpServer(api()); const client = new Client({ name: 'sdk-production-verifier', version: '1.0.0' });
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
     try {
-      await server.connect(serverTransport); await client.connect(clientTransport); expect(client.getServerVersion()?.name).toBe('chronos-atlas');
+      await server.connect(serverTransport); await client.connect(clientTransport); expect(client.getServerVersion()?.name).toBe('repofair');
       const names = (await client.listTools()).tools.map(tool => tool.name);
       expect(names).toContain('atlas_resolve_dependency'); expect(names).toContain('atlas_resume_purchase');
       expect(names.some(name => /fixture|budget|allowance|approve|sign|pay$/.test(name))).toBe(false);
@@ -231,7 +231,7 @@ describe('authenticated production MCP protocol and process transport', () => {
     } });
     const stderr: string[] = []; transport.stderr?.on('data', chunk => stderr.push(String(chunk)));
     try {
-      await client.connect(transport); expect(transport.pid).toBeGreaterThan(0); expect(client.getServerVersion()?.name).toBe('chronos-atlas');
+      await client.connect(transport); expect(transport.pid).toBeGreaterThan(0); expect(client.getServerVersion()?.name).toBe('repofair');
       expect(mcpText(await client.callTool({ name: 'atlas_account', arguments: {} })).principalId).toBe(principalId);
       const answered = mcpText(await client.callTool({ name: 'atlas_question', arguments: { repositoryId, snapshotId, question: 'How does retry work?' } }));
       expect(answered.answer.citations.length).toBeGreaterThan(0); expect(answered.answer.citations.every((item: { source: { snapshotId: string } }) => item.source.snapshotId === snapshotId)).toBe(true);

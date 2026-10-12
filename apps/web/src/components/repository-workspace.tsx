@@ -124,6 +124,37 @@ function GitWorkspace({ repositoryId, account, onSessionChanged }: { repositoryI
     void poll(); return () => { controller.abort(); if (timer) clearTimeout(timer); };
   }, [repositoryId, jobRefresh, sessionFailure]);
 
+  const pendingJobId = job?.canCancel && (job.status === 'queued' || job.status === 'running') ? job.id : null;
+  useEffect(() => {
+    if (!pendingJobId) return;
+    const controller = new AbortController(); let timer: ReturnType<typeof setTimeout> | undefined;
+    async function advance() {
+      try {
+        const { data } = await repositoryRequest(`/api/repositories/${encodeURIComponent(repositoryId)}/jobs`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'advance' }), signal: controller.signal,
+        }, 120_000);
+        if (controller.signal.aborted) return;
+        const result = data.job === null ? null : parseImportJob(data.job);
+        if (result && (result.repositoryId !== repositoryId || result.id !== pendingJobId)) { setJobRefresh(value => value + 1); return; }
+        setJob(result);
+        if (result?.status === 'complete') {
+          if (completion.current !== result.id) { completion.current = result.id; setMapRefresh(value => value + 1); }
+          return;
+        }
+        if (!result || !['queued', 'running'].includes(result.status)) return;
+        timer = setTimeout(() => void advance(), 3_000);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setJobError(messageOf(error));
+        if (error instanceof RepositoryRequestError && error.status === 403) return;
+        sessionFailure(error);
+        timer = setTimeout(() => void advance(), 15_000);
+      }
+    }
+    void advance();
+    return () => { controller.abort(); if (timer) clearTimeout(timer); };
+  }, [repositoryId, pendingJobId, sessionFailure]);
+
   useEffect(() => {
     const controller = new AbortController(); pageAbort.current?.abort(); pageAbort.current = null; expansionAbort.current?.abort(); expansionAbort.current = null; setPageBusy(false); setExpansionBusy(null); setExpansionError(null); setMapBusy(true); setMapError(null);
     const params = new URLSearchParams({ limit: '120' }); if (folder) params.set('folder', folder); if (query) params.set('query', query);

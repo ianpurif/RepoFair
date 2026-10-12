@@ -21,7 +21,7 @@ async function json(response:Response):Promise<Record<string,unknown>> {
   finally {reader.releaseLock();}
   const bytes=new Uint8Array(size);let offset=0;for(const part of parts){bytes.set(part,offset);offset+=part.length;}
   const value:unknown=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));
-  if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('Invalid Atlas response');return value as Record<string,unknown>;
+  if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('Invalid RepoFair response');return value as Record<string,unknown>;
 }
 /** Authenticated repository and purchase API. The session credential is sent only to this exact Atlas origin. */
 export class AuthenticatedAtlasClient {

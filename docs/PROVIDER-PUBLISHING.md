@@ -7,8 +7,8 @@ Updated 2026-10-12. Signing configuration, a separate hosted provider database a
 1. At **/app/publish**, select a completed immutable snapshot. Fresh workspace owner/admin and GitHub administrative authority are required; read permission alone is insufficient.
 2. Select exact source paths, review bytes/lines/digests, declare rights, choose private/authenticated/public metadata policy, and configure an HTTPS endpoint and exact PathUSD price/recipient. Saving remains a private draft mutation.
 3. Explicitly approve and download the signed export. It contains only selected original files and supported graph members, exact commit/release identity, source/graph proofs and immutable terms digest. It is not uploaded automatically.
-4. An independent operator installs that reviewed file in **its own database**, starts its configured HTTPS provider, and receives only the Atlas issuer **public** key.
-5. Activate the selected revision. Atlas sends a short-lived signed control proof bound to the origin, publication, digest, revision and nonce. An anonymous nonce cannot reveal private metadata or prove control.
+4. An independent operator installs that reviewed file in **its own database**, starts its configured HTTPS provider, and receives only the RepoFair issuer **public** key.
+5. Activate the selected revision. RepoFair sends a short-lived signed control proof bound to the origin, publication, digest, revision and nonce. An anonymous nonce cannot reveal private metadata or prove control.
 6. Accessible publications appear in **Providers** with exact package/version/commit and testnet terms. Dependency discovery requests the exact resolved version; missing versions are never replaced with latest.
 
 Administration, declared rights, accuracy, endpoint control and settlement are separate claims. A rights checkbox is not independent licensing verification. No accurate/trustworthy badge is invented.
@@ -17,7 +17,7 @@ Draft history is capped at 50 records per workspace. Source/terms changes update
 
 ## Independent runtime setup
 
-Central Atlas requires its foundational migrations plus **202610110001** and **202610110002**. The current hosted database already contains their exact tables, columns, constraints, functions and triggers, verified through native PostgreSQL on 2026-10-12. This setup did not replay those migrations or backfill their historical journal.
+Central RepoFair requires its foundational migrations plus **202610110001** and **202610110002**. The current hosted database already contains their exact tables, columns, constraints, functions and triggers, verified through native PostgreSQL on 2026-10-12. This setup did not replay those migrations or backfill their historical journal.
 
 A separate provider database applies only:
 
@@ -25,7 +25,7 @@ A separate provider database applies only:
 - `202610070006_provider_ledger.sql`
 - `202610110003_provider_delivery.sql`
 
-No central Atlas tables, Clerk secrets/session credentials, buyer budget connection or central database fallback are required.
+No central RepoFair tables, Clerk secrets/session credentials, buyer budget connection or central database fallback are required.
 
 The SQL expects the standard Supabase roles `anon`, `authenticated` and `service_role` to exist. Use a separate Supabase project or provision equivalent PostgreSQL roles and server-only privileges before applying the migrations. A bare PostgreSQL database without those roles is not an installation target yet.
 
@@ -41,7 +41,7 @@ node scripts/provider.mjs --install "C:\secure\owner-approved-export.json" --env
 node scripts/provider.mjs --env-file "C:\secure\provider.env"
 ```
 
-Use a fresh shell without inherited Atlas secrets. Keep issuer private keys, central database credentials, Clerk/GitHub secrets and buyer signing keys out of the provider environment. The provider receives only the issuer public key and needs only the recipient address, never that recipient's wallet private key.
+Use a fresh shell without inherited RepoFair secrets. Keep issuer private keys, central database credentials, Clerk/GitHub secrets and buyer signing keys out of the provider environment. The provider receives only the issuer public key and needs only the recipient address, never that recipient's wallet private key.
 
 The listener defaults to **127.0.0.1:4311** behind an operator-controlled HTTPS proxy. Startup fails closed when installed source, configured price/recipient/origin, issuer key or actual RPC chain differs. Installation is idempotent; immutable paid source cannot be replaced.
 
@@ -49,9 +49,9 @@ For readiness before a source export is approved, use `node scripts/provider.mjs
 
 ## Prepared environment — 2026-10-12
 
-Atlas is temporarily reachable at `https://known-les-characters-narrow.trycloudflare.com`; the inactive provider is at `https://dennis-headline-bytes-pct.trycloudflare.com`. Both user-approved Cloudflare Quick Tunnels change on restart and depend on this machine. These are not permanent production hosting.
+RepoFair is temporarily reachable at `https://known-les-characters-narrow.trycloudflare.com`; the inactive provider is at `https://dennis-headline-bytes-pct.trycloudflare.com`. Both user-approved Cloudflare Quick Tunnels change on restart and depend on this machine. These are not permanent production hosting.
 
-Provisioned a separate database, `atlas_provider_payments`, with dedicated login `atlas_provider_runtime` on the existing Supabase cluster. Applied only the three provider migrations above, with an atomic digest journal. The login has no superuser, database/role creation, replication, RLS bypass or central service-role membership. Native tests denied central Atlas table access and verified separate-backend replay/sale contention. This is database/credential separation within one project, not proof of a separate operator or independent infrastructure ownership.
+Provisioned a separate database, `atlas_provider_payments`, with dedicated login `atlas_provider_runtime` on the existing Supabase cluster. Applied only the three provider migrations above, with an atomic digest journal. The login has no superuser, database/role creation, replication, RLS bypass or central service-role membership. Native tests denied central RepoFair table access and verified separate-backend replay/sale contention. This is database/credential separation within one project, not proof of a separate operator or independent infrastructure ownership.
 
 Ed25519 issuer keys, MPP secret, provider-only database/CA configuration and two testnet account keys are stored under `C:\Users\IAN\.atlas-secrets`, outside the checkout and OneDrive, with restricted Windows ACLs. The provider receives only the issuer public key and recipient address. Root `.env.local` and provider settings now bind the actual temporary origins. No publication UUID was invented; it will come from an explicitly approved signed artifact.
 
@@ -59,7 +59,7 @@ The provider is currently running preparation only. Actual HTTPS health, retriev
 
 ## Authorization and delivery
 
-Atlas issues a 120-second signed grant scoped to principal/session, workspace membership revision, provider audience, publication digest, exact release, request digest and idempotency key. The provider freshly introspects it through Atlas, including the current Clerk session, owner authority and private buyer/source access. It never receives a Clerk bearer token.
+RepoFair issues a 120-second signed grant scoped to principal/session, workspace membership revision, provider audience, publication digest, exact release, request digest and idempotency key. The provider freshly introspects it through RepoFair, including the current Clerk session, owner authority and private buyer/source access. It never receives a Clerk bearer token.
 
 Network requests use bounded public HTTPS, DNS/IP checks, pinned addresses, timeouts and redirect rejection. Private metadata requires the signed activation proof; anonymous health returns generic readiness only.
 

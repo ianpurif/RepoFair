@@ -113,7 +113,7 @@ function PublicationActivation({ draft, dirty, onSessionChanged, onBusyChange }:
       const signed = await readPublicationExport(data, draft); const contents = JSON.stringify(signed);
       if (new TextEncoder().encode(contents).byteLength > 4_100_000) throw new Error('The selected export exceeds the download limit. Reduce the selected source.');
       if (controller.signal.aborted) return;
-      const url = URL.createObjectURL(new Blob([contents], { type: 'application/json' })); const anchor = document.createElement('a'); anchor.href = url; anchor.download = `atlas-${draft.id}-r${draft.revision}.json`; document.body.append(anchor); anchor.click(); anchor.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+      const url = URL.createObjectURL(new Blob([contents], { type: 'application/json' })); const anchor = document.createElement('a'); anchor.href = url; anchor.download = `repofair-${draft.id}-r${draft.revision}.json`; document.body.append(anchor); anchor.click(); anchor.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
       setNotice('Source artifact downloaded. Install it on your independent provider, then approve publication after reviewing its endpoint.');
     } catch (error) { if (!controller.signal.aborted) { setError(messageOf(error)); if (error instanceof RepositoryRequestError && [401, 403].includes(error.status)) onSessionChanged(); } }
     finally { if (!controller.signal.aborted) { mutation.current = null; setBusy(false); } }

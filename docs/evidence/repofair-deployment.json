@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-12T17:40:48.414Z",
+  "product": "RepoFair",
+  "repository": "https://github.com/ianpurif/RepoFair",
+  "requestedOrigin": "https://repofair.vercel.app",
+  "status": "locally-verified-deployment-pending",
+  "newRepositoryCreated": false,
+  "customDomain": false,
+  "paidPlan": false,
+  "mainnet": false,
+  "realMoneySpent": false,
+  "tests": {
+    "node": "125/125",
+    "product": "516/516",
+    "localBrowser": "5/5",
+    "typecheck": "pass",
+    "lint": "pass",
+    "build": "pass",
+    "parserBundle": "native Node pass; traced in jobs Function"
+  },
+  "externalSetup": {
+    "projectName": "repofair",
+    "plan": "Hobby observed in dashboard",
+    "productionDomainVerified": true,
+    "nodeVersion": "22.x",
+    "rootDirectory": "apps/web",
+    "sourceFilesOutsideRootDirectory": true,
+    "fluid": true,
+    "maxDurationSeconds": 300,
+    "productionFields": 19,
+    "clerkDisplayName": "RepoFair",
+    "githubEnabled": true,
+    "githubAppSlug": "repofair"
+  },
+  "liveVerification": "pending",
+  "paymentBroadcasts": 0,
+  "limitations": [
+    "Clerk development instance on .vercel.app retains provider-documented limits.",
+    "No active source publication or real testnet settlement is claimed."
+  ]
+}

@@ -1,16 +1,16 @@
 # Authenticated SDK and MCP
 
-Updated 2026-10-11. `bun run mcp` starts the actual MCP v1.32 stdio server over the authenticated Atlas API. Fixture tools require a separate development command.
+Updated 2026-10-11. `bun run mcp` starts the actual MCP v1.32 stdio server over the authenticated RepoFair API. Fixture tools require a separate development command.
 
 ## Configuration
 
-Set `ATLAS_API_ORIGIN` to the exact Atlas HTTPS origin and `ATLAS_SESSION_TOKEN_FILE` to a private file containing the caller's Clerk session token. The file is read per request, allowing the caller to refresh it. Expired/revoked sessions fail closed. Loopback development additionally requires `ATLAS_ALLOW_LOCAL_DEVELOPMENT=true`.
+Set `ATLAS_API_ORIGIN` to the exact RepoFair HTTPS origin and `ATLAS_SESSION_TOKEN_FILE` to a private file containing the caller's Clerk session token. The file is read per request, allowing the caller to refresh it. Expired/revoked sessions fail closed. Loopback development additionally requires `ATLAS_ALLOW_LOCAL_DEVELOPMENT=true`.
 
 Run `bun run mcp`, or configure the client's command as `bun`, argument `packages/sdk/src/mcp.ts`, and this repository as cwd. JSON-RPC stays on stdout; configuration errors use sanitized stderr. Never place secrets in prompts or tool arguments.
 
 Tools read the account, authorized repositories, durable import status, bounded maps/source, commit-pinned answers, exact dependency/provider discovery and persisted purchase history. Models may resume an **existing** submitted purchase, but cannot configure an allowance, approve a new purchase, provide payment credentials or invoke signing.
 
-Session tokens go only to Atlas. Providers receive short-lived audience-scoped issuer grants, never Clerk tokens. Redirects, excessive bytes and timeouts fail explicitly.
+Session tokens go only to RepoFair. Providers receive short-lived audience-scoped issuer grants, never Clerk tokens. Redirects, excessive bytes and timeouts fail explicitly.
 
 ## Caller-owned SDK
 
@@ -40,4 +40,4 @@ Tests use native loopback HTTP, official offline challenges, actual MCP protocol
 
 `bun run fixture:mcp` exposes authored tools only with explicit enablement outside production. `bun run sdk:example` uses the loopback fixture client. Production refuses fixture mode.
 
-Remote MCP Streamable HTTP/OAuth transport is not implemented. Authenticated stdio uses the existing Atlas HTTPS API and does not claim a separate remote paid MCP service.
+Remote MCP Streamable HTTP/OAuth transport is not implemented. Authenticated stdio uses the existing RepoFair HTTPS API and does not claim a separate remote paid MCP service.

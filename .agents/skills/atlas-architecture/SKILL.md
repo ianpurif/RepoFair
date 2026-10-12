@@ -1,6 +1,6 @@
 ---
 name: atlas-architecture
-description: Plan Atlas interfaces and implementation milestones without changing its approved product scope.
+description: Plan RepoFair interfaces and implementation milestones without changing its approved product scope.
 ---
 
 # atlas-architecture

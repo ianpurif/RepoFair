@@ -150,7 +150,7 @@ export class GitHubAppClient {
     const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), Math.max(1, Math.min(15_000, timeoutMs)));
     try {
       const response = await this.fetchImpl(`${API}${path}`, { method: body === undefined ? 'GET' : 'POST', redirect: 'error', signal: signal ? AbortSignal.any([controller.signal, signal]) : controller.signal,
-        headers: { Accept: 'application/vnd.github+json', Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': GITHUB_API_VERSION, 'User-Agent': 'Chronos-Atlas', ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) },
+        headers: { Accept: 'application/vnd.github+json', Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': GITHUB_API_VERSION, 'User-Agent': 'RepoFair', ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) },
         ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
       if (!response.ok) {
         let rateLimited = response.status === 429 || response.status === 403 && (response.headers.get('x-ratelimit-remaining') === '0' || response.headers.has('retry-after'));

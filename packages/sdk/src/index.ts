@@ -1,10 +1,11 @@
 import type { Capabilities, CapabilityState } from '../../contracts/src/index.ts';
 export * from './authenticated.ts';
+export { AuthenticatedAtlasClient as AuthenticatedRepoFairClient, AtlasApiError as RepoFairApiError } from './authenticated.ts';
 const states = new Set<CapabilityState>(['available', 'not-implemented', 'unverified', 'disabled']);
 function isCapabilities(value: unknown): value is Capabilities {
   if (typeof value !== 'object' || value === null) return false;
   const v = value as Record<string, unknown>;
-  return v.product === 'Chronos Atlas' && (v.stage === 'starter' || v.stage === 'local-fixture') && v.mode === 'fixture'
+  return (v.product === 'RepoFair' || v.product === 'Chronos Atlas') && (v.stage === 'starter' || v.stage === 'local-fixture' || v.stage === 'application') && (v.mode === 'fixture' || v.mode === 'tempo-testnet')
     && v.livePayments === false && typeof v.capabilities === 'object' && v.capabilities !== null
     && !Array.isArray(v.capabilities)
     && Object.values(v.capabilities).every(s => typeof s === 'string' && states.has(s as CapabilityState))
@@ -31,7 +32,7 @@ async function readBoundedJson(response: Response): Promise<unknown> {
   } finally { reader.releaseLock(); }
 }
 /** Starter-only capability client. Paid requests and MCP are not implemented. */
-export class ChronosAtlasClient {
+export class RepoFairClient {
   readonly #base: URL;
   constructor(baseUrl: string, options: { allowLocalDevelopment?: boolean } = {}) {
     const url = new URL(baseUrl);
@@ -53,3 +54,5 @@ export class ChronosAtlasClient {
     return value;
   }
 }
+/** Legacy SDK export retained so existing integrations continue to work. */
+export { RepoFairClient as ChronosAtlasClient };

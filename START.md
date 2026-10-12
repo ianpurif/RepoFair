@@ -1,4 +1,4 @@
-# Start Chronos Atlas
+# Start RepoFair
 
 ## Instruction to Codex
 
@@ -8,7 +8,7 @@ Read and execute this file. Build the product defined in **BUILD.md**, continuin
 
 Read `AGENTS.md`, all of `BUILD.md`, `docs/PLAN.md`, `docs/PROGRESS.md`, `docs/STATE.json`, and `docs/ORCHESTRATION.md`. Read `docs/STARTER-STATUS.md` so you do not mistake supplied helpers for product features. Follow the numbered sections across multiple reads when tool output is truncated.
 
-The current product is **general codebase intelligence plus paid, independently operated knowledge providers**. Do not revive Chronos Desk, repair sales, transaction diagnosis, or a payment-security scanner.
+The current product is **general codebase intelligence plus paid, independently operated knowledge providers**. Do not revive superseded repair sales, transaction diagnosis, or payment-security scanner scope.
 
 ### Requested models — do not silently change
 

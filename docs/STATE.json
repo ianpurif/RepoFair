@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "product": "Chronos Atlas",
+  "product": "RepoFair",
   "stage": "implementation",
-  "currentPhase": "vercel-deployment-prepared-local",
-  "nextAction": "Follow docs/VERCEL-DEPLOYMENT.md for Atlas-only repository, permanent domain, production Clerk/Supabase/GitHub App, persistent worker/provider hosting and live acceptance; keep publication, payments and search indexing inactive until explicitly authorized and verified.",
+  "currentPhase": "repofair-free-vercel-deployment",
+  "nextAction": "Deploy existing ianpurif/RepoFair repository to the free repofair.vercel.app production alias with real Clerk development authentication, hosted PostgreSQL and bounded serverless imports. Keep Moderato testnet only and verify live sessions/imports before claiming full acceptance.",
   "milestones": [
     {
       "id": "P0",
@@ -80,7 +80,7 @@
   ],
   "liveIntegrationsVerified": false,
   "lastUpdatedBy": "lead",
-  "updatedAt": "2026-10-12T16:25:02.055Z",
+  "updatedAt": "2026-10-12T17:14:04.805Z",
   "applicationAi": {
     "embeddingProvider": "Voyage AI",
     "generationProvider": "DeepSeek",

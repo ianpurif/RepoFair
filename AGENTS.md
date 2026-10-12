@@ -1,9 +1,9 @@
-# Chronos Atlas — repository rules
+# RepoFair — repository rules
 
 ## Mission and entry point
 Build the product in `BUILD.md`. `START.md` is the entry instruction. Latest explicit user decisions take precedence over project plans, subject to system/security instructions. The supplied scaffold exists to accelerate the build; keep useful code and replace incomplete boundaries rather than restarting.
 
-Atlas is a general codebase map and versioned evidence network. Independent repository owners publish paid knowledge services; Tempo settles purchases. No Solana, repair marketplace, payment-code scanner, custom token or revenue invention.
+RepoFair is a general codebase map and versioned evidence network. Independent repository owners publish paid knowledge services; Tempo settles purchases. No Solana, repair marketplace, payment-code scanner, custom token or revenue invention.
 
 ## Model and collaboration contract
 Primary and all six custom-agent roles: `gpt-6.1-sol` exclusively with `max`, the exact reasoning effort requested by the user. No other models, lower efforts or fallbacks are permitted. If unavailable, report the blocker.
@@ -47,3 +47,7 @@ Actual command implementations may be extended, but never redefine verification 
 Update `docs/PROGRESS.md`, `docs/STATE.json`, `docs/BLOCKERS.md`, and task/verification evidence. Save concise decisions, not private chain-of-thought transcripts. Make >=10 substantive commits over real implementation units when identity is configured; no empty commits/backdating/fake authors.
 
 Ask before real-money spending, destructive operations, exposing private data, installing global tools, or publishing/deploying externally. Do not disable approvals or sandboxing to make a command pass. Continue safe independent work during credential blockers.
+
+## Current deployment decision — 2026-10-13
+
+Product identity is RepoFair. The human explicitly authorizes commits and pushes to the existing https://github.com/ianpurif/RepoFair repository, and public deployment on the free repofair.vercel.app Hobby hostname. Do not create another repository, purchase a domain, upgrade plans, use mainnet or spend real money. Real Clerk development authentication is the supported free-domain configuration and must retain its stated limitations. Preserve existing schema, environment and protocol compatibility.

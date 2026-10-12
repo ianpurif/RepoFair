@@ -7,7 +7,7 @@ test('SDK rejects misleading origin URL paths',()=>assert.throws(()=>new Chronos
 test('SDK accepts a clean HTTPS origin',()=>assert.doesNotThrow(()=>new ChronosAtlasClient('https://example.com')));
 
 test('SDK validates complete response fields before returning',async t=>{
- t.mock.method(globalThis,'fetch',async()=>Response.json({product:'Chronos Atlas',stage:'starter'}));
+ t.mock.method(globalThis,'fetch',async()=>Response.json({product:'RepoFair',stage:'starter'}));
  await assert.rejects(new ChronosAtlasClient('https://example.com').capabilities(),/Unsupported capability response/);
 });
 test('SDK preserves actual unavailable status',async t=>{
@@ -19,7 +19,7 @@ test('SDK rejects oversized provider response',async t=>{
  await assert.rejects(new ChronosAtlasClient('https://example.com').capabilities(),/permitted size/);
 });
 test('SDK accepts a fully validated starter capability response',async t=>{
- const value={product:'Chronos Atlas',stage:'starter',mode:'fixture',livePayments:false,capabilities:{mcp:'not-implemented'},limitations:['starter']};
+ const value={product:'RepoFair',stage:'starter',mode:'fixture',livePayments:false,capabilities:{mcp:'not-implemented'},limitations:['starter']};
  t.mock.method(globalThis,'fetch',async()=>Response.json(value));
  assert.deepEqual(await new ChronosAtlasClient('https://example.com').capabilities(),value);
 });

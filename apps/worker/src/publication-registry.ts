@@ -41,7 +41,7 @@ export function createPublicationRegistry(database: AtlasDatabase, env: Readonly
   const issuer = (): string => {
     required(env.ATLAS_PUBLIC_ORIGIN, 'issuer-unavailable', 'Configure the public Atlas HTTPS origin before publishing', 503);
     const origin = publicProviderUrl(env.ATLAS_PUBLIC_ORIGIN).origin;
-    required(origin === env.ATLAS_PUBLIC_ORIGIN, 'issuer-unavailable', 'Atlas issuer must be an exact HTTPS origin', 503); return origin;
+    required(origin === env.ATLAS_PUBLIC_ORIGIN, 'issuer-unavailable', 'RepoFair issuer must be an exact HTTPS origin', 503); return origin;
   };
   async function lockCurrent(tx: AtlasTransaction, principal: string, verified: Awaited<ReturnType<typeof drafts.getAuthorizedDraft>>): Promise<void> {
     // Share repository-first locks and revision fences with saves/revocations.

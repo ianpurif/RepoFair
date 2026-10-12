@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { join } from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { parseEnv } from 'node:util';
 import { ROOT } from './lib.mjs';
 const localEnvPath=join(ROOT,'.env.local');
@@ -10,6 +10,10 @@ const action=process.argv[2];
 if(!['dev','build','start'].includes(action))throw new Error('Use dev, build, or start.');
 const next=[join(ROOT,'apps/web/node_modules/next/dist/bin/next'),join(ROOT,'node_modules/next/dist/bin/next')].find(existsSync);
 if(!next){console.error('Next.js dependencies are not installed. Complete START.md P0 / bootstrap first.');process.exit(1);}
+if(action==='build'||action==='dev'){
+  const parser=spawnSync(process.execPath,[join(ROOT,'scripts/build-web-parser.mjs')],{cwd:ROOT,stdio:'inherit',windowsHide:true});
+  if(parser.status!==0)process.exit(parser.status??1);
+}
 if(action!=='build'){
   await new Promise((resolve,reject)=>{
     const probe=createServer();

@@ -21,7 +21,7 @@ it('actual stdio subprocess negotiates MCP, lists tools, and binds versioned cit
   try {
     await client.connect(transport);
     expect(transport.pid).toBeGreaterThan(0);
-    expect(client.getServerVersion()).toMatchObject({ name: 'chronos-atlas-fixture', version: '0.1.0' });
+    expect(client.getServerVersion()).toMatchObject({ name: 'repofair-fixture', version: '0.1.0' });
     const tools = await client.listTools();
     expect(tools.tools.map(tool => tool.name).sort()).toEqual(['atlas_explore', 'atlas_list_fixtures', 'atlas_question', 'atlas_source']);
     expect(textResult(await client.callTool({ name: 'atlas_list_fixtures', arguments: {} }))).toMatchObject({ mode: 'fixture', payments: 'disabled' });

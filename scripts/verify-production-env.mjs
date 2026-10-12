@@ -9,7 +9,8 @@ const exactOrigin = (value) => {
       && /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/.test(host)
       && !/^(?:\d{1,3}\.){3}\d{1,3}$/.test(host)
       && !['localhost', 'local', 'internal', 'invalid', 'test', 'example'].some(suffix => host === suffix || host.endsWith(`.${suffix}`))
-      && !['trycloudflare.com', 'vercel.app', 'ngrok.io', 'ngrok-free.app', 'ngrok.app', 'loca.lt', 'localhost.run'].some(suffix => host === suffix || host.endsWith(`.${suffix}`));
+      && !['trycloudflare.com', 'ngrok.io', 'ngrok-free.app', 'ngrok.app', 'loca.lt', 'localhost.run'].some(suffix => host === suffix || host.endsWith(`.${suffix}`))
+      && host !== 'vercel.app';
   } catch { return false; }
 };
 
@@ -44,10 +45,16 @@ export function checkProductionEnvironment(environment) {
   if (environment.DATABASE_SSL_CA_FILE?.trim()) issues.push('Vercel requires inline DATABASE_SSL_CA; local paths are unavailable');
   required('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY');
   required('CLERK_SECRET_KEY');
-  if (environment.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && !/^pk_live_[A-Za-z0-9+/=]+$/.test(environment.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY)) issues.push('Production requires a Clerk live publishable key');
-  if (environment.CLERK_SECRET_KEY && !/^sk_live_[A-Za-z0-9]{10,}$/.test(environment.CLERK_SECRET_KEY)) issues.push('Production requires a Clerk live secret key');
-  if (environment.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith('pk_live_')) {
-    const encoded = environment.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.slice('pk_live_'.length);
+  let freeVercelOrigin = false;
+  try { freeVercelOrigin = exactOrigin(environment.APP_ORIGIN) && /^[a-z0-9-]+\.vercel\.app$/.test(new URL(environment.APP_ORIGIN).hostname); } catch { /* The origin diagnostic above is authoritative. */ }
+  const hostedDevelopment = freeVercelOrigin && environment.REPOFAIR_HOSTED_TESTNET_AUTH === 'clerk-development';
+  const keyEnvironment = hostedDevelopment ? 'test' : 'live';
+  if (freeVercelOrigin && !hostedDevelopment) issues.push('Free Vercel hosting requires explicit REPOFAIR_HOSTED_TESTNET_AUTH=clerk-development');
+  if (environment.REPOFAIR_HOSTED_TESTNET_AUTH && !hostedDevelopment) issues.push('Hosted development authentication requires an exact free Vercel origin');
+  if (environment.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && !new RegExp(`^pk_${keyEnvironment}_[A-Za-z0-9+/=]+$`).test(environment.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY)) issues.push(hostedDevelopment ? 'Hosted testnet requires a Clerk development publishable key' : 'Production requires a Clerk live publishable key');
+  if (environment.CLERK_SECRET_KEY && !new RegExp(`^sk_${keyEnvironment}_[A-Za-z0-9]{10,}$`).test(environment.CLERK_SECRET_KEY)) issues.push(hostedDevelopment ? 'Hosted testnet requires a Clerk development secret key' : 'Production requires a Clerk live secret key');
+  if (environment.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith(`pk_${keyEnvironment}_`)) {
+    const encoded = environment.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.slice(`pk_${keyEnvironment}_`.length);
     const hostname = Buffer.from(encoded, 'base64').toString('utf8');
     if (!/^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.[a-z]{2,}\$$/i.test(hostname)) issues.push('Clerk publishable key contains an invalid frontend domain');
   }

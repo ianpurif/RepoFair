@@ -405,14 +405,28 @@ export function createRepositoryService(database: AtlasDatabase, env: Readonly<R
   async function release(tx: AtlasTransaction, job: ClaimedJob, phase: ImportPhase): Promise<void> {
     await tx.query("UPDATE atlas.jobs SET status='queued',phase=$1,claim_token=NULL,lease_until=NULL,next_attempt_at=now(),updated_at=now(),error_code=NULL,error_retryable=false WHERE id=$2 AND claim_token=$3", [phase, job.job_id, job.claim_token]);
   }
-  async function processOne(options: Readonly<{ signal?: AbortSignal }> = {}): Promise<WorkerResult> {
+  /** A web caller must supply both fields from its verified session and route. */
+  async function processOne(options: Readonly<{ signal?: AbortSignal; principalId?: string; repositoryId?: string }> = {}): Promise<WorkerResult> {
+    if ((options.principalId === undefined) !== (options.repositoryId === undefined)) return fail('invalid-job-scope', 'A verified principal and repository are required together', 400);
     if (options.signal?.aborted) return { status: 'idle' };
+    const target = options.principalId !== undefined && options.repositoryId !== undefined
+      ? { principalId: options.principalId, repository: await access(options.principalId, options.repositoryId, true) } : null;
     const job = await database.withAdminTransaction(async tx => {
-      const repository = (await tx.query<RepositoryRow>(`SELECT r.*,r.permission_revision::text FROM atlas.repositories r WHERE EXISTS
+      // Targeted requests prove access before reading jobs, then lock and
+      // recheck the same repository and membership before a claim can be made.
+      const repository = target
+        ? (await tx.query<RepositoryRow>(`SELECT r.*,r.permission_revision::text FROM atlas.repositories r
+          WHERE r.id=$1 AND r.workspace_id=$2 AND NOT r.access_revoked FOR UPDATE OF r SKIP LOCKED`, [target.repository.id, target.repository.workspace_id])).rows[0]
+        : (await tx.query<RepositoryRow>(`SELECT r.*,r.permission_revision::text FROM atlas.repositories r WHERE EXISTS
         (SELECT 1 FROM atlas.jobs j JOIN atlas.snapshots s ON s.id=j.snapshot_id AND s.workspace_id=j.workspace_id WHERE s.repository_id=r.id AND j.workspace_id=r.workspace_id
           AND j.next_attempt_at<=now() AND (j.status='queued' OR j.status='running' AND (j.lease_until IS NULL OR j.lease_until<now())))
         ORDER BY (SELECT min(j.updated_at) FROM atlas.jobs j JOIN atlas.snapshots s ON s.id=j.snapshot_id WHERE s.repository_id=r.id AND j.status IN ('queued','running')),r.id FOR UPDATE OF r SKIP LOCKED LIMIT 1`)).rows[0];
       if (!repository) return null;
+      if (target) {
+        ensureRevision(repository.permission_revision, target.repository.permission_revision);
+        const requester = await membership(tx, target.principalId, repository.workspace_id, true, true);
+        ensureRevision(requester.revision, target.repository.member_revision);
+      }
       const selected = (await tx.query<Omit<ClaimedJob, keyof RepositoryRow | 'claim_token'>>(`SELECT j.id AS job_id,j.snapshot_id,j.principal_id,j.permission_revision::text AS member_revision,
         j.repository_permission_revision::text AS repository_revision,s.revision AS commit_sha,s.index_version,j.attempts,j.phase
         FROM atlas.jobs j JOIN atlas.snapshots s ON s.id=j.snapshot_id AND s.workspace_id=j.workspace_id WHERE s.repository_id=$1 AND j.workspace_id=$2
@@ -425,27 +439,39 @@ export function createRepositoryService(database: AtlasDatabase, env: Readonly<R
       return { ...repository, ...selected, claim_token: token } as ClaimedJob;
     });
     if (!job) return { status: 'idle' };
+    const ownedSlice = <T>(work: (tx: AtlasTransaction) => Promise<T>): Promise<T> => owned(job, async tx => {
+      if (target) {
+        const requester = await membership(tx, target.principalId, job.workspace_id, true, true);
+        ensureRevision(requester.revision, target.repository.member_revision);
+      }
+      return work(tx);
+    });
+    const freshSliceRepository = async () => {
+      const linked = await freshRepository(job.principal_id, job);
+      if (target && target.principalId !== job.principal_id) await freshRepository(target.principalId, job);
+      return linked;
+    };
     const controller = new AbortController(); const signal = options.signal ? AbortSignal.any([controller.signal, options.signal]) : controller.signal;
     let heartbeatFailure: unknown; let heartbeatWork: Promise<void> | undefined; let active = true;
     const deadline = setTimeout(() => { heartbeatFailure = new RepositoryServiceError('worker-timeout', 'Import slice exceeded its deadline'); controller.abort(); }, 100_000);
     const heartbeat = setInterval(() => {
       if (!active || heartbeatWork) return;
-      heartbeatWork = owned(job, tx => tx.query("UPDATE atlas.jobs SET heartbeat_at=now(),lease_until=now()+interval '2 minutes',updated_at=now() WHERE id=$1 AND claim_token=$2", [job.job_id, job.claim_token]).then(() => {}))
+      heartbeatWork = ownedSlice(tx => tx.query("UPDATE atlas.jobs SET heartbeat_at=now(),lease_until=now()+interval '2 minutes',updated_at=now() WHERE id=$1 AND claim_token=$2", [job.job_id, job.claim_token]).then(() => {}))
         .catch(error => { heartbeatFailure = error; controller.abort(); }).finally(() => { heartbeatWork = undefined; });
     }, 15_000);
     const stopHeartbeat = async () => { active = false; clearInterval(heartbeat); clearTimeout(deadline); if (heartbeatWork) await heartbeatWork; };
     const checkAbort = () => { if (heartbeatFailure) throw heartbeatFailure; if (signal.aborted) return fail('worker-interrupted', 'Repository import was interrupted'); };
     try {
       const grant = await member(job.principal_id, job.workspace_id, true); ensureRevision(grant.revision, job.member_revision);
-      await owned(job, async () => {}); checkAbort();
-      const linked = await freshRepository(job.principal_id, job); checkAbort();
+      await ownedSlice(async () => {}); checkAbort();
+      const linked = await freshSliceRepository(); checkAbort();
       if (job.phase === 'discovering') {
-        const saved = await owned(job, async tx => (await tx.query<Manifest>('SELECT tree_sha,files,limitations,discovery_state FROM atlas.import_manifests WHERE snapshot_id=$1 AND workspace_id=$2', [job.snapshot_id, job.workspace_id])).rows[0]);
+        const saved = await ownedSlice(async tx => (await tx.query<Manifest>('SELECT tree_sha,files,limitations,discovery_state FROM atlas.import_manifests WHERE snapshot_id=$1 AND workspace_id=$2', [job.snapshot_id, job.workspace_id])).rows[0]);
         const checkpoint = saved ? { ...saved.discovery_state, files: saved.files, limitations: saved.limitations } : undefined;
         const next = await linked.client.discoverSnapshot(linked.authorized, job.commit_sha, checkpoint, { signal }); checkAbort();
         const totalBytes = next.files.reduce((sum, file) => sum + file.size, 0); const { files, limitations, ...state } = next;
         await stopHeartbeat(); checkAbort();
-        await owned(job, async tx => {
+        await ownedSlice(async tx => {
           await tx.query(`INSERT INTO atlas.import_manifests(snapshot_id,workspace_id,tree_sha,files,limitations,discovery_state) VALUES($1,$2,$3,$4::jsonb,$5::jsonb,$6::jsonb)
             ON CONFLICT(snapshot_id) DO UPDATE SET files=excluded.files,limitations=excluded.limitations,discovery_state=excluded.discovery_state`, [job.snapshot_id, job.workspace_id, next.treeSha, JSON.stringify(files), JSON.stringify(limitations), JSON.stringify(state)]);
           const tree = await tx.query('UPDATE atlas.snapshots SET tree_sha=$1 WHERE id=$2 AND workspace_id=$3 AND (tree_sha IS NULL OR tree_sha=$1) RETURNING id', [next.treeSha, job.snapshot_id, job.workspace_id]);
@@ -456,7 +482,7 @@ export function createRepositoryService(database: AtlasDatabase, env: Readonly<R
         return { status: 'progress', jobId: job.job_id, phase: next.complete ? 'downloading' : 'discovering' };
       }
       if (job.phase === 'downloading') {
-        const selected = await owned(job, async tx => {
+        const selected = await ownedSlice(async tx => {
           const manifest = (await tx.query<Manifest>('SELECT tree_sha,files,limitations,discovery_state FROM atlas.import_manifests WHERE snapshot_id=$1 AND workspace_id=$2', [job.snapshot_id, job.workspace_id])).rows[0];
           if (!manifest?.discovery_state.complete) return fail('checkpoint-invalid', 'Import discovery checkpoint is unavailable');
           const files = (await tx.query<{ path: string; size: number; blobSha: string; reusedText: string | null }>(`WITH selected AS MATERIALIZED (
@@ -478,8 +504,8 @@ export function createRepositoryService(database: AtlasDatabase, env: Readonly<R
           if (!fetched) return fail('source-integrity', 'Source download is incomplete', 422);
           verifiedContent(fetched, file); return { path: file.path, size: file.size, blob_sha: file.blobSha, content: fetched.text, reused: file.reusedText !== null };
         });
-        await freshRepository(job.principal_id, job); checkAbort(); await stopHeartbeat(); checkAbort();
-        const phase = await owned(job, async tx => {
+        await freshSliceRepository(); checkAbort(); await stopHeartbeat(); checkAbort();
+        const phase = await ownedSlice(async tx => {
           await tx.query(`INSERT INTO atlas.import_files(snapshot_id,workspace_id,path,blob_sha,size,content,reused)
             SELECT $1,$2,f.path,f.blob_sha,f.size,f.content,f.reused FROM jsonb_to_recordset($3::jsonb) AS f(path text,blob_sha text,size integer,content text,reused boolean)
             ON CONFLICT(snapshot_id,path) DO NOTHING`, [job.snapshot_id, job.workspace_id, JSON.stringify(staged)]);
@@ -491,7 +517,7 @@ export function createRepositoryService(database: AtlasDatabase, env: Readonly<R
         return { status: 'progress', jobId: job.job_id, phase };
       }
       if (job.phase !== 'parsing' && job.phase !== 'publishing') return fail('checkpoint-invalid', 'Import phase is invalid');
-      const staged = await owned(job, async tx => {
+      const staged = await ownedSlice(async tx => {
         const manifest = (await tx.query<Manifest>('SELECT tree_sha,files,limitations,discovery_state FROM atlas.import_manifests WHERE snapshot_id=$1 AND workspace_id=$2', [job.snapshot_id, job.workspace_id])).rows[0];
         if (!manifest?.discovery_state.complete) return fail('checkpoint-invalid', 'Import discovery checkpoint is unavailable');
         const files = (await tx.query<{ path: string; text: string; blobSha: string }>('SELECT path,content AS text,blob_sha AS "blobSha" FROM atlas.import_files WHERE snapshot_id=$1 AND workspace_id=$2 ORDER BY path', [job.snapshot_id, job.workspace_id])).rows;
@@ -511,9 +537,9 @@ export function createRepositoryService(database: AtlasDatabase, env: Readonly<R
       const parsed = await parseRepositoryIsolated(input, env, { signal }); checkAbort();
       const index: RepositoryIndex = { ...parsed, limitations: [...parsed.limitations, ...staged.manifest.limitations].slice(0, 100) };
       validateSourceIndex(index);
-      await owned(job, async tx => { await tx.query("UPDATE atlas.jobs SET phase='publishing',files_parsed=$1,updated_at=now() WHERE id=$2 AND claim_token=$3", [index.files.length, job.job_id, job.claim_token]); });
-      await freshRepository(job.principal_id, job); checkAbort(); await stopHeartbeat(); checkAbort();
-      await owned(job, async tx => {
+      await ownedSlice(async tx => { await tx.query("UPDATE atlas.jobs SET phase='publishing',files_parsed=$1,updated_at=now() WHERE id=$2 AND claim_token=$3", [index.files.length, job.job_id, job.claim_token]); });
+      await freshSliceRepository(); checkAbort(); await stopHeartbeat(); checkAbort();
+      await ownedSlice(async tx => {
         // Publish graph and source together, with no per-file SQL loop and no
         // mutation of any previously completed snapshot.
         await tx.query(`INSERT INTO atlas.source_files(workspace_id,snapshot_id,path,content,blob_sha)

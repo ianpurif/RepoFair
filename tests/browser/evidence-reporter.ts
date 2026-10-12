@@ -13,12 +13,14 @@ export default class BrowserEvidenceReporter implements Reporter {
       durationMs: result.duration, errors: result.errors.map(error => error.message ?? String(error)), console: consoleOutput });
   }
   async onEnd(result: FullResult): Promise<void> {
-    await writeFile(resolve('docs/evidence/browser-verification.json'), JSON.stringify({
+    const filename = process.env.REPOFAIR_BROWSER_EVIDENCE_FILE ?? 'browser-verification.json';
+    if (!/^[a-z0-9][a-z0-9-]*\.json$/.test(filename)) throw new Error('Browser evidence requires a JSON filename without directories.');
+    await writeFile(resolve('docs/evidence', filename), JSON.stringify({
       schemaVersion: 1, startedAt: this.startedAt, finishedAt: new Date().toISOString(), exitStatus: result.status,
       command: 'Playwright test invocation with evidence reporter',
-      url: 'http://localhost:3000', serverMode: 'externally started server; mode not independently detected',
+      url: process.env.REPOFAIR_BROWSER_BASE_URL ?? 'http://localhost:3000', serverMode: 'externally started server; mode not independently detected',
       browser: process.platform === 'win32' ? 'Microsoft Edge via Playwright' : 'Playwright Chromium',
-      payments: 'not attempted', providerEndpoints: ['http://127.0.0.1:4311', 'http://127.0.0.1:4312'],
+      payments: 'not attempted',
       total: this.observations.length, passed: this.observations.filter(item => item.status === 'passed').length,
       failed: this.observations.filter(item => item.status === 'failed' || item.status === 'timedOut').length,
       skipped: this.observations.filter(item => item.status === 'skipped').length, observations: this.observations,

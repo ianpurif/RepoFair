@@ -35,7 +35,7 @@ export type PaymentState = 'draft' | 'approved' | 'reserved' | 'pending' | 'unkn
 export type DeliveryState = 'not-started' | 'awaiting-payment' | 'running' | 'ready' | 'failed' | 'revoked';
 export type CapabilityState = 'available' | 'not-implemented' | 'unverified' | 'disabled';
 export type Capabilities = Readonly<{
-  product: 'Chronos Atlas'; stage: 'starter' | 'local-fixture'; mode: 'fixture';
+  product: 'RepoFair' | 'Chronos Atlas'; stage: 'starter' | 'local-fixture' | 'application'; mode: 'fixture' | 'tempo-testnet';
   capabilities: Readonly<Record<string, CapabilityState>>;
   livePayments: false; limitations: readonly string[];
 }>;

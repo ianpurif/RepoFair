@@ -1,4 +1,6 @@
 import 'server-only';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { auth } from '@clerk/nextjs/server';
 import { workspaceDatabase } from './database';
 import { createRepositoryService, RepositoryServiceError } from '@atlas/worker/repositories';
@@ -9,7 +11,10 @@ export const privateHeaders = { 'Cache-Control': 'no-store', Vary: 'Cookie, Auth
 export async function repositoryContext() {
   const { userId, sessionId } = await auth();
   if (!userId || !sessionId) throw new Error('AUTHENTICATION_REQUIRED');
-  service ??= workspaceDatabase().then(db => createRepositoryService(db, process.env)).catch(error => { service = undefined; throw error; });
+  service ??= workspaceDatabase().then(db => {
+    const bundledParser = [resolve(process.cwd(), '.atlas/repository-parser-child.mjs'), resolve(process.cwd(), 'apps/web/.atlas/repository-parser-child.mjs')].find(existsSync);
+    return createRepositoryService(db, { ...process.env, ATLAS_PARSER_SCRIPT: process.env.ATLAS_PARSER_SCRIPT ?? bundledParser });
+  }).catch(error => { service = undefined; throw error; });
   return { principalId: userId, service: await service };
 }
 export function repositoryFailure(error: unknown): Response {

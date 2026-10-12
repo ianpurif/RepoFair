@@ -1,13 +1,13 @@
 import type { Metadata, MetadataRoute } from 'next';
 
-export const SITE_NAME = 'Chronos Atlas';
-export const SITE_TITLE = 'Chronos Atlas · Codebase maps and source evidence';
+export const SITE_NAME = 'RepoFair';
+export const SITE_TITLE = 'RepoFair · Codebase maps and source evidence';
 export const SITE_DESCRIPTION = 'Explore immutable GitHub codebase maps, inspect original source lines, and retrieve version-specific evidence from independent knowledge providers.';
 export const PUBLIC_PATHS = ['/', '/privacy', '/terms'] as const;
 type PublicPath = typeof PUBLIC_PATHS[number];
 type SiteEnvironment = Readonly<Record<string, string | undefined>>;
 const LOCAL_ORIGINS = new Set(['http://localhost:3000', 'http://127.0.0.1:3000', 'http://[::1]:3000']);
-const TEMPORARY_HOST_SUFFIXES = ['trycloudflare.com', 'vercel.app', 'ngrok.io', 'ngrok-free.app', 'ngrok.app', 'loca.lt', 'localhost.run'];
+const TEMPORARY_HOST_SUFFIXES = ['trycloudflare.com', 'ngrok.io', 'ngrok-free.app', 'ngrok.app', 'loca.lt', 'localhost.run'];
 
 export const PRIVATE_ROBOTS: Metadata['robots'] = {
   index: false,
@@ -29,6 +29,7 @@ export function siteConfiguration(env: SiteEnvironment = process.env): { origin:
   const permanentHost = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/.test(host)
     && !/^(?:\d{1,3}\.){3}\d{1,3}$/.test(host)
     && !/(?:^|\.)(?:localhost|local|internal|invalid|test|example)$/.test(host)
+    && host !== 'vercel.app'
     && !TEMPORARY_HOST_SUFFIXES.some(suffix => host === suffix || host.endsWith(`.${suffix}`));
   if (origin.protocol !== 'https:' || origin.origin !== value || origin.username || origin.password || origin.port || !permanentHost) {
     return { origin: null, indexingEnabled: false };
@@ -83,7 +84,7 @@ export function searchRobots(env: SiteEnvironment = process.env): MetadataRoute.
   return {
     rules: {
       userAgent: '*',
-      allow: ['/$', '/privacy$', '/terms$', '/_next/', '/favicon.ico', '/opengraph-image', '/manifest.webmanifest'],
+      allow: ['/$', '/privacy$', '/terms$', '/_next/', '/icon.svg', '/opengraph-image', '/manifest.webmanifest'],
       disallow: '/',
     },
     sitemap: new URL('/sitemap.xml', origin).href,

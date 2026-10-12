@@ -1,4 +1,4 @@
-# Chronos Atlas — project-scoped Codex configuration.
+# RepoFair — project-scoped Codex configuration.
 # Reviewed against official documentation on 2026-10-03.
 # Project trust and model access must be confirmed in the user's Codex client.
 model = "gpt-6.1-sol"

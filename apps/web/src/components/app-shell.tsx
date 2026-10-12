@@ -15,12 +15,12 @@ const links = [
   { href: '/app/activity', title: 'Activity', icon: Activity },
   { href: '/app/settings', title: 'Settings', icon: Settings2 },
 ];
-export function AtlasLogo({ compact = false }: { compact?: boolean }) {
-  return <Link href="/" className="brand" aria-label="Chronos Atlas home"><span className="brand-icon"><Layers3 size={19} strokeWidth={1.65} /></span>{!compact && <span>Chronos <strong>Atlas</strong></span>}</Link>;
+export function RepoFairLogo({ compact = false }: { compact?: boolean }) {
+  return <Link href="/" className="brand" aria-label="RepoFair home"><span className="brand-icon"><Layers3 size={19} strokeWidth={1.65} /></span>{!compact && <span>Repo<strong>Fair</strong></span>}</Link>;
 }
 export function AppShell({ children }: { children: ReactNode }) {
   const path = usePathname();
-  return <div className="app-shell"><aside className="app-rail"><AtlasLogo compact /><nav aria-label="Application">{links.map(({ href, title, icon: Icon }) => {
+  return <div className="app-shell"><aside className="app-rail"><RepoFairLogo compact /><nav aria-label="Application">{links.map(({ href, title, icon: Icon }) => {
     const active = href === '/app' ? path === href || path.startsWith('/app/repositories/') || path === '/demo' : path.startsWith(href);
     return <Link key={href} href={href} className={`rail-link ${active ? 'active' : ''}`} aria-label={title} title={title} aria-current={active ? 'page' : undefined}><Icon size={19} strokeWidth={1.7} /><span>{title}</span></Link>;
   })}</nav><div className="rail-bottom"><ThemeToggle /><AuthStatus /></div></aside><div className="app-content">{children}</div></div>;

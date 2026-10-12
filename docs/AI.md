@@ -38,7 +38,7 @@ Supported generation models are `deepseek-flash` and `deepseek-v4-pro`; `DEEPSEE
 
 With the user's separate US$1 approval, one real public-fixture workflow passed on 2026-10-07: document/query embeddings, reranking and generation returned successfully with eight validated original-source citations. Estimated usage cost was US$0.00068157; this is an estimate, not an account billing statement. Evidence: `docs/evidence/ai-live.json`. Private RepoFair source was not sent to AI. The application remains disabled by default; this bounded verification does not authorize ongoing private-source disclosure or establish general answer quality.
 
-Development-agent settings and historical build evidence describe the tools used to develop Atlas. They do not select application models, bundle SDKs or authorize runtime calls.
+Development-agent settings and historical build evidence describe the tools used to develop RepoFair. They do not select application models, bundle SDKs or authorize runtime calls.
 
 ## Official interfaces verified 2026-10-07
 

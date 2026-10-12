@@ -10,7 +10,7 @@ import { answerLocal, lookupSource } from '@atlas/core/local';
 
 function createFixtureMcpServer(): McpServer {
   if(process.env.ATLAS_FIXTURES_ENABLED!=='true'||process.env.NODE_ENV==='production')throw new Error('Fixture MCP requires explicit development configuration');
-  const server = new McpServer({ name: 'chronos-atlas-fixture', version: '0.1.0' });
+  const server = new McpServer({ name: 'repofair-fixture', version: '0.1.0' });
   const fixtureId = z.enum(['jobboard-app@1.0.0', 'jobboard-app@2.0.0', 'retry-kit@1.0.0', 'retry-kit@2.0.0', 'event-log@1.0.0']);
   const wrap = async (operation: () => Promise<unknown>) => {
     try { return { content: [{ type: 'text' as const, text: JSON.stringify(await operation()) }] }; }
@@ -28,11 +28,11 @@ function createFixtureMcpServer(): McpServer {
 }
 export function createAtlasMcpServer(client?:AuthenticatedAtlasClient):McpServer {
   if(process.env.ATLAS_MODE==='fixture')return createFixtureMcpServer();
-  if(!client)throw new Error('Configure an authenticated Atlas API client');
-  const server=new McpServer({name:'chronos-atlas',version:'0.2.0'});const uuid=z.string().uuid();
+  if(!client)throw new Error('Configure an authenticated RepoFair API client');
+  const server=new McpServer({name:'repofair',version:'0.2.0'});const uuid=z.string().uuid();
   const wrap=async(operation:()=>Promise<unknown>)=>{
     try{return {content:[{type:'text' as const,text:JSON.stringify(await operation())}]};}
-    catch{return {isError:true,content:[{type:'text' as const,text:'Authenticated Atlas operation failed. Check current session, repository access, exact snapshot, and saved purchase status.'}]};}
+    catch{return {isError:true,content:[{type:'text' as const,text:'Authenticated RepoFair operation failed. Check current session, repository access, exact snapshot, and saved purchase status.'}]};}
   };
   server.registerTool('atlas_account',{description:'Read authenticated workspace membership.',inputSchema:{}},()=>wrap(()=>client.account()));
   server.registerTool('atlas_repositories',{description:'List authorized persisted repositories.',inputSchema:{workspaceId:uuid}},({workspaceId})=>wrap(()=>client.repositories(workspaceId)));
@@ -58,5 +58,5 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       }});
     }
     await createAtlasMcpServer(client).connect(new StdioServerTransport());
-  }catch{console.error('Atlas MCP configuration or session unavailable. Configure the API origin and session-token file, or explicitly enable development fixtures.');process.exitCode=1;}
+  }catch{console.error('RepoFair MCP configuration or session unavailable. Configure the API origin and session-token file, or explicitly enable development fixtures.');process.exitCode=1;}
 }

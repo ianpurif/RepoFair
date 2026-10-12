@@ -4,6 +4,7 @@ export default {
   agentRules: false,
   devIndicators: false,
   outputFileTracingRoot: root,
+  outputFileTracingIncludes: { '/api/repositories/*/jobs': ['./.atlas/repository-parser-child.mjs'] },
   transpilePackages: ['@atlas/core', '@atlas/contracts', '@atlas/worker'],
   serverExternalPackages: ['ts-morph'],
   turbopack: { root },

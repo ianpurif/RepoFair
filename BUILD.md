@@ -1,8 +1,8 @@
-# Build Chronos Atlas from the Ground Up
+# Build RepoFair from the Ground Up
 
 You are Codex acting as the lead engineer, product designer, and implementation coordinator.
 
-Build **Chronos Atlas** from the ground up in the current directory. This is an implementation task—not a request for another proposal, a static mockup, or a boilerplate that stops before the core functionality works.
+Build **RepoFair** from the ground up in the current directory. This is an implementation task—not a request for another proposal, a static mockup, or a boilerplate that stops before the core functionality works.
 
 Inspect the directory before making changes. This distribution contains an intentional starter scaffold. Preserve useful files and user changes; complete its missing functionality rather than erasing it.
 
@@ -10,7 +10,7 @@ This file contains the complete product build prompt from the conversation, with
 
 ## 1. Product Definition
 
-**Chronos Atlas turns repositories into interactive codebase maps and lets authorized repository owners publish their code intelligence as services that coding agents can purchase through Tempo.**
+**RepoFair turns repositories into interactive codebase maps and lets authorized repository owners publish their code intelligence as services that coding agents can purchase through Tempo.**
 
 Humans explore the map. Agents retrieve structured, source-backed context. Independent providers receive payment for operating their knowledge services.
 
@@ -18,7 +18,7 @@ Humans explore the map. Agents retrieve structured, source-backed context. Indep
 
 A developer connects an ordinary TypeScript repository, explores its architecture, and asks questions about its code.
 
-When a question requires knowledge about an external dependency, Atlas can discover an opted-in provider, obtain the developer's approval, purchase the relevant version-specific context, and expand the map with the returned evidence.
+When a question requires knowledge about an external dependency, RepoFair can discover an opted-in provider, obtain the developer's approval, purchase the relevant version-specific context, and expand the map with the returned evidence.
 
 ### Product positioning
 
@@ -36,7 +36,7 @@ Do not turn it into:
 - A generic document-chat interface with a crypto checkout.
 - A token project, speculative marketplace, or Solana application.
 
-Tempo belongs in the product because agents purchase services from independent providers—not because Atlas analyzes payment functions.
+Tempo belongs in the product because agents purchase services from independent providers—not because RepoFair analyzes payment functions.
 
 The paid service is maintained indexing, retrieval, and contextualization. Do not imply that public source code becomes proprietary or that paying automatically grants access to private source.
 
@@ -258,7 +258,7 @@ Return:
 
 Treat summaries as navigation aids. Cite original source, not a generated summary.
 
-Preserve provenance, authorization scope, freshness, conflicts, and explicit insufficient/unknown outcomes. These retain the original ChronosRAG evidence-contract principles without importing its superseded product scope.
+Preserve provenance, authorization scope, freshness, conflicts, and explicit insufficient/unknown outcomes. These retain the original source-evidence contract principles without importing its superseded product scope.
 
 Validate that cited identifiers and line ranges exist and were authorized for that request. Do not claim this structural validation proves semantic correctness.
 
@@ -286,7 +286,7 @@ Do not turn one verification into a blanket “trusted provider” badge.
 
 ### Provider manifest
 
-Define a versioned Atlas manifest containing:
+Define a versioned RepoFair manifest containing:
 
 - Provider identity and endpoint.
 - Repository/package identity.
@@ -295,7 +295,7 @@ Define a versioned Atlas manifest containing:
 - Price, currency, network, recipient, and validity information.
 - Access rules, licensing/attribution information, and service limits.
 
-Label this an **Atlas manifest**, not an invented industry standard. Use documented MPP discovery separately where supported.
+Label this an **RepoFair manifest**, not an invented industry standard. Use documented MPP discovery separately where supported.
 
 Metadata must not expose private paths, symbols, or repository existence to unauthorized users.
 
@@ -313,7 +313,7 @@ Support unpublishing and access revocation. Stop new access and invalidate relev
 
 This is the signature workflow.
 
-A user asks a question about their application. Atlas investigates locally first.
+A user asks a question about their application. RepoFair investigates locally first.
 
 When the graph reaches an external dependency, consult only approved provider registrations matching the package and exact version.
 

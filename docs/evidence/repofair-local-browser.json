@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-12T17:38:13.547Z",
+  "finishedAt": "2026-10-12T17:38:33.488Z",
+  "exitStatus": "passed",
+  "command": "Playwright test invocation with evidence reporter",
+  "url": "http://localhost:3000",
+  "serverMode": "externally started server; mode not independently detected",
+  "browser": "Microsoft Edge via Playwright",
+  "payments": "not attempted",
+  "total": 5,
+  "passed": 5,
+  "failed": 0,
+  "skipped": 0,
+  "observations": [
+    {
+      "title": "public SEO, robots, and sitemap agree on the deployment indexing boundary",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 3243,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "authentication and workspace metadata stay private without a misleading home canonical",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 2097,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "public information links, manifest, generated image, and not-found recovery are real",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 1068,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "public notices stay readable and keyboard accessible at a narrow viewport",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 1017,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "reader with a pending import polls status without advancing work or refreshing the account",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 9405,
+      "errors": [],
+      "console": null
+    }
+  ],
+  "developmentIdentityControlsEnabled": true,
+  "identityScope": "Opt-in controls create and clean fresh sessions for the existing authorized development Clerk account; commerce and wallet transports remain fixtures.",
+  "limitations": [
+    "Fixture/transport browser cases do not establish hosted RLS, real database concurrency, provider publication or Tempo settlement.",
+    "Opt-in real development sign-in checks do not turn simulated catalog, purchase-history or wallet responses into real commerce evidence.",
+    "The indexing recovery case deliberately aborts one browser request; the successful retry uses the actual server."
+  ]
+}

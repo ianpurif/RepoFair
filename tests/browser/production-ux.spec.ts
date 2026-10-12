@@ -90,6 +90,20 @@ test('explicit fixture graph keyboard opens source and keeps dragged positions d
 developmentTest.describe('opt-in real Clerk session with explicit commerce transport fixtures',()=>{
 developmentTest.skip(process.env.ATLAS_BROWSER_TEST_SESSION!=='true','Set ATLAS_BROWSER_TEST_SESSION=true to use a fresh development session; no live signing or payment.');
 
+developmentTest('reader with a pending import polls status without advancing work or refreshing the account', async ({page,developmentPrincipal}) => {
+  const repositoryId='00000000-0000-4000-8000-000000000011'; let polls=0; let advances=0; let accounts=0;
+  const job={schemaVersion:1,id:'00000000-0000-4000-8000-000000000012',repositoryId,snapshotId:'00000000-0000-4000-8000-000000000013',commitSha:'a'.repeat(40),requestedRef:null,status:'queued',phase:'discovering',progress:{discovered:0,eligible:null,downloaded:0,reused:0,parsed:0,skipped:0,bytesTotal:null,bytesProcessed:0},attempts:0,nextAttemptAt:null,updatedAt:'2026-10-13T00:00:00Z',startedAt:null,finishedAt:null,error:null,canCancel:false,canRetry:false};
+  await page.route('**/api/account',route=>{accounts++;return route.fulfill({json:{authenticated:true,principalId:developmentPrincipal,workspaces:[{id:'00000000-0000-4000-8000-000000000014',name:'Reader transport test',role:'reader'}]}});});
+  await page.route(`**/api/repositories/${repositoryId}/jobs`,route=>{if(route.request().method()==='POST'){advances++;return route.fulfill({status:403,json:{error:'Reader cannot advance.'}});}polls++;return route.fulfill({json:{job}});});
+  await page.route(`**/api/repositories/${repositoryId}/map?*`,route=>route.fulfill({status:202,json:{status:'pending'}}));
+  await page.goto(`/app/repositories/${repositoryId}`);
+  await expect(page.locator('.import-progress')).toContainText('Import queued');
+  const initialAccounts=accounts;
+  await expect.poll(()=>polls,{timeout:10000}).toBeGreaterThanOrEqual(2);
+  expect(advances).toBe(0);expect(accounts).toBe(initialAccounts);
+  await expect(page.getByRole('button',{name:'Cancel import'})).toHaveCount(0);
+});
+
 developmentTest('browser wallet on mainnet cannot connect, approve or sign a purchase', async ({ page,developmentPrincipal }) => {
   await page.addInitScript(() => {
     const target=window as Window&{ethereum?:{request:(input:{method:string})=>Promise<unknown>};walletCalls?:string[]};

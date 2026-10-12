@@ -1,8 +1,8 @@
-# Chronos Atlas
+# RepoFair
 
 **Map your code. Connect the knowledge.**
 
-Atlas imports authorized GitHub repositories into immutable code maps and source-grounded answers. Owners can export selected knowledge to an independent provider and activate a version-specific Tempo Moderato service. Authenticated workflows and payment adapters are implemented; hosted deployment and a real testnet purchase remain unverified. See [the overhaul report](docs/OVERHAUL.md) and [current blockers](docs/BLOCKERS.md).
+RepoFair imports authorized GitHub repositories into immutable code maps and source-grounded answers. Owners can export selected knowledge to an independent provider and activate a version-specific Tempo Moderato service. Authenticated workflows and payment adapters are implemented; hosted deployment and a real testnet purchase remain unverified. See [the overhaul report](docs/OVERHAUL.md) and [current blockers](docs/BLOCKERS.md).
 
 ## Run locally
 
@@ -14,7 +14,7 @@ node scripts/doctor.mjs
 bun run dev
 ```
 
-Open **http://localhost:3000**, sign in, connect GitHub in account settings, and open **Repositories**. Start the durable import worker in another terminal:
+Open **http://localhost:3000**, sign in, connect GitHub in account settings, and open **Repositories**. Imports advance in bounded authenticated requests while the repository workspace is open. To process jobs while browsers are closed, start the optional durable worker:
 
 ```powershell
 bun run worker
@@ -37,7 +37,7 @@ Static relationships describe potential impact. Paying for context is not a corr
 
 [Provider publishing](docs/PROVIDER-PUBLISHING.md) explains export/install/activate. [Tempo](docs/TEMPO.md) defines chain and recovery guarantees. [SDK/MCP](docs/MCP.md) documents authenticated agent access and caller-owned signing.
 
-Only **Tempo Moderato (42431)** and PathUSD are supported. The issuer private key stays on Atlas; an independent provider receives only its public key. Wallet keys are never stored in the application. Private source leaves Atlas only through an owner-approved export and authorized delivery.
+Only **Tempo Moderato (42431)** and PathUSD are supported. The issuer private key stays on RepoFair; an independent provider receives only its public key. Wallet keys are never stored in the application. Private source leaves RepoFair only through an owner-approved export and authorized delivery.
 
 Optional AI uses native Voyage embeddings/reranking and DeepSeek generation, disabled by default. Current private repository questions are deterministic and extractive. Private AI disclosure, operating-cost reservations and quality acceptance remain open; see [AI.md](docs/AI.md).
 

@@ -3,9 +3,9 @@ import { test, expect } from '@playwright/test';
 // Exercises actual public rendering and anonymous boundaries. No route mocking,
 // private sessions, private source reads, or payment activity.
 const publicPages = [
-  { path: '/', title: 'Chronos Atlas · Codebase maps and source evidence', heading: 'Map your code.' },
-  { path: '/privacy', title: 'Privacy and data use | Chronos Atlas', heading: 'Privacy and data use' },
-  { path: '/terms', title: 'Use and payment terms | Chronos Atlas', heading: 'Use and payment terms' },
+  { path: '/', title: 'RepoFair · Codebase maps and source evidence', heading: 'Map your code.' },
+  { path: '/privacy', title: 'Privacy and data use | RepoFair', heading: 'Privacy and data use' },
+  { path: '/terms', title: 'Use and payment terms | RepoFair', heading: 'Use and payment terms' },
 ];
 
 test('public SEO, robots, and sitemap agree on the deployment indexing boundary', async ({ page, request }) => {
@@ -15,6 +15,7 @@ test('public SEO, robots, and sitemap agree on the deployment indexing boundary'
     const response = await page.goto(entry.path);
     expect(response?.status()).toBe(200);
     await expect(page).toHaveTitle(entry.title);
+    await expect(page.getByRole('link', { name: 'RepoFair home' })).toBeVisible();
     await expect(page.getByRole('heading', { level: 1 })).toContainText(entry.heading);
     const robots = await page.locator('meta[name="robots"]').getAttribute('content');
     expect(robots).toBeTruthy();
@@ -79,7 +80,11 @@ test('public information links, manifest, generated image, and not-found recover
   expect(manifestHref).toBe('/manifest.webmanifest');
   const manifestResponse = await request.get(manifestHref!);
   expect(manifestResponse.status()).toBe(200);
-  expect(await manifestResponse.json()).toMatchObject({ name: 'Chronos Atlas', start_url: '/', icons: [{ src: '/favicon.ico' }] });
+  expect(await manifestResponse.json()).toMatchObject({ name: 'RepoFair', short_name: 'RepoFair', start_url: '/', icons: [{ src: '/icon.svg', type: 'image/svg+xml' }] });
+  const iconResponse = await request.get('/icon.svg');
+  expect(iconResponse.status()).toBe(200);
+  expect(iconResponse.headers()['content-type']).toContain('image/svg+xml');
+  expect(await iconResponse.text()).toContain('<title>RepoFair</title>');
   const imageUrl = new URL((await page.locator('meta[property="og:image"]').getAttribute('content'))!);
   expect(imageUrl.pathname).toBe('/opengraph-image');
   const imageResponse = await request.get(`${imageUrl.pathname}${imageUrl.search}`);

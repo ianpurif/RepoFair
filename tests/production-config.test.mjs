@@ -38,3 +38,14 @@ test('invalid origin diagnostics never echo supplied credential-bearing URL valu
   assert.ok(problems.some(issue => issue.includes('ATLAS_PUBLIC_ORIGIN must exactly match APP_ORIGIN')));
   assert.ok(problems.every(issue => !issue.includes(sentinel) && !issue.includes('review-user')));
 });
+
+test('free RepoFair Vercel origin accepts real Clerk development keys only in explicit testnet authentication mode', () => {
+  const freeHost = { ...configured, APP_ORIGIN: 'https://repofair.vercel.app', ATLAS_PUBLIC_ORIGIN: 'https://repofair.vercel.app',
+    REPOFAIR_HOSTED_TESTNET_AUTH: 'clerk-development', NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: 'pk_test_ZXhhbXBsZS5jb20k', CLERK_SECRET_KEY: 'sk_test_abcdefghijklmnopqrstuvwxyz' };
+  assert.deepEqual(checkProductionEnvironment(freeHost), []);
+  assert.ok(checkProductionEnvironment({ ...freeHost, REPOFAIR_HOSTED_TESTNET_AUTH: undefined }).some(issue => issue.includes('explicit REPOFAIR_HOSTED_TESTNET_AUTH')));
+  assert.ok(checkProductionEnvironment({ ...freeHost, CLERK_SECRET_KEY: configured.CLERK_SECRET_KEY }).some(issue => issue.includes('development secret')));
+  assert.ok(checkProductionEnvironment({ ...freeHost, TEMPO_CHAIN_ID: '4217' }).some(issue => issue.includes('42431')));
+  assert.ok(checkProductionEnvironment({ ...freeHost, ATLAS_FIXTURES_ENABLED: 'true' }).some(issue => issue.includes('ATLAS_FIXTURES_ENABLED')));
+  assert.ok(checkProductionEnvironment({ ...freeHost, APP_ORIGIN: 'https://repofair.trycloudflare.com' }).some(issue => issue.includes('exact free Vercel origin')));
+});
