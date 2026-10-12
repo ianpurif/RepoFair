@@ -30,3 +30,7 @@ Dated 2026-10-07 reports cover actual development sign-in/native Supabase JWTs, 
 ## Agent configuration
 
 The user's 2026-10-11 correction requires **gpt-6.1-sol / max**, without fallbacks, for the lead and all six custom roles. The current overhaul actually delegated all six named roles; task handles and results are recorded in [TASKS.json](TASKS.json) and [AGENT-RUNS.jsonl](AGENT-RUNS.jsonl). Configuration, role names and an agent's self-report do not independently expose backend model/effort. Observed fields remain null; no model execution is fabricated.
+
+## Production Vercel status — 2026-10-13 local
+
+Local web and container builds are prepared; the application has **not** been deployed to Vercel or a permanent domain. The current Git remote belongs to RepoFair, so Atlas needs its own repository before Vercel import. A controlled domain, production Clerk instance, new central Supabase project and applied/journaled central schema, GitHub App callback/secret, persistent worker host, and an operator-controlled provider Supabase project/host remain external setup. Generic empty PostgreSQL lacks the provider RLS roles and cannot accept its migrations. Published source still needs owner review and signed export; a real Moderato buyer/recipient payment, receipt and recovery remain unverified. Public contact, retention/erasure and legal terms must be finalized before opening accounts or search indexing. See `docs/VERCEL-DEPLOYMENT.md` for the ordered setup; the older statement that temporary tunnels are running is historical and may no longer be true.

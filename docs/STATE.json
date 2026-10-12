@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "product": "Chronos Atlas",
   "stage": "implementation",
-  "currentPhase": "publishing-infrastructure-prepared",
-  "nextAction": "Keep publication and payments inactive as approved. Review exact snapshot, package/version and source paths before a signed export; then explicitly approve provider installation/activation and a bounded Moderato purchase/delivery/recovery. Temporary HTTPS origins, same-cluster provider separation, remaining hosted import/buyer races and broader product gates retain their documented limits.",
+  "currentPhase": "vercel-deployment-prepared-local",
+  "nextAction": "Follow docs/VERCEL-DEPLOYMENT.md for Atlas-only repository, permanent domain, production Clerk/Supabase/GitHub App, persistent worker/provider hosting and live acceptance; keep publication, payments and search indexing inactive until explicitly authorized and verified.",
   "milestones": [
     {
       "id": "P0",
@@ -80,7 +80,7 @@
   ],
   "liveIntegrationsVerified": false,
   "lastUpdatedBy": "lead",
-  "updatedAt": "2026-10-12T14:51:13.681Z",
+  "updatedAt": "2026-10-12T16:25:02.055Z",
   "applicationAi": {
     "embeddingProvider": "Voyage AI",
     "generationProvider": "DeepSeek",
@@ -194,5 +194,15 @@
     "temporaryOriginsChangeOnRestart": true,
     "requestOriginRepairImplemented": true,
     "requestOriginSecurityReview": "Actual bounded atlas_security review and48 native synthetic-route cases; fresh authenticated public HTTPS rejected all three loopback Origins with403denied/no-store."
+  },
+  "vercelDeployment": {
+    "locallyPrepared": true,
+    "permanentlyDeployed": false,
+    "productionAcceptanceVerified": false,
+    "searchIndexingEnabled": false,
+    "evidence": "docs/evidence/vercel-local-preflight.json",
+    "rootDirectory": "apps/web",
+    "runtime": "Node.js 22.x",
+    "operatorActionRequired": true
   }
 }

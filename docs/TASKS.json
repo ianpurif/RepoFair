@@ -446,6 +446,88 @@
       "requestedEffort": "max",
       "observedModel": null,
       "observedEffort": null
+    },
+    {
+      "task": "/root/vercel_engineering",
+      "role": "atlas_engineer",
+      "milestone": "vercel-deployment-preparation",
+      "allowedWritePaths": [
+        "apps/worker/src",
+        "apps/provider/src",
+        "scripts/provider-configuration.mjs",
+        "tests/integration",
+        "tests/provider-launcher.test.mjs"
+      ],
+      "status": "completed",
+      "completedAt": "2026-10-12T16:25:02.055Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/vercel_public_web",
+      "role": "atlas_frontend",
+      "milestone": "vercel-deployment-preparation",
+      "allowedWritePaths": [
+        "apps/web/src/app",
+        "apps/web/src/lib/site-metadata.ts",
+        "tests/browser/production-seo.spec.ts"
+      ],
+      "status": "completed",
+      "completedAt": "2026-10-12T16:25:02.055Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/vercel_security",
+      "role": "atlas_security",
+      "milestone": "vercel-deployment-preparation",
+      "allowedWritePaths": [],
+      "status": "completed",
+      "completedAt": "2026-10-12T16:25:02.055Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/vercel_verifier",
+      "role": "atlas_verifier",
+      "milestone": "vercel-deployment-preparation",
+      "allowedWritePaths": [],
+      "status": "completed",
+      "completedAt": "2026-10-12T16:25:02.055Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/vercel_architecture",
+      "role": "atlas_architect",
+      "milestone": "vercel-deployment-preparation",
+      "allowedWritePaths": [],
+      "status": "capacity-unavailable",
+      "completedAt": "2026-10-12T16:25:02.055Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
+    },
+    {
+      "task": "/root/vercel_research",
+      "role": "atlas_researcher",
+      "milestone": "vercel-deployment-preparation",
+      "allowedWritePaths": [],
+      "status": "capacity-unavailable",
+      "completedAt": "2026-10-12T16:25:02.055Z",
+      "requestedModel": "gpt-6.1-sol",
+      "requestedEffort": "max",
+      "observedModel": null,
+      "observedEffort": null
     }
   ],
   "note": "Actual delegated task handles; completed execution recorded after work. Requested model/effort configuration is not backend execution attestation. No nested delegation or agent commits."
