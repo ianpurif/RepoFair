@@ -6,7 +6,7 @@ Build the product in `BUILD.md`. `START.md` is the entry instruction. Latest exp
 Atlas is a general codebase map and versioned evidence network. Independent repository owners publish paid knowledge services; Tempo settles purchases. No Solana, repair marketplace, payment-code scanner, custom token or revenue invention.
 
 ## Model and collaboration contract
-Primary: `gpt-6-astra` / `medium`. Read-only architecture/research/security: Astra / medium. Engineering/UI/verification: `gpt-6.1-sol` / `xhigh`. Extra high means `xhigh`, not `extrahigh`, `max`, or `high`.
+Primary and all six custom-agent roles: `gpt-6.1-sol` exclusively with `max`, the exact reasoning effort requested by the user. No other models, lower efforts or fallbacks are permitted. If unavailable, report the blocker.
 Use the six project custom-agent roles. Maximum two concurrent subagents; no nested delegation. Configuration does not prove model execution. Never simulate another agent's review or silently change model/effort. See `docs/ORCHESTRATION.md`.
 
 Only the lead owns root manifests, lockfiles, shared contracts, migrations and shared progress by default. Assign disjoint path sets before parallel writes. Subagents do not commit. Respect existing edits. Never use destructive resets/cleaning to resolve conflicts.

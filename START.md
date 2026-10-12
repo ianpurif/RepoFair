@@ -12,12 +12,10 @@ The current product is **general codebase intelligence plus paid, independently 
 
 ### Requested models — do not silently change
 
-- Primary coordinator: **GPT-6 Astra**, `gpt-6-astra`, `medium`.
-- Architecture/research/security agents: **GPT-6 Astra**, `medium`.
-- Implementation/frontend/verification agents: **GPT-6.1 Sol**, `gpt-6.1-sol`, `xhigh` (Extra high).
+- Primary coordinator and all six custom-agent roles: **GPT-6.1 Sol**, `gpt-6.1-sol`, `max` (reasoning effort explicitly requested by the user). No other models, lower efforts or fallbacks.
 - Use only the six configured roles in `.codex/agents/`. At most two spawned agents open concurrently. Do not recursively delegate.
 
-Configuration is a requested setting, not proof of the actual running model. Inspect active client/session settings where possible. Do not claim that reading a file changes a running thread's model. If an IDE overrides the lead model, request a switch or use the optional project launcher. Never substitute a cheaper/different model without the user's consent.
+Configuration is a requested setting, not proof of the actual running model. Inspect active client/session settings where possible. Do not claim that reading a file changes a running thread's model. If an IDE overrides the lead model, request a switch or use the optional project launcher. No model or effort fallback is permitted; report unavailable settings as a blocker.
 
 ### Start-up sequence
 

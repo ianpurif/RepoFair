@@ -1,8 +1,8 @@
 # Chronos Atlas — project-scoped Codex configuration.
 # Reviewed against official documentation on 2026-10-03.
 # Project trust and model access must be confirmed in the user's Codex client.
-model = "gpt-6-astra"
-model_reasoning_effort = "medium"
+model = "gpt-6.1-sol"
+model_reasoning_effort = "max"
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 web_search = "live"
@@ -11,7 +11,7 @@ web_search = "live"
 enabled = true
 max_concurrent_threads_per_session = 2
 default_subagent_model = "gpt-6.1-sol"
-default_subagent_reasoning_effort = "xhigh"
+default_subagent_reasoning_effort = "max"
 
 [features]
 multi_agent = true

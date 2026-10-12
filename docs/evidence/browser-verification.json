@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-11T15:12:36.815Z",
-  "finishedAt": "2026-10-11T15:13:36.614Z",
+  "startedAt": "2026-10-12T16:27:03.224Z",
+  "finishedAt": "2026-10-12T16:27:11.400Z",
   "exitStatus": "passed",
   "command": "Playwright test invocation with evidence reporter",
   "url": "http://localhost:3000",
@@ -12,265 +12,49 @@
     "http://127.0.0.1:4311",
     "http://127.0.0.1:4312"
   ],
-  "total": 21,
-  "passed": 21,
+  "total": 4,
+  "passed": 4,
   "failed": 0,
   "skipped": 0,
   "observations": [
     {
-      "title": "AI disclosure is bound to the edited question and consumed; generated citations open real source",
+      "title": "public SEO, robots, and sitemap agree on the deployment indexing boundary",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 3453,
+      "durationMs": 2700,
       "errors": [],
       "console": null
     },
     {
-      "title": "AI failure stays visible and never triggers local extraction as a fallback",
+      "title": "authentication and workspace metadata stay private without a misleading home canonical",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 2406,
+      "durationMs": 1719,
       "errors": [],
       "console": null
     },
     {
-      "title": "parsed graph selection and list relationships open actual immutable source",
+      "title": "public information links, manifest, generated image, and not-found recovery are real",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 2171,
-      "errors": [],
-      "console": {
-        "pageErrors": [],
-        "consoleErrors": [],
-        "consoleWarnings": [
-          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
-        ]
-      }
-    },
-    {
-      "title": "local question citations match original files and exact selected lines",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 2243,
-      "errors": [],
-      "console": {
-        "pageErrors": [],
-        "consoleErrors": [],
-        "consoleWarnings": [
-          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
-        ]
-      }
-    },
-    {
-      "title": "unanswerable runtime guarantees and unsupported versions abstain without citations",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 2476,
-      "errors": [],
-      "console": {
-        "pageErrors": [],
-        "consoleErrors": [],
-        "consoleWarnings": [
-          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
-        ]
-      }
-    },
-    {
-      "title": "search shortcut, empty state, and keyboard resizing remain usable",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 2203,
-      "errors": [],
-      "console": {
-        "pageErrors": [],
-        "consoleErrors": [],
-        "consoleWarnings": [
-          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
-        ]
-      }
-    },
-    {
-      "title": "provider approval explicitly discloses a separate bounded outbound question",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 2601,
-      "errors": [],
-      "console": {
-        "pageErrors": [],
-        "consoleErrors": [],
-        "consoleWarnings": [
-          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
-        ]
-      }
-    },
-    {
-      "title": "two explicit fixture HTTP providers extend graph with distinct exact-version provenance and clickable source",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 2489,
-      "errors": [],
-      "console": {
-        "pageErrors": [],
-        "consoleErrors": [],
-        "consoleWarnings": [
-          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
-        ]
-      }
-    },
-    {
-      "title": "buyer version change clears stale provider context, approval, question and source",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 6820,
-      "errors": [],
-      "console": {
-        "pageErrors": [],
-        "consoleErrors": [],
-        "consoleWarnings": [
-          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
-        ]
-      }
-    },
-    {
-      "title": "mobile panels, keyboard evidence navigation and reduced motion fit the viewport",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 1852,
-      "errors": [],
-      "console": {
-        "pageErrors": [],
-        "consoleErrors": [],
-        "consoleWarnings": [
-          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
-        ]
-      }
-    },
-    {
-      "title": "publishing remains gated and configured Clerk sign-in offers real authentication",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 3167,
-      "errors": [],
-      "console": {
-        "pageErrors": [],
-        "consoleErrors": [
-          "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
-        ],
-        "consoleWarnings": [
-          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
-          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
-        ]
-      }
-    },
-    {
-      "title": "normal purchase history hides fixture operations and requires an authenticated account",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 2668,
-      "errors": [],
-      "console": {
-        "pageErrors": [],
-        "consoleErrors": [
-          "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
-        ],
-        "consoleWarnings": [
-          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
-        ]
-      }
-    },
-    {
-      "title": "invalid snapshot, private path and cross-origin HTTP operations fail closed",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 1592,
-      "errors": [],
-      "console": {
-        "pageErrors": [],
-        "consoleErrors": [],
-        "consoleWarnings": [
-          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
-        ]
-      }
-    },
-    {
-      "title": "injected fixture indexing transport failure shows retry and actual recovered graph",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 1641,
-      "errors": [],
-      "console": {
-        "pageErrors": [],
-        "consoleErrors": [
-          "Failed to load resource: net::ERR_FAILED"
-        ],
-        "consoleWarnings": [
-          "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
-        ]
-      }
-    },
-    {
-      "title": "real anonymous product workspace requires authentication and does not load fixture source",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 1108,
+      "durationMs": 1094,
       "errors": [],
       "console": null
     },
     {
-      "title": "catalog transport mock shows honest loading, empty, failure and recovery states",
+      "title": "public notices stay readable and keyboard accessible at a narrow viewport",
       "status": "passed",
       "expectedStatus": "passed",
-      "durationMs": 1262,
-      "errors": [],
-      "console": null
-    },
-    {
-      "title": "catalog transport mock rejects mainnet terms before displaying purchase controls",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 1462,
-      "errors": [],
-      "console": null
-    },
-    {
-      "title": "catalog transport mock shows exact service terms and no signing at narrow width",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 1212,
-      "errors": [],
-      "console": null
-    },
-    {
-      "title": "explicit fixture graph keyboard opens source and keeps dragged positions during expansion",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 1773,
-      "errors": [],
-      "console": null
-    },
-    {
-      "title": "browser wallet on mainnet cannot connect, approve or sign a purchase",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 6343,
-      "errors": [],
-      "console": null
-    },
-    {
-      "title": "purchase history recovery posts only to the recorded resume endpoint",
-      "status": "passed",
-      "expectedStatus": "passed",
-      "durationMs": 5622,
+      "durationMs": 972,
       "errors": [],
       "console": null
     }
   ],
+  "developmentIdentityControlsEnabled": false,
+  "identityScope": "No opt-in development identity controls enabled.",
   "limitations": [
-    "Nineteen fixture/transport/anonymous checks plus two real development sign-in controls do not establish hosted RLS, multi-backend concurrency, independent provider publication or Tempo settlement.",
-    "The two real sign-in controls use simulated catalog, purchase-history and wallet transport; no wallet signature or transaction was submitted.",
-    "The indexing recovery case deliberately aborts one browser request; the successful retry uses the actual fixture server."
-  ],
-  "developmentIdentityControlsEnabled": true,
-  "identityScope": "Two opt-in controls used fresh sessions for the existing authorized development Clerk account, verified the actual account route, and revoked only their own sessions/tickets. Commerce and wallet responses remained explicit fixtures.",
-  "evidenceScopeClarifiedAt": "2026-10-11T15:25:50Z"
+    "Fixture/transport browser cases do not establish hosted RLS, real database concurrency, provider publication or Tempo settlement.",
+    "Opt-in real development sign-in checks do not turn simulated catalog, purchase-history or wallet responses into real commerce evidence.",
+    "The indexing recovery case deliberately aborts one browser request; the successful retry uses the actual server."
+  ]
 }

@@ -1,6 +1,6 @@
 # Multi-agent operating plan
 
-The primary thread coordinates with Astra medium. It must actually spawn the configured roles; writing six personas in one answer is not delegation. Read `.codex/agent-policy.json` and keep it consistent with configuration.
+The primary thread and all six roles use `gpt-6.1-sol` exclusively with `max` (the exact reasoning effort requested by the user). No other models, lower efforts or fallbacks are permitted. It must actually spawn the configured roles; writing six personas in one answer is not delegation. Read `.codex/agent-policy.json` and keep it consistent with configuration.
 
 ## Waves
 1. **Preflight:** architect + researcher, both read-only, bounded to P0/P1. Verify model/client access and return concrete plans.
@@ -24,7 +24,7 @@ Return summary, files inspected/changed, actual commands and exit results, concr
 ## Model evidence
 Log actual Codex task handles and timestamps only after the tool returns them. Requested model/effort is from configuration; observed model/effort is null unless the client exposes it. An agent repeating a model name is not backend proof. Do not fabricate verification of an account's access.
 
-Model not available: retain the requested setting, record the failure, ask the user about access or a permitted change, and continue nonblocked work possible in the current authorized session. No silent fallback. No file can force a client to expose missing features.
+Model not available: retain the requested setting, record the failure, ask the user about access or a permitted change, and continue nonblocked work possible in the current authorized session. No fallback. Reload the client/session to load edited role configurations; already loaded role definitions are not changed by editing files. No file can force a client to expose missing features.
 
 ## Resume and long sessions
 Save progress at each gate and before context compaction. On resumption inspect filesystem, Git and state, check for unfinished work and continue the earliest unmet gate. Never assume a prior process is alive or repeat payment calls because context was lost. Resume requires the user's active Codex session, not a promised background service.
