@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-12T13:39:19.314Z",
+  "status": "verified",
+  "scope": "Native hosted PostgreSQL infrastructure and real backend storage contention using synthetic authorization and audit rows; no real publication or payment.",
+  "requestedModel": "gpt-6.1-sol",
+  "requestedReasoningEffort": "max",
+  "observedModel": null,
+  "observedReasoningEffort": null,
+  "checks": [
+    {
+      "id": "central-target-and-verified-client-tls",
+      "status": "passed",
+      "details": {
+        "configuredDatabaseMatched": true,
+        "configuredLoginMatched": true,
+        "sessionRoleMatched": true,
+        "clientTlsEncryptedAndAuthorized": true,
+        "backendHopTls": false
+      }
+    },
+    {
+      "id": "central-current-001-002-signatures-and-readonly-role-permissions",
+      "status": "passed",
+      "details": {
+        "tableCount": 15,
+        "columnCount": 149,
+        "constraintCount": 94,
+        "functionCount": 8,
+        "triggerCount": 4,
+        "expectedSignatureSha256": "becfd51c419271ed8e951aa8a2382661de8915fe312f27b18d274a1418ed79af",
+        "observedSignatureSha256": "becfd51c419271ed8e951aa8a2382661de8915fe312f27b18d274a1418ed79af",
+        "readOnlyTransaction": true,
+        "migrationsReplayedOnHostedDatabase": false,
+        "notNullVerifiedViaColumnMetadata": true,
+        "untrustedRolesCannotBypassRls": true
+      }
+    },
+    {
+      "id": "provider-separate-target-login-tls-and-backends",
+      "status": "passed",
+      "details": {
+        "independentDatabase": true,
+        "independentLogin": true,
+        "distinctContenderBackends": 2,
+        "observerBackend": true,
+        "clientTlsEncryptedAndAuthorized": true,
+        "configuredDatabaseMatched": true,
+        "configuredLoginMatched": true
+      }
+    },
+    {
+      "id": "provider-current-005-006-003-schema-signatures-and-rls",
+      "status": "passed",
+      "details": {
+        "tableCount": 5,
+        "columnCount": 42,
+        "constraintCount": 37,
+        "functionCount": 2,
+        "triggerCount": 4,
+        "expectedSignatureSha256": "7ec73696b550e7807d16892656414e4cc5b6bee47c3410a4cbbc8ee7669ad0c1",
+        "observedSignatureSha256": "7ec73696b550e7807d16892656414e4cc5b6bee47c3410a4cbbc8ee7669ad0c1",
+        "readOnlyTransaction": true,
+        "migrationsReplayedOnHostedDatabase": false,
+        "notNullVerifiedViaColumnMetadata": true,
+        "untrustedRolesCannotBypassRls": true
+      }
+    },
+    {
+      "id": "provider-owner-privileges-and-restricted-login",
+      "status": "passed",
+      "details": {
+        "loginEnabled": true,
+        "noSuperuserOrBypassRls": true,
+        "noCreateDatabaseOrRoleOrReplication": true,
+        "noInheritedRolePrivileges": true,
+        "noServiceRoleOrAuthenticatedMembership": true,
+        "providerTablesOwnedWithReadWritePrivileges": 5,
+        "buyerSchemaAbsent": true
+      }
+    },
+    {
+      "id": "provider-credentials-denied-central-atlas-table-access",
+      "status": "passed",
+      "details": {
+        "providerLoginAuthenticatedToCentralTarget": true,
+        "atlasTableReadDenied": true,
+        "existingTenantRowsRead": 0
+      }
+    },
+    {
+      "id": "synthetic-audit-identities-are-unused",
+      "status": "passed",
+      "details": {
+        "ownedSaleRowsBefore": 0,
+        "ownedReplayRowsBefore": 0
+      }
+    },
+    {
+      "id": "real-backend-replay-contention-single-winner",
+      "status": "passed",
+      "details": {
+        "attempts": 8,
+        "winners": 1,
+        "advisoryWaitObservedOnSeparateBackend": true
+      }
+    },
+    {
+      "id": "real-backend-atomic-replay-updates-isolation-and-rollback",
+      "status": "passed",
+      "details": {
+        "concurrentUpdates": 8,
+        "savedCounter": 8,
+        "namespaceIsolated": true,
+        "rejectedCallbackRolledBack": true
+      }
+    },
+    {
+      "id": "real-backend-immutable-quotes-and-single-sale-claim",
+      "status": "passed",
+      "details": {
+        "concurrentQuotes": 8,
+        "saleRows": 1,
+        "originalExpiryFrozen": true,
+        "claimAttempts": 8,
+        "winners": 1,
+        "pendingContenders": 7,
+        "advisoryWaitObservedOnSeparateBackend": true
+      }
+    },
+    {
+      "id": "unknown-sale-cannot-reclaim-reopen-or-substitute-terms",
+      "status": "passed",
+      "details": {
+        "repeatedClaimAttempts": 8,
+        "allRemainUnknown": true,
+        "sqlReopenAttemptsDenied": 2,
+        "alteredIdempotentTermsDenied": true,
+        "immutableSaleRows": 1,
+        "receiptPresent": false,
+        "injectedRevocationDeniedRead": true
+      }
+    }
+  ],
+  "failure": null,
+  "cleanup": {
+    "status": "verified",
+    "ownedRowsRemaining": 0
+  },
+  "hostedSchemaMutations": false,
+  "existingRecordMutations": false,
+  "existingTenantSourceReads": 0,
+  "syntheticAuthorization": true,
+  "signingPerformed": false,
+  "fundingPerformed": false,
+  "paymentSubmitted": false,
+  "receiptCreated": false,
+  "settlementVerified": false,
+  "privateSourceExported": false,
+  "liveEntitlementVerified": false,
+  "clientToServerTlsScope": "Encrypted and certificate/hostname-authorized native pg client connection. Pooler internal TLS is a separate observation, not inferred.",
+  "reproduction": "node --experimental-transform-types scripts/verify-publishing-infrastructure.ts --provider-env ABSOLUTE_PATH",
+  "notRun": [
+    "Real Clerk/GitHub entitlement or owner activation.",
+    "Signed artifact installation, external deployment and provider reachability.",
+    "Wallet authorization, chain funding, MPP payment, receipt, settlement or paid source delivery."
+  ],
+  "references": [
+    "https://node-postgres.com/features/ssl",
+    "https://www.postgresql.org/docs/current/explicit-locking.html",
+    "https://www.postgresql.org/docs/current/ddl-rowsecurity.html",
+    "https://www.postgresql.org/docs/current/functions-info.html",
+    "https://www.postgresql.org/docs/18/catalog-pg-constraint.html",
+    "https://www.postgresql.org/docs/17/catalog-pg-constraint.html"
+  ],
+  "validation": {
+    "nativeExecution": {
+      "command": "node --experimental-transform-types scripts/verify-publishing-infrastructure.ts --provider-env ABSOLUTE_PATH",
+      "exitCode": 0,
+      "checksPassed": 11,
+      "checksFailed": 0,
+      "ownedRowsRemainingAfterCleanup": 0
+    },
+    "eslint": {
+      "command": "bunx eslint scripts/verify-publishing-infrastructure.ts",
+      "exitCode": 0
+    },
+    "strictTypeScript": {
+      "command": "bunx tsc --noEmit --module ESNext --moduleResolution Bundler --target ES2022 --lib ES2023,DOM --skipLibCheck --strict --noUncheckedIndexedAccess --exactOptionalPropertyTypes --allowImportingTsExtensions --types node scripts/verify-publishing-infrastructure.ts",
+      "exitCode": 0
+    },
+    "scriptSha256AfterFinalRun": "88c15688c3072522d68afbee9c42bad099e91a2f107e2e114cef368dda7bc84b"
+  },
+  "catalogNormalization": {
+    "description": "PostgreSQL18 records table NOT NULL constraints in pg_constraint; PostgreSQL17 represents them in pg_attribute. Exact column attnotnull equality verifies nullability on both versions; duplicate version-specific contype n rows are excluded from the remaining exact constraint comparison.",
+    "columnNullabilityComparedExactly": true,
+    "otherConstraintDefinitionsComparedExactly": true,
+    "hostedMigrationJournalReadOrModified": false,
+    "schemaMismatchBypassed": false
+  },
+  "historicalAttempts": [
+    {
+      "checkedAt": "2026-10-12T13:31:23.417Z",
+      "status": "failed",
+      "failure": "schema-constraints-mismatch",
+      "providerWritesStarted": false,
+      "observedCause": "The initial local catalog included PostgreSQL18 NOT NULL rows absent from the PostgreSQL17 hosted pg_constraint representation. Read-only diagnostics found no other central metadata differences. Nullability remained verified through exact column metadata."
+    },
+    {
+      "checkedAt": "2026-10-12T13:33:53.554Z",
+      "status": "verified",
+      "checksPassed": 11,
+      "ownedRowsRemainingAfterCleanup": 0,
+      "observation": "Initial successful native audit. The final run also verifies NOINHERIT on the provider login and confirms anon/authenticated are neither superusers nor RLS bypass roles."
+    }
+  ],
+  "findings": [],
+  "executionBoundaries": {
+    "maximumConcurrentConnectionsToProviderDatabase": 3,
+    "providerContenderConnections": 2,
+    "providerObserverConnections": 1,
+    "advisoryWaitMeasuredFromNativePgStatActivity": true,
+    "separateDatabaseAndLoginComparedWithoutReportingIdentifiers": true,
+    "existingCentralTablesQueriedForTenantContents": false,
+    "centralDeniedReadUsesLimitZero": true,
+    "allConcurrentOperationsSettledBeforeOwnedRowCleanup": true,
+    "cleanupTargetsOnlyPrecheckedUnusedGeneratedIdentities": true
+  }
+}
