@@ -28,7 +28,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     const host = process.env.ATLAS_PROVIDER_BIND_HOST ?? '127.0.0.1';
     if (host !== '127.0.0.1' && host !== '0.0.0.0') throw new Error('Invalid provider bind host');
     provider.server.once('error',() => {console.error('Provider listener unavailable; check the configured port');process.exitCode=1;void provider.close();});
-    provider.server.listen(port,host,() => console.log(JSON.stringify({service:'atlas-provider',port,mode:'tempo-testnet',status:'configured'})));
+    provider.server.listen(port,host,() => console.log(JSON.stringify({service:'repofair-provider',port,mode:'tempo-testnet',status:'configured'})));
     for(const signal of ['SIGINT','SIGTERM'])process.once(signal,() => provider.server.close(() => {void provider.close();}));
   } catch {console.error('Provider configuration unavailable: configure its own database, signed source export, issuer key, MPP secret, HTTPS origin and Moderato RPC');process.exitCode=1;}
 }

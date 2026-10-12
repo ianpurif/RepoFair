@@ -6,7 +6,7 @@ import { privateKeyToAccount } from 'viem/accounts';
 import { tempoModerato } from 'viem/tempo/chains';
 import { MODERATO_NETWORK, MODERATO_PATHUSD } from '../../contracts/src/commerce.ts';
 import type { CatalogProvider, PurchaseBudget } from '../../contracts/src/index.ts';
-import { AtlasApiError, AuthenticatedAtlasClient } from '../src/authenticated.ts';
+import { RepoFairApiError, AuthenticatedRepoFairClient } from '../src/index.ts';
 import type { ModeratoSigner, PaidKnowledge } from '../src/authenticated.ts';
 import { atomicToDecimal } from '../src/payment-policy.ts';
 
@@ -15,7 +15,7 @@ export const MODERATO_RPC = 'https://rpc.moderato.tempo.xyz';
 const checkout = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const maximumAtomic = (1n << 256n) - 1n;
 const usage = `Run from the checkout with Node 22:
-node --experimental-transform-types packages/sdk/examples/moderato.ts --check --origin https://YOUR-ATLAS-HOST --token-file C:\\secure\\clerk-session.jwt --provider PROVIDER-UUID --question "Your source question"
+node --experimental-transform-types packages/sdk/examples/moderato.ts --check --origin https://repofair.vercel.app --token-file C:\\secure\\clerk-session.jwt --provider PROVIDER-UUID --question "Your source question"
 
 Modes (default: --check):
   --check                 Read RPC chain, account, accessible catalog and existing allowance only.
@@ -27,10 +27,10 @@ Check/purchase: --provider UUID, --question TEXT, --workspace UUID (required if 
 Purchase: --approve-atomic-amount INTEGER, --key-file ABSOLUTE-PATH-OUTSIDE-CHECKOUT,
           --idempotency-key STABLE-KEY (16-128 letters, digits, underscore or hyphen)
 Purchase/resume: --output-file ABSOLUTE-PATH-OUTSIDE-CHECKOUT (exclusive creation of private result)
-Local Atlas only: --allow-local-development permits an explicit loopback HTTP origin.
+Local RepoFair only: --allow-local-development permits an explicit loopback HTTP origin.
 
 RPC is fixed to Moderato 42431. PathUSD has six decimals: 1000 atomic units = 0.001000 PathUSD.
-Configure the workspace allowance in Atlas first; this example never changes it.
+Configure the workspace allowance in RepoFair first; this example never changes it.
 Refresh the caller-owned Clerk session-token file when it expires; it is reread per API request.
 Check results do not verify a real signature, gas funding, settlement or paid delivery.
 After an interrupted purchase, use --resume with the printed purchase ID; never sign a replacement.
@@ -44,7 +44,7 @@ function requireValue(value: unknown, code: string, message: string): asserts va
   if (!value) throw new CliError(code, message);
 }
 function uuid(value: string | undefined): string {
-  requireValue(value && /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(value), 'invalid-id', 'Use an Atlas UUID.');
+  requireValue(value && /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(value), 'invalid-id', 'Use a RepoFair UUID.');
   return value.toLowerCase();
 }
 function integer(value: unknown, positive = false): bigint {
@@ -85,7 +85,7 @@ export function parseModeratoOptions(args: readonly string[]): ModeratoOptions {
   requireValue(Number(switches.has('--check')) + Number(switches.has('--purchase')) + Number(values.has('--resume')) <= 1, 'conflicting-modes', 'Choose check, purchase or resume.');
   const mode = values.has('--resume') ? 'resume' : switches.has('--purchase') ? 'purchase' : 'check';
   const origin = values.get('--origin');
-  requireValue(origin, 'origin-required', 'Supply the exact Atlas HTTPS origin.');
+  requireValue(origin, 'origin-required', 'Supply the exact RepoFair HTTPS origin.');
   const common: Common = { origin, tokenFile: absoluteFile(values.get('--token-file')), allowLocalDevelopment: switches.has('--allow-local-development'),
     ...(values.has('--output-file') ? { outputFile: absoluteFile(values.get('--output-file'), true) } : {}) };
   const purchaseFlags = ['--approve-atomic-amount', '--key-file', '--idempotency-key'];
@@ -183,7 +183,7 @@ export async function runModeratoCli(args: readonly string[], dependencies: Mode
     const options = parseModeratoOptions(args); operation = options.mode;
     const read = dependencies.readText ?? readBoundedText;
     const rpcFetch = dependencies.rpcFetch ?? globalThis.fetch.bind(globalThis);
-    const api = new AuthenticatedAtlasClient(options.origin, { allowLocalDevelopment: options.allowLocalDevelopment,
+    const api = new AuthenticatedRepoFairClient(options.origin, { allowLocalDevelopment: options.allowLocalDevelopment,
       ...(dependencies.atlasFetch ? { fetch: dependencies.atlasFetch } : {}), sessionToken: async () => {
         const token = await read(options.tokenFile, 16_384);
         requireValue(token && !/\s/.test(token), 'invalid-session-file', 'Session-token file must contain one current token.'); return token;
@@ -197,9 +197,9 @@ export async function runModeratoCli(args: readonly string[], dependencies: Mode
       write(JSON.stringify({ mode: 'tempo-testnet', operation, ...summary(result), outputSaved: !!options.outputFile })); return 0;
     }
     const account = await api.account();
-    requireValue(account.authenticated === true && Array.isArray(account.workspaces), 'account-unavailable', 'Authenticated Atlas account is required.');
+    requireValue(account.authenticated === true && Array.isArray(account.workspaces), 'account-unavailable', 'Authenticated RepoFair account is required.');
     const workspaceId = options.workspaceId ?? (account.workspaces.length === 1 ? account.workspaces[0]?.id : undefined);
-    requireValue(workspaceId, 'workspace-required', 'Supply --workspace when the account has multiple workspaces, or create one in Atlas first.');
+    requireValue(workspaceId, 'workspace-required', 'Supply --workspace when the account has multiple workspaces, or create one in RepoFair first.');
     requireValue(account.workspaces.some(workspace => workspace.id.toLowerCase() === workspaceId.toLowerCase()), 'workspace-denied', 'The selected workspace is not accessible to this account.');
     const selectedWorkspace = uuid(workspaceId);
     const provider = (await api.catalog()).providers.find(item => item.id.toLowerCase() === options.providerId);
@@ -217,7 +217,7 @@ export async function runModeratoCli(args: readonly string[], dependencies: Mode
     }
     requireValue(options.approvedAtomicAmount === provider.atomicPrice, 'price-approval-mismatch', 'Exact provider price differs from your explicit integer approval; no purchase was reserved.');
     requireValue(unresolved.length === 0, 'purchase-unresolved', 'Resume the existing pending or unknown provider purchase before approving another.');
-    requireValue(budget && remaining >= integer(provider.atomicPrice, true), 'allowance-required', 'Set a sufficient workspace allowance in Atlas first; this example cannot broaden it.');
+    requireValue(budget && remaining >= integer(provider.atomicPrice, true), 'allowance-required', 'Set a sufficient workspace allowance in RepoFair first; this example cannot broaden it.');
     // Load only after exact approval and current read-only policy checks. No signature is created here.
     const signer = await (dependencies.loadSigner ?? signerFromFile)(options.keyFile, rpcFetch);
     const reservation = await api.approvePurchase({ workspaceId: selectedWorkspace, providerId: options.providerId, question: options.question,
@@ -230,7 +230,7 @@ export async function runModeratoCli(args: readonly string[], dependencies: Mode
     write(JSON.stringify({ mode: 'tempo-testnet', operation, ...summary(result), outputSaved: !!options.outputFile })); return 0;
   } catch (error) {
     const safe = error instanceof CliError ? { code: error.code, message: error.message }
-      : error instanceof AtlasApiError ? { code: error.code, httpStatus: error.status }
+      : error instanceof RepoFairApiError ? { code: error.code, httpStatus: error.status }
         : { code: 'operation-unavailable', message: 'Operation failed. Credentials, RPC details and private source are omitted.' };
     write(JSON.stringify({ mode: 'tempo-testnet', operation, status: 'failed', ...safe, ...(purchaseId ? { purchaseId, nextAction: 'Resume this recorded purchase without a signing key; do not sign a replacement.' } : {}) })); return 1;
   }

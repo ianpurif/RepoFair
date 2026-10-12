@@ -33,7 +33,8 @@ test('public SEO, robots, and sitemap agree on the deployment indexing boundary'
       expect(url.pathname).toBe(entry.path);
       expect(url.search).toBe(''); expect(url.hash).toBe(''); expect(url.username).toBe(''); expect(url.password).toBe('');
       if (pageIndexed) { expect(url.protocol).toBe('https:'); expect(url.hostname).not.toMatch(/localhost|trycloudflare\.com|ngrok|^\d+\./); }
-      canonicals.push(value);
+      // Next can serialize the origin without its equivalent trailing slash.
+      canonicals.push(url.href);
     }
   }
   const robotsResponse = await request.get('/robots.txt');

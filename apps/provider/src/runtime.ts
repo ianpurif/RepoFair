@@ -65,7 +65,9 @@ export async function createIndependentProvider(env: Readonly<Record<string,stri
   requireValue(env.TEMPO_CHAIN_ID === '42431','Only explicitly configured Tempo Moderato chain 42431 is permitted');
   const client = supplied.client ?? createModeratoClient(env.TEMPO_RPC_URL);
   requireValue(client.chain?.id === 42431 && await client.getChainId() === 42431,'Remote RPC is not Tempo Moderato');
-  const database = supplied.database ?? await createAtlasDatabase(independentProviderEnvironment(env));
+  const suppliedDatabase = supplied.database;
+  const database = suppliedDatabase ?? await createAtlasDatabase(independentProviderEnvironment(env));
+  try {
   const http = supplied.http ?? providerHttp; const now = supplied.now ?? Date.now;
   const stored = await database.withAdminTransaction(async tx => (await tx.query<{artifact:PublicationArtifact;signature:string;terms_digest:string}>(
     'SELECT artifact,signature,terms_digest FROM atlas_provider.publications WHERE provider_id=$1',[env.ATLAS_PROVIDER_ID])).rows[0]);
@@ -185,4 +187,12 @@ export async function createIndependentProvider(env: Readonly<Record<string,stri
     return response;
   }
   return {handle,close:() => database.close(),artifact:signed as SignedPublicationArtifact};
+  } catch (error) {
+    // Initialization may reject an absent/invalid installed artifact after opening a pool.
+    // Retry must not leak that owned pool; injected databases remain caller-owned.
+    if (!suppliedDatabase) {
+      try { await database.close(); } catch { /* Retain the original initialization failure. */ }
+    }
+    throw error;
+  }
 }

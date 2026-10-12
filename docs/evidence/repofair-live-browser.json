@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-12T18:00:21.022Z",
+  "finishedAt": "2026-10-12T18:01:51.827Z",
+  "exitStatus": "passed",
+  "command": "Playwright test invocation with evidence reporter",
+  "url": "https://repofair.vercel.app",
+  "serverMode": "externally started server; mode not independently detected",
+  "browser": "Microsoft Edge via Playwright",
+  "payments": "not attempted",
+  "total": 6,
+  "passed": 6,
+  "failed": 0,
+  "skipped": 0,
+  "observations": [
+    {
+      "title": "public SEO, robots, and sitemap agree on the deployment indexing boundary",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 2901,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "authentication and workspace metadata stay private without a misleading home canonical",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 2835,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "public information links, manifest, generated image, and not-found recovery are real",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 1895,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "public notices stay readable and keyboard accessible at a narrow viewport",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 1457,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "live RepoFair signs in, imports the owned GitHub repository, and renders original source evidence",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 58397,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "live authenticated publishing and purchase interfaces read real records without exporting or spending",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 20500,
+      "errors": [],
+      "console": null
+    }
+  ],
+  "developmentIdentityControlsEnabled": true,
+  "liveRepoFairImportVerificationEnabled": true,
+  "identityScope": "Fresh real Clerk sessions for the existing authorized account; deployed GitHub import, hosted database and source evidence use no route mocks. Owned sessions are revoked. No purchase or wallet activity.",
+  "limitations": [
+    "Fixture/transport browser cases do not establish hosted RLS, real database concurrency, provider publication or Tempo settlement.",
+    "Opt-in real development sign-in checks do not turn simulated catalog, purchase-history or wallet responses into real commerce evidence.",
+    "The indexing recovery case deliberately aborts one browser request; the successful retry uses the actual server."
+  ]
+}

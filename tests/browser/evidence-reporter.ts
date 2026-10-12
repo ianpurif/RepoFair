@@ -25,8 +25,11 @@ export default class BrowserEvidenceReporter implements Reporter {
       failed: this.observations.filter(item => item.status === 'failed' || item.status === 'timedOut').length,
       skipped: this.observations.filter(item => item.status === 'skipped').length, observations: this.observations,
       developmentIdentityControlsEnabled: process.env.ATLAS_BROWSER_TEST_SESSION === 'true',
+      liveRepoFairImportVerificationEnabled: process.env.REPOFAIR_LIVE_IMPORT_VERIFICATION === 'true',
       identityScope: process.env.ATLAS_BROWSER_TEST_SESSION === 'true'
-        ? 'Opt-in controls create and clean fresh sessions for the existing authorized development Clerk account; commerce and wallet transports remain fixtures.'
+        ? process.env.REPOFAIR_LIVE_IMPORT_VERIFICATION === 'true'
+          ? 'Fresh real Clerk sessions for the existing authorized account; deployed GitHub import, hosted database and source evidence use no route mocks. Owned sessions are revoked. No purchase or wallet activity.'
+          : 'Opt-in controls create and clean fresh sessions for the existing authorized development Clerk account; simulated transports remain labelled by each test.'
         : 'No opt-in development identity controls enabled.',
       limitations: ['Fixture/transport browser cases do not establish hosted RLS, real database concurrency, provider publication or Tempo settlement.',
         'Opt-in real development sign-in checks do not turn simulated catalog, purchase-history or wallet responses into real commerce evidence.',

@@ -6,6 +6,7 @@
     "packages/core/src/**/*.ts",
     "packages/sdk/src/**/*.ts",
     "apps/worker/src/**/*.ts",
-    "apps/provider/src/**/*.ts"
+    "apps/provider/src/**/*.ts",
+    "apps/provider/api/**/*.ts"
   ]
 }

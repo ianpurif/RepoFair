@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-12T17:48:39.325Z",
+  "finishedAt": "2026-10-12T17:53:19.952Z",
+  "exitStatus": "failed",
+  "command": "Playwright test invocation with evidence reporter",
+  "url": "https://repofair.vercel.app",
+  "serverMode": "externally started server; mode not independently detected",
+  "browser": "Microsoft Edge via Playwright",
+  "payments": "not attempted",
+  "total": 5,
+  "passed": 3,
+  "failed": 2,
+  "skipped": 0,
+  "observations": [
+    {
+      "title": "public SEO, robots, and sitemap agree on the deployment indexing boundary",
+      "status": "failed",
+      "expectedStatus": "passed",
+      "durationMs": 4969,
+      "errors": [
+        "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 1\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[32m-   \"https://repofair.vercel.app\",\u001b[39m\n\u001b[31m+   \"https://repofair.vercel.app/\",\u001b[39m\n\u001b[2m    \"https://repofair.vercel.app/privacy\",\u001b[22m\n\u001b[2m    \"https://repofair.vercel.app/terms\",\u001b[22m\n\u001b[2m  ]\u001b[22m"
+      ],
+      "console": null
+    },
+    {
+      "title": "authentication and workspace metadata stay private without a misleading home canonical",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 6214,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "public information links, manifest, generated image, and not-found recovery are real",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 2864,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "public notices stay readable and keyboard accessible at a narrow viewport",
+      "status": "passed",
+      "expectedStatus": "passed",
+      "durationMs": 1494,
+      "errors": [],
+      "console": null
+    },
+    {
+      "title": "live RepoFair signs in, imports the owned GitHub repository, and renders original source evidence",
+      "status": "failed",
+      "expectedStatus": "passed",
+      "durationMs": 260729,
+      "errors": [
+        "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.import-progress')\nExpected substring: \u001b[32m\"Import \u001b[7mcomplete\u001b[27m\"\u001b[39m\nReceived string:    \u001b[31m\"Import \u001b[7mqueuedReading sourceCancel import387 discovered256 / 323 files read0 reused0 parsed64 skipped1.3 MB / 1.8 MBViewing the last completed snapshot while this import runs.Next attempt scheduled for 10/13/2026, 1:53:01 AM.Import detailsAttempt 0 · Updated 10/13/2026, 1:53:01 AM395d76316b25f7005822931520e3d2f2de3d6fff\u001b[27m\"\u001b[39m\nTimeout: 240000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" locator('.import-progress') with timeout 240000ms\u001b[22m\n\u001b[2m  - waiting for locator('.import-progress')\u001b[22m\n\u001b[2m    2 × locator resolved to <section class=\"import-progress queued\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m      - unexpected value \"Import queuedDiscovering filesCancel import0 discovered0 files read0 reused0 parsed0 skipped0 BNext attempt scheduled for 10/13/2026, 1:49:14 AM.Import detailsAttempt 0 · Updated 10/13/2026, 1:49:14 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    16 × locator resolved to <section class=\"import-progress queued\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import queuedDiscovering filesCancel import0 discovered0 files read0 reused0 parsed0 skipped0 BViewing the last completed snapshot while this import runs.Next attempt scheduled for 10/13/2026, 1:49:14 AM.Import detailsAttempt 0 · Updated 10/13/2026, 1:49:14 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    15 × locator resolved to <section class=\"import-progress running\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import runningDiscovering filesCancel import0 discovered0 files read0 reused0 parsed0 skipped0 BViewing the last completed snapshot while this import runs.Import detailsAttempt 0 · Updated 10/13/2026, 1:49:30 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    30 × locator resolved to <section class=\"import-progress queued\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import queuedReading sourceCancel import387 discovered0 / 323 files read0 reused0 parsed64 skipped0 B / 1.8 MBViewing the last completed snapshot while this import runs.Next attempt scheduled for 10/13/2026, 1:49:38 AM.Import detailsAttempt 0 · Updated 10/13/2026, 1:49:38 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    18 × locator resolved to <section class=\"import-progress running\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import runningReading sourceCancel import387 discovered0 / 323 files read0 reused0 parsed64 skipped0 B / 1.8 MBViewing the last completed snapshot while this import runs.Import detailsAttempt 0 · Updated 10/13/2026, 1:49:52 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    32 × locator resolved to <section class=\"import-progress queued\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import queuedReading sourceCancel import387 discovered32 / 323 files read0 reused0 parsed64 skipped91.1 KB / 1.8 MBViewing the last completed snapshot while this import runs.Next attempt scheduled for 10/13/2026, 1:50:04 AM.Import detailsAttempt 0 · Updated 10/13/2026, 1:50:04 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    17 × locator resolved to <section class=\"import-progress running\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import runningReading sourceCancel import387 discovered32 / 323 files read0 reused0 parsed64 skipped91.1 KB / 1.8 MBViewing the last completed snapshot while this import runs.Import detailsAttempt 0 · Updated 10/13/2026, 1:50:17 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    32 × locator resolved to <section class=\"import-progress queued\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import queuedReading sourceCancel import387 discovered64 / 323 files read0 reused0 parsed64 skipped122.8 KB / 1.8 MBViewing the last completed snapshot while this import runs.Next attempt scheduled for 10/13/2026, 1:50:29 AM.Import detailsAttempt 0 · Updated 10/13/2026, 1:50:29 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    26 × locator resolved to <section class=\"import-progress running\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import runningReading sourceCancel import387 discovered64 / 323 files read0 reused0 parsed64 skipped122.8 KB / 1.8 MBViewing the last completed snapshot while this import runs.Import detailsAttempt 0 · Updated 10/13/2026, 1:50:42 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    22 × locator resolved to <section class=\"import-progress queued\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import queuedReading sourceCancel import387 discovered96 / 323 files read0 reused0 parsed64 skipped400.8 KB / 1.8 MBViewing the last completed snapshot while this import runs.Next attempt scheduled for 10/13/2026, 1:50:53 AM.Import detailsAttempt 0 · Updated 10/13/2026, 1:50:53 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    29 × locator resolved to <section class=\"import-progress running\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import runningReading sourceCancel import387 discovered96 / 323 files read0 reused0 parsed64 skipped400.8 KB / 1.8 MBViewing the last completed snapshot while this import runs.Import detailsAttempt 0 · Updated 10/13/2026, 1:51:08 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    17 × locator resolved to <section class=\"import-progress queued\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import queuedReading sourceCancel import387 discovered128 / 323 files read0 reused0 parsed64 skipped702.8 KB / 1.8 MBViewing the last completed snapshot while this import runs.Next attempt scheduled for 10/13/2026, 1:51:21 AM.Import detailsAttempt 0 · Updated 10/13/2026, 1:51:21 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    32 × locator resolved to <section class=\"import-progress running\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import runningReading sourceCancel import387 discovered128 / 323 files read0 reused0 parsed64 skipped702.8 KB / 1.8 MBViewing the last completed snapshot while this import runs.Import detailsAttempt 0 · Updated 10/13/2026, 1:51:34 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    32 × locator resolved to <section class=\"import-progress queued\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import queuedReading sourceCancel import387 discovered160 / 323 files read0 reused0 parsed64 skipped845.9 KB / 1.8 MBViewing the last completed snapshot while this import runs.Next attempt scheduled for 10/13/2026, 1:51:46 AM.Import detailsAttempt 0 · Updated 10/13/2026, 1:51:46 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    17 × locator resolved to <section class=\"import-progress running\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import runningReading sourceCancel import387 discovered160 / 323 files read0 reused0 parsed64 skipped845.9 KB / 1.8 MBViewing the last completed snapshot while this import runs.Import detailsAttempt 0 · Updated 10/13/2026, 1:51:59 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    31 × locator resolved to <section class=\"import-progress queued\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import queuedReading sourceCancel import387 discovered192 / 323 files read0 reused0 parsed64 skipped893.9 KB / 1.8 MBViewing the last completed snapshot while this import runs.Next attempt scheduled for 10/13/2026, 1:52:11 AM.Import detailsAttempt 0 · Updated 10/13/2026, 1:52:11 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    14 × locator resolved to <section class=\"import-progress running\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import runningReading sourceCancel import387 discovered192 / 323 files read0 reused0 parsed64 skipped893.9 KB / 1.8 MBViewing the last completed snapshot while this import runs.Import detailsAttempt 0 · Updated 10/13/2026, 1:52:24 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    33 × locator resolved to <section class=\"import-progress queued\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import queuedReading sourceCancel import387 discovered224 / 323 files read0 reused0 parsed64 skipped1.0 MB / 1.8 MBViewing the last completed snapshot while this import runs.Next attempt scheduled for 10/13/2026, 1:52:36 AM.Import detailsAttempt 0 · Updated 10/13/2026, 1:52:36 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    15 × locator resolved to <section class=\"import-progress running\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import runningReading sourceCancel import387 discovered224 / 323 files read0 reused0 parsed64 skipped1.0 MB / 1.8 MBViewing the last completed snapshot while this import runs.Import detailsAttempt 0 · Updated 10/13/2026, 1:52:49 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n\u001b[2m    25 × locator resolved to <section class=\"import-progress queued\" aria-label=\"Repository import progress\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"Import queuedReading sourceCancel import387 discovered256 / 323 files read0 reused0 parsed64 skipped1.3 MB / 1.8 MBViewing the last completed snapshot while this import runs.Next attempt scheduled for 10/13/2026, 1:53:01 AM.Import detailsAttempt 0 · Updated 10/13/2026, 1:53:01 AM395d76316b25f7005822931520e3d2f2de3d6fff\"\u001b[22m\n"
+      ],
+      "console": null
+    }
+  ],
+  "developmentIdentityControlsEnabled": true,
+  "identityScope": "Opt-in controls create and clean fresh sessions for the existing authorized development Clerk account; commerce and wallet transports remain fixtures.",
+  "limitations": [
+    "Fixture/transport browser cases do not establish hosted RLS, real database concurrency, provider publication or Tempo settlement.",
+    "Opt-in real development sign-in checks do not turn simulated catalog, purchase-history or wallet responses into real commerce evidence.",
+    "The indexing recovery case deliberately aborts one browser request; the successful retry uses the actual server."
+  ]
+}
