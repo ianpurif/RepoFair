@@ -1,11 +1,16 @@
+import { generateKeyPairSync, X509Certificate } from 'node:crypto';
 import { EventEmitter } from 'node:events';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { rootCertificates } from 'node:tls';
 import { describe, expect, it, vi } from 'vitest';
 import { AtlasDatabaseError, createAtlasDatabase, loadDatabasePoolConfiguration } from '../../apps/worker/src/database.ts';
 import type { AtlasPool, AtlasTransaction } from '../../apps/worker/src/database.ts';
+
+// Resolve the exact driver declared by the worker instead of a phantom root dependency.
+const { Pool } = createRequire(new URL('../../apps/worker/src/database.ts', import.meta.url))('pg') as typeof import('pg');
 
 const env = { DATABASE_URL: 'postgresql://test-user:test-only-password@db.example.com:6543/postgres?sslmode=require' };
 function poolHarness(fail?: (sql: string) => unknown) {
@@ -50,6 +55,57 @@ describe('verified database connection configuration', () => {
       const invalid = join(directory, 'invalid.pem'); await writeFile(invalid, '-----BEGIN CERTIFICATE-----\ninvalid\n-----END CERTIFICATE-----');
       for (const path of [invalid, join(directory, 'absent.pem'), directory]) await expect(loadDatabasePoolConfiguration({ ...env, DATABASE_SSL_CA_FILE: path })).rejects.toThrow('certificate PEM');
     } finally { await rm(directory, { recursive: true, force: true }); }
+  });
+  it.each(['multiline', 'escaped-newlines', 'escaped-crlf', 'crlf'])('validates inline native X509 certificates from %s configuration', async representation => {
+    const certificate = rootCertificates[0]!;
+    const inline = representation === 'escaped-newlines' ? certificate.replace(/\n/g, '\\n')
+      : representation === 'escaped-crlf' ? certificate.replace(/\n/g, '\\r\\n') : representation === 'crlf' ? certificate.replace(/\n/g, '\r\n') : certificate;
+    const config = await loadDatabasePoolConfiguration({ ...env, DATABASE_SSL_CA: inline });
+    expect(config.ssl).toEqual({ rejectUnauthorized: true, ca: certificate });
+    expect(new X509Certificate((config.ssl as { ca: string }).ca).fingerprint256).toBe(new X509Certificate(certificate).fingerprint256);
+  });
+  it('accepts a bounded complete CA bundle and passes verified TLS unchanged into the native pg driver', async () => {
+    const bundle = rootCertificates.slice(0, 2).join('\n\n');
+    const config = await loadDatabasePoolConfiguration({ ...env, DATABASE_SSL_CA: bundle });
+    const pool = new Pool(config);
+    try {
+      expect(pool.options.ssl).toEqual({ rejectUnauthorized: true, ca: bundle });
+      expect(pool.options.connectionString).toBeUndefined(); expect(pool.totalCount).toBe(0);
+    } finally { await pool.end(); }
+  });
+  it('rejects competing CA sources before reading a file and treats blank templates as unset', async () => {
+    await expect(loadDatabasePoolConfiguration({ ...env, DATABASE_SSL_CA: rootCertificates[0], DATABASE_SSL_CA_FILE: 'PRIVATE_CONFIGURATION_SENTINEL.pem' })).rejects.toThrow('exactly one');
+    expect((await loadDatabasePoolConfiguration({ ...env, DATABASE_SSL_CA: ' ', DATABASE_SSL_CA_FILE: ' ' })).ssl).toEqual({ rejectUnauthorized: true });
+  });
+  it('rejects invalid, oversized, noncertificate, appended DER and mixed malformed PEM content without disclosure', async () => {
+    const certificate = rootCertificates[0]!; const privateKey = generateKeyPairSync('ed25519').privateKey.export({ type: 'pkcs8', format: 'pem' }).toString();
+    const appended = Buffer.concat([new X509Certificate(certificate).raw, Buffer.from('PRIVATE_CONFIGURATION_SENTINEL')]);
+    const extraDer = `-----BEGIN CERTIFICATE-----\n${appended.toString('base64')}\n-----END CERTIFICATE-----`;
+    const invalid = ['', 'PRIVATE_CONFIGURATION_SENTINEL', `PRIVATE_CONFIGURATION_SENTINEL\n${certificate}`, `${certificate}\nPRIVATE_CONFIGURATION_SENTINEL`,
+      `${certificate}\n${privateKey}`, `${certificate}\n-----BEGIN CERTIFICATE-----\nAAAA\n-----END CERTIFICATE-----`,
+      `${certificate}\n\0`, extraDer, 'x'.repeat(1_000_001), Array.from({ length: 65 }, () => certificate).join('\n')];
+    // Empty configuration explicitly keeps the native verified system trust store.
+    invalid.shift();
+    for (const value of invalid) {
+      const error = await loadDatabasePoolConfiguration({ ...env, DATABASE_SSL_CA: value }).then(() => null, error => error as AtlasDatabaseError);
+      expect(error).toMatchObject({ code: 'configuration' }); expect(String(error)).toContain('certificate PEM');
+      expect(String(error)).not.toContain('PRIVATE_CONFIGURATION_SENTINEL'); expect(String(error)).not.toContain(privateKey);
+    }
+  });
+  it('rejects malformed extras in CA files as well as inline values', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'atlas-database-ca-extras-'));
+    try {
+      const file = join(directory, 'root.pem'); await writeFile(file, `${rootCertificates[0]}\nPRIVATE_CONFIGURATION_SENTINEL`);
+      const error = await loadDatabasePoolConfiguration({ ...env, DATABASE_SSL_CA_FILE: file }).then(() => null, error => error as AtlasDatabaseError);
+      expect(error).toMatchObject({ code: 'configuration' }); expect(String(error)).not.toContain(directory); expect(String(error)).not.toContain('PRIVATE_CONFIGURATION_SENTINEL');
+    } finally { await rm(directory, { recursive: true, force: true }); }
+  });
+  it('rejects nonstring CA configuration without leaking values or driver details', async () => {
+    for (const name of ['DATABASE_SSL_CA', 'DATABASE_SSL_CA_FILE']) {
+      const configured = { ...env, [name]: { secret: 'PRIVATE_CONFIGURATION_SENTINEL' } } as unknown as Record<string, string>;
+      const error = await loadDatabasePoolConfiguration(configured).then(() => null, error => error as AtlasDatabaseError);
+      expect(error).toMatchObject({ code: 'configuration' }); expect(String(error)).not.toContain('PRIVATE_CONFIGURATION_SENTINEL');
+    }
   });
 });
 describe('principal and trusted admin transactions', () => {

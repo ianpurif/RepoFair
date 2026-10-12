@@ -1,5 +1,6 @@
 import { clerkMiddleware } from '@clerk/nextjs/server';
 import { NextResponse, type NextFetchEvent, type NextRequest } from 'next/server';
+import { cleanConfiguredOrigin } from './lib/request-origin';
 
 const isProtectedApi = (pathname: string) => ['/api/account', '/api/repositories', '/api/publications','/api/catalog','/api/purchases'].some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 
@@ -9,13 +10,18 @@ const keyMatch = publishableKey?.match(/^pk_(test|live)_([A-Za-z0-9+/=]+)$/);
 const secretMatch = secretKey?.match(/^sk_(test|live)_[A-Za-z0-9]{10,}$/);
 const frontendHost = keyMatch?.[2] ? Buffer.from(keyMatch[2], 'base64').toString('utf8') : '';
 const configured = /^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.[a-z]{2,}\$$/i.test(frontendHost) && !!secretMatch && keyMatch?.[1] === secretMatch[1];
+const publicOrigin = process.env.APP_ORIGIN;
+const authorizedParties = [
+  ...(publicOrigin && cleanConfiguredOrigin(publicOrigin) ? [publicOrigin] : []),
+  ...(process.env.VERCEL_ENV === 'production' ? [] : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://[::1]:3000']),
+];
 
 // Use static environment keys; explicit key overrides require Clerk's encrypted dynamic-key transport.
 const authenticatedProxy = configured && publishableKey && secretKey ? clerkMiddleware(async (auth, request) => {
   if (!isProtectedApi(request.nextUrl.pathname)) return;
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: { code: 'AUTHENTICATION_REQUIRED', message: 'Sign in to access your workspace.' } }, { status: 401, headers: { 'Cache-Control': 'no-store', Vary: 'Cookie, Authorization' } });
-}) : null;
+}, { authorizedParties, contentSecurityPolicy: {} }) : null;
 
 export default function proxy(request: NextRequest, event: NextFetchEvent) {
   if (authenticatedProxy) return authenticatedProxy(request, event);

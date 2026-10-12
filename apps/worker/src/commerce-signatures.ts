@@ -1,5 +1,5 @@
 import { createHash, createPrivateKey, createPublicKey, sign, verify } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import type { KeyObject } from 'node:crypto';
 import type { ProviderGrant, PublicationControlProof } from '../../../packages/contracts/src/commerce.ts';
 
@@ -33,13 +33,40 @@ export function canonicalJson(value: unknown): string {
   const result = visit(value, 0); if (Buffer.byteLength(result) > 4_000_000) throw new Error('Signed document exceeds 4 MB'); return result;
 }
 export const documentDigest = (value: unknown): string => createHash('sha256').update(canonicalJson(value)).digest('hex');
-export async function loadCommerceKey(file: string | undefined, kind: 'private' | 'public'): Promise<KeyObject> {
-  if (!file?.trim()) throw new Error(`Publication ${kind === 'private' ? 'signing' : 'verification'} key file is not configured`);
+/** One PKCS#8 private or SPKI public Ed25519 PEM; never derive an issuer public key from a supplied private PEM. */
+export async function loadCommerceKey(file: string | undefined, kind: 'private' | 'public', inline?: string): Promise<KeyObject> {
+  if (kind !== 'private' && kind !== 'public') throw new Error('Invalid publication key purpose');
+  if ((file !== undefined && typeof file !== 'string') || (inline !== undefined && typeof inline !== 'string')) throw new Error('Publication key configuration must use a PEM string or file path');
+  const path = file?.trim(); const value = inline?.trim();
+  if (path && value) throw new Error('Configure exactly one publication key source: inline PEM or file');
+  if (!path && !value) throw new Error(`Publication ${kind === 'private' ? 'signing' : 'verification'} key is not configured`);
   let key: KeyObject;
   try {
-    const bytes = await readFile(file); if (!bytes.length || bytes.length > 16_384) throw new Error();
-    key = kind === 'private' ? createPrivateKey(bytes) : createPublicKey(bytes);
-  } catch { throw new Error('Publication key file is unavailable or invalid'); }
+    let source: string;
+    if (path) {
+      if (path.length > 8192) throw new Error();
+      const file = await stat(path); if (!file.isFile() || file.size < 1 || file.size > 16_384) throw new Error();
+      source = await readFile(path, 'utf8');
+    } else source = inline!;
+    if (Buffer.byteLength(source) > 16_384) throw new Error();
+    const pem = source.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n').replace(/\r\n/g, '\n').trim();
+    const label = kind === 'private' ? 'PRIVATE KEY' : 'PUBLIC KEY';
+    const match = /^-----BEGIN (PRIVATE KEY|PUBLIC KEY)-----\n([A-Za-z0-9+/= \t\n]+)\n-----END \1-----$/.exec(pem);
+    if (!match || match[1] !== label) throw new Error();
+    const encoded = match[2]!.replace(/[ \t\n]/g, '');
+    if (!/^[A-Za-z0-9+/]+={0,2}$/.test(encoded) || encoded.length % 4 !== 0) throw new Error();
+    const der = Buffer.from(encoded, 'base64');
+    if (der.toString('base64') !== encoded || der[0] !== 0x30) throw new Error();
+    // DER must contain exactly one complete outer sequence. Native key parsing can ignore trailing bytes.
+    const firstLength = der[1]; if (firstLength === undefined) throw new Error();
+    const lengthBytes = firstLength < 128 ? 0 : firstLength & 0x7f;
+    if (firstLength >= 128 && (lengthBytes === 0 || lengthBytes > 3 || der.length < 2 + lengthBytes || der[2] === 0)) throw new Error();
+    let length = lengthBytes === 0 ? firstLength : 0;
+    for (let index = 0; index < lengthBytes; index++) length = length * 256 + der[index + 2]!;
+    if ((lengthBytes > 0 && length < 128) || 2 + lengthBytes + length !== der.length) throw new Error();
+    key = kind === 'private' ? createPrivateKey({ key: der, format: 'der', type: 'pkcs8' }) : createPublicKey({ key: der, format: 'der', type: 'spki' });
+    if (!(key.export({ format: 'der', type: kind === 'private' ? 'pkcs8' : 'spki' }) as Buffer).equals(der)) throw new Error();
+  } catch { throw new Error('Publication key must be a single valid unencrypted Ed25519 PEM string or accessible PEM file'); }
   if (key.asymmetricKeyType !== 'ed25519' || key.type !== kind) throw new Error('Publication keys must use Ed25519'); return key;
 }
 export function signDocument(value: unknown, key: KeyObject): string {

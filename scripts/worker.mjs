@@ -9,7 +9,7 @@ if (!args.every(arg => ['--once','--build'].includes(arg))) throw new Error('Use
 const outputs={ 'repository-parser-child':join(ROOT,'packages/core/.atlas/repository-parser-child.mjs'), 'worker-main':join(ROOT,'apps/worker/.atlas/worker-main.mjs') };
 for(const directory of ['packages/core/.atlas','apps/worker/.atlas'])mkdirSync(join(ROOT,directory),{recursive:true});
 for (const entry of ['repository-parser-child','worker-main']) {
-  const spec = command('bun', ['build', join(ROOT,'apps/worker/src',entry+'.ts'), '--target=node', '--packages=external', '--outfile='+outputs[entry]]);
+  const spec = command('bun', ['build', join(ROOT,'apps/worker/src',entry+'.ts'), '--target=node', '--packages=external', '--no-env-file', '--env=disable', '--outfile='+outputs[entry]]);
   const result = spawnSync(spec.bin, spec.args, { cwd: ROOT, stdio: 'inherit', windowsHide: true });
   if (result.status !== 0) process.exit(result.status ?? 1);
 }

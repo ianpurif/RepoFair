@@ -66,7 +66,7 @@ export function createPublicationRegistry(database: AtlasDatabase, env: Readonly
     let artifact:PublicationArtifact;
     try { artifact = buildPublicationArtifact(draft, await repositories.getIndex(principal,draft.repositoryId,draft.snapshotId)); }
     catch { throw new PublicationServiceError('export-incomplete', 'Select package.json and source, declare rights, and configure an HTTPS endpoint with PathUSD pricing; the export must fit 1.5 MB', 422); }
-    let key; try { key = await loadCommerceKey(env.ATLAS_PUBLICATION_SIGNING_KEY_FILE,'private'); }
+    let key; try { key = await loadCommerceKey(env.ATLAS_PUBLICATION_SIGNING_KEY_FILE,'private',env.ATLAS_PUBLICATION_SIGNING_KEY); }
     catch { throw new PublicationServiceError('signing-key-unavailable', 'The publication issuer signing key is not configured', 503); }
     const fresh=await drafts.getAuthorizedDraft(principal,id);
     required(fresh.draft.revision===draft.revision&&fresh.draft.termsDigest===draft.termsDigest,'revision-conflict','The draft changed during export',409);
@@ -80,7 +80,7 @@ export function createPublicationRegistry(database: AtlasDatabase, env: Readonly
     required(url.pathname === '/context/retrieve' && !url.search, 'invalid-endpoint', 'Use the provider /context/retrieve HTTPS endpoint');
     const nonce = randomBytes(24).toString('hex'); const origin = issuer(); let manifest: Record<string,unknown>;
     try {
-      const key=await loadCommerceKey(env.ATLAS_PUBLICATION_SIGNING_KEY_FILE,'private');
+      const key=await loadCommerceKey(env.ATLAS_PUBLICATION_SIGNING_KEY_FILE,'private',env.ATLAS_PUBLICATION_SIGNING_KEY);
       const control=createPublicationControlProof({schemaVersion:1,purpose:'activation-control',publicationId:id,draftRevision:artifact.draftRevision,
         termsDigest:artifact.termsDigest,providerOrigin:url.origin,nonce,expiresAtMs:now()+60_000},key);
       const response = await http(`${url.origin}/.well-known/atlas-provider.json?nonce=${nonce}`, { headers:{'X-Atlas-Publication-Control':control},maximumBytes: 16_384 });
@@ -139,7 +139,7 @@ export function createPublicationRegistry(database: AtlasDatabase, env: Readonly
     const row = await available(principal,providerId); workspaceId = uuid(workspaceId);
     const membership = await database.withPrincipalTransaction(principal,async tx => (await tx.query<{ revision: string }>('SELECT revision::text FROM atlas.memberships WHERE workspace_id=$1 AND principal_id=$2',[workspaceId,principal])).rows[0]);
     required(membership && await activeSession(principal,sessionId),'authorization-unavailable','A current authenticated workspace session is required',403);
-    let key; try { key = await loadCommerceKey(env.ATLAS_PUBLICATION_SIGNING_KEY_FILE,'private'); }
+    let key; try { key = await loadCommerceKey(env.ATLAS_PUBLICATION_SIGNING_KEY_FILE,'private',env.ATLAS_PUBLICATION_SIGNING_KEY); }
     catch { throw new PublicationServiceError('signing-key-unavailable','Provider delegation signing is not configured',503); }
     const grant: ProviderGrant = { schemaVersion:1,issuer:issuer(),providerId:row.id,principalId:principal,sessionId,workspaceId,
       permissionRevision:`${membership.revision}:${row.terms_digest}`,publicationDigest:row.terms_digest,packageName:row.metadata.packageName,version:row.metadata.version,
@@ -153,7 +153,7 @@ export function createPublicationRegistry(database: AtlasDatabase, env: Readonly
   }
   async function introspect(token: string): Promise<ProviderGrant> {
     let grant: ProviderGrant;
-    try { const key = createPublicKey(await loadCommerceKey(env.ATLAS_PUBLICATION_SIGNING_KEY_FILE,'private')); grant = verifyProviderGrant(token,key,issuer(),undefined,now()); }
+    try { const key = createPublicKey(await loadCommerceKey(env.ATLAS_PUBLICATION_SIGNING_KEY_FILE,'private',env.ATLAS_PUBLICATION_SIGNING_KEY)); grant = verifyProviderGrant(token,key,issuer(),undefined,now()); }
     catch { throw new PublicationServiceError('delegation-denied','Invalid or expired provider delegation',403); }
     const row = await available(grant.principalId,grant.providerId);
     const membership = await database.withPrincipalTransaction(grant.principalId,async tx => (await tx.query<{ revision: string }>('SELECT revision::text FROM atlas.memberships WHERE workspace_id=$1 AND principal_id=$2',[grant.workspaceId,grant.principalId])).rows[0]);

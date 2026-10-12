@@ -15,12 +15,12 @@ import { loadProviderEnvironment, parseProviderArguments, providerBuildArguments
 const privateMarker = 'SYNTHETIC_CENTRAL_PRIVATE_SENTINEL';
 const repository = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const centralVariables = [
-  'DATABASE_URL', 'DATABASE_SSL_CA_FILE', 'CLERK_SECRET_KEY', 'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY',
+  'DATABASE_URL', 'DATABASE_SSL_CA_FILE', 'DATABASE_SSL_CA', 'CLERK_SECRET_KEY', 'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY',
   'GITHUB_APP_PRIVATE_KEY', 'GITHUB_APP_PRIVATE_KEY_FILE', 'GITHUB_WEBHOOK_SECRET',
   'VOYAGE_API_KEY', 'DEEPSEEK_API_KEY', 'LANGSMITH_API_KEY', 'SUPABASE_SERVICE_ROLE_KEY',
-  'ATLAS_PUBLICATION_SIGNING_KEY_FILE', 'ATLAS_SESSION_TOKEN_FILE', 'ATLAS_API_ORIGIN',
+  'ATLAS_PUBLICATION_SIGNING_KEY_FILE', 'ATLAS_PUBLICATION_SIGNING_KEY', 'ATLAS_SESSION_TOKEN_FILE', 'ATLAS_API_ORIGIN',
   'PRIVATE_KEY', 'WALLET_PRIVATE_KEY', 'BUYER_PRIVATE_KEY', 'TEMPO_PRIVATE_KEY',
-  'ATLAS_PROVIDER_ISSUER_PRIVATE_KEY_FILE',
+  'ATLAS_PROVIDER_ISSUER_PRIVATE_KEY_FILE', 'ATLAS_PROVIDER_ISSUER_PRIVATE_KEY',
 ];
 const injectionVariables = [
   'NODE_OPTIONS', 'NODE_PATH', 'NODE_EXTRA_CA_CERTS', 'NODE_TLS_REJECT_UNAUTHORIZED',
@@ -73,7 +73,9 @@ test('invalid modes/files fail with safe instructions rather than echoing suppli
   }
 });
 test('preparation child receives only its listener port and OS settings, no publication/payment/database settings', () => withDirectory(({ root }) => {
-  const configured = { ...contaminatedEnvironment(), ATLAS_PROVIDER_PORT: '4311', ATLAS_PROVIDER_MPP_SECRET_FILE: privateMarker, ATLAS_PROVIDER_ISSUER_PUBLIC_KEY_FILE: privateMarker, ATLAS_PROVIDER_RECIPIENT: privateMarker, TEMPO_RPC_URL: privateMarker };
+  const configured = { ...contaminatedEnvironment(), ATLAS_PROVIDER_PORT: '4311', ATLAS_PROVIDER_MPP_SECRET_FILE: privateMarker, ATLAS_PROVIDER_MPP_SECRET: privateMarker,
+    ATLAS_PROVIDER_ISSUER_PUBLIC_KEY_FILE: privateMarker, ATLAS_PROVIDER_ISSUER_PUBLIC_KEY: privateMarker, ATLAS_PROVIDER_DATABASE_SSL_CA: privateMarker,
+    ATLAS_PROVIDER_RECIPIENT: privateMarker, TEMPO_RPC_URL: privateMarker };
   const child = inspectChild(providerPreparationEnvironment(configured), root);
   assert.deepEqual(child.provider, { ATLAS_PROVIDER_PORT: '4311' });
   assert.deepEqual(child.forbiddenPresent, []); assert.equal(child.privateMarkerPresent, false);
@@ -94,6 +96,15 @@ test('default settings retain only exact provider/TEMPO keys and legitimate prov
   assert.deepEqual(child.provider, { ATLAS_PROVIDER_ID: 'synthetic-inherited-provider', ATLAS_PROVIDER_DATABASE_URL: 'synthetic-inherited-provider-db', ATLAS_PROVIDER_PORT: '4311', TEMPO_CHAIN_ID: '1' });
   assert.deepEqual(child.forbiddenPresent, []); assert.equal(child.privateMarkerPresent, false);
   // The provider runtime, rather than the launcher, rejects non-Moderato terms.
+}));
+test('exact inline provider secrets reach the runtime child while new central inline secrets remain excluded', () => withDirectory(({ root, write }) => {
+  const settings = { ATLAS_PROVIDER_DATABASE_SSL_CA: 'SYNTHETIC_PROVIDER_CERTIFICATE', ATLAS_PROVIDER_ISSUER_PUBLIC_KEY: 'SYNTHETIC_PROVIDER_PUBLIC_KEY', ATLAS_PROVIDER_MPP_SECRET: 'SYNTHETIC_PROVIDER_MPP_SECRET' };
+  const envFile = write('inline-provider.env', Object.entries(settings).map(([name, value]) => `${name}=${value}`).join('\n'));
+  const explicit = inspectChild(loadProviderEnvironment({ root, envFile, inherited: contaminatedEnvironment() }), root);
+  assert.deepEqual(explicit.provider, settings); assert.deepEqual(explicit.forbiddenPresent, []); assert.equal(explicit.privateMarkerPresent, false);
+  const inherited = inspectChild(loadProviderEnvironment({ root, inherited: { ...contaminatedEnvironment(), ...settings } }), root);
+  for (const [name, value] of Object.entries(settings)) assert.equal(inherited.provider[name], value);
+  assert.deepEqual(inherited.forbiddenPresent, []); assert.equal(inherited.privateMarkerPresent, false);
 }));
 test('each central credential and unsafe runtime field is rejected in an explicit file, including blank settings', () => withDirectory(({ root, write }) => {
   for (const [index, field] of [...centralVariables, ...injectionVariables].entries()) {

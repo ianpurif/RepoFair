@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import { BodyDigest, Receipt } from 'mppx';
 import type { PublicClient } from 'viem';
 import type { PublicationArtifact, ProviderGrant, PurchaseTerms, SignedPublicationArtifact } from '../../../packages/contracts/src/index.ts';
@@ -21,10 +21,30 @@ const uuid = /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/;
 function requireValue(value: unknown, message: string): asserts value { if (!value) throw new Error(message); }
 export function independentProviderEnvironment(env: Readonly<Record<string,string|undefined>>) {
   requireValue(env.ATLAS_PROVIDER_DATABASE_URL,'Independent provider database is not configured');
-  return {DATABASE_URL:env.ATLAS_PROVIDER_DATABASE_URL,DATABASE_SSL_CA_FILE:env.ATLAS_PROVIDER_DATABASE_SSL_CA_FILE};
+  return {DATABASE_URL:env.ATLAS_PROVIDER_DATABASE_URL,DATABASE_SSL_CA_FILE:env.ATLAS_PROVIDER_DATABASE_SSL_CA_FILE,DATABASE_SSL_CA:env.ATLAS_PROVIDER_DATABASE_SSL_CA};
+}
+/** Independent provider secret only; no issuer private key or central credential fallback. */
+export async function loadProviderMppSecret(env: Readonly<Record<string,string|undefined>>): Promise<string> {
+  const file = env.ATLAS_PROVIDER_MPP_SECRET_FILE; const inline = env.ATLAS_PROVIDER_MPP_SECRET;
+  if ((file !== undefined && typeof file !== 'string') || (inline !== undefined && typeof inline !== 'string')) throw new Error('MPP challenge secret configuration must use a string or file path');
+  const path = file?.trim(); const value = inline?.trim();
+  if (path && value) throw new Error('Configure exactly one MPP challenge secret source: inline value or file');
+  if (!path && !value) throw new Error('Independent MPP challenge secret is not configured');
+  let secret: string;
+  try {
+    if (path) {
+      if (path.length > 8192) throw new Error();
+      const file = await stat(path); if (!file.isFile() || file.size < 1 || file.size > 4096) throw new Error();
+      secret = await readFile(path, 'utf8');
+    } else secret = inline!;
+    if (Buffer.byteLength(secret) > 4096) throw new Error();
+    secret = secret.trim();
+  } catch { throw new Error('MPP challenge secret is unavailable or invalid'); }
+  requireValue(Buffer.byteLength(secret) >= 32 && Buffer.byteLength(secret) <= 1024,'MPP challenge secret must contain 32–1024 bytes');
+  return secret;
 }
 export async function installProviderArtifact(database: AtlasDatabase, env: Readonly<Record<string,string|undefined>>, raw: unknown): Promise<void> {
-  const key = await loadCommerceKey(env.ATLAS_PROVIDER_ISSUER_PUBLIC_KEY_FILE,'public'); const signed = verifyPublicationArtifact(raw,key);
+  const key = await loadCommerceKey(env.ATLAS_PROVIDER_ISSUER_PUBLIC_KEY_FILE,'public',env.ATLAS_PROVIDER_ISSUER_PUBLIC_KEY); const signed = verifyPublicationArtifact(raw,key);
   requireValue(signed.artifact.id === env.ATLAS_PROVIDER_ID && uuid.test(signed.artifact.id),'Artifact differs from the independently configured provider identity');
   await database.withAdminTransaction(async tx => {
     const row = (await tx.query<{terms_digest:string}>('SELECT terms_digest FROM atlas_provider.publications WHERE provider_id=$1 FOR UPDATE',[signed.artifact.id])).rows[0];
@@ -40,10 +60,8 @@ export async function createIndependentProvider(env: Readonly<Record<string,stri
   requireValue(origin === env.ATLAS_PROVIDER_ORIGIN,'Configure the exact public provider HTTPS origin');
   const issuer = publicProviderUrl(env.ATLAS_PROVIDER_AUTHORIZATION_ISSUER ?? '').origin;
   requireValue(issuer === env.ATLAS_PROVIDER_AUTHORIZATION_ISSUER,'Configure the exact trusted authorization issuer');
-  const key = await loadCommerceKey(env.ATLAS_PROVIDER_ISSUER_PUBLIC_KEY_FILE,'public');
-  requireValue(env.ATLAS_PROVIDER_MPP_SECRET_FILE,'Independent MPP challenge secret file is not configured');
-  const secret = (await readFile(env.ATLAS_PROVIDER_MPP_SECRET_FILE,'utf8')).trim();
-  requireValue(Buffer.byteLength(secret) >= 32 && Buffer.byteLength(secret) <= 1024,'MPP challenge secret must contain 32–1024 bytes');
+  const key = await loadCommerceKey(env.ATLAS_PROVIDER_ISSUER_PUBLIC_KEY_FILE,'public',env.ATLAS_PROVIDER_ISSUER_PUBLIC_KEY);
+  const secret = await loadProviderMppSecret(env);
   requireValue(env.TEMPO_CHAIN_ID === '42431','Only explicitly configured Tempo Moderato chain 42431 is permitted');
   const client = supplied.client ?? createModeratoClient(env.TEMPO_RPC_URL);
   requireValue(client.chain?.id === 42431 && await client.getChainId() === 42431,'Remote RPC is not Tempo Moderato');

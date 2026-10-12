@@ -1,6 +1,6 @@
 const localOrigins = new Set(['http://localhost:3000', 'http://127.0.0.1:3000', 'http://[::1]:3000']);
 
-function cleanConfiguredOrigin(value: string): boolean {
+export function cleanConfiguredOrigin(value: string): boolean {
   try {
     const url = new URL(value);
     return url.origin === value && !url.username && !url.password && !url.search && !url.hash

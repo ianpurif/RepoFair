@@ -183,7 +183,7 @@ export function createCommerceService(database:AtlasDatabase,env:Readonly<Record
     try {
       required(delivered.mode==='tempo-testnet'&&delivered.payment==='settled'&&delivered.delivery==='ready'&&delivered.providerId===row.provider_id
         && delivered.publicationDigest===row.approval.publicationDigest&&delivered.commitSha===row.approval.commitSha&&delivered.snapshotId===row.approval.snapshotId,'delivery-mismatch','Delivered publication or commit differs from the paid request',422);
-      const key=createPublicKey(await loadCommerceKey(env.ATLAS_PUBLICATION_SIGNING_KEY_FILE,'private'));
+      const key=createPublicKey(await loadCommerceKey(env.ATLAS_PUBLICATION_SIGNING_KEY_FILE,'private',env.ATLAS_PUBLICATION_SIGNING_KEY));
       verifyDeliveredContext(delivered.context,delivered.sourceSignatures,{id:row.provider_id,publicationDigest:row.approval.publicationDigest,commitSha:row.approval.commitSha,
         snapshotId:row.approval.snapshotId,packageName:row.package_name,version:row.version},key,delivered.graphSignatures);
     }catch {await database.withAdminTransaction(tx=>tx.query("UPDATE atlas.purchases SET delivery_state='failed' WHERE id=$1 AND principal_id=$2",[id,principal]));throw new PublicationServiceError('evidence-invalid','Payment settled, but delivered evidence does not match the owner-approved source',422);}

@@ -24,6 +24,7 @@ jobs:
         with:
           bun-version: '1.4.1'
       - run: bun install --frozen-lockfile
+      - run: bun run test
       - run: bun run lint
       - run: bun run test:product
       - run: bun run typecheck
@@ -31,6 +32,10 @@ jobs:
       - run: bun run evaluate
       - run: bunx playwright install --with-deps chromium
       - name: Start explicit fixture services
+        env:
+          ATLAS_MODE: fixture
+          NEXT_PUBLIC_ATLAS_MODE: fixture
+          ATLAS_FIXTURES_ENABLED: 'true'
         run: |
           bun run dev > /tmp/atlas-web.log 2>&1 &
           bun run provider:a > /tmp/atlas-a.log 2>&1 &
@@ -41,5 +46,9 @@ jobs:
           done
           exit 1
       - run: bun run test:browser
+        env:
+          ATLAS_MODE: fixture
+          NEXT_PUBLIC_ATLAS_MODE: fixture
+          ATLAS_FIXTURES_ENABLED: 'true'
 # Fixture gates only. Hosted auth, concurrent PostgreSQL and real Tempo settlement
 # require separately configured acceptance runs. No remote run is claimed here.
